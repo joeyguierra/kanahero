@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link href="https://fonts.googleapis.com/css2?family=Shantell+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"><style>body{margin:0;background:#f0eee9;font-family:"Shantell Sans",system-ui,sans-serif;color:#1a1a1a}a{color:#2a78d6}a:hover{color:#1a5cb0}.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}.dv-tname{font:600 13px/1.2 system-ui,sans-serif;color:#1a1a1a}.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 system-ui,sans-serif;color:rgba(0,0,0,.55)}.dv-next{margin:22px 0 0;font:12px/1.5 system-ui,sans-serif;color:rgba(0,0,0,.5)}
+.phone{width:300px;height:620px;background:#fff;border:2px solid #1a1a1a;border-radius:18px;display:flex;flex-direction:column;padding:18px 16px;gap:12px;box-shadow:3px 4px 0 rgba(0,0,0,.12)}
+.scr-title{font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:baseline}
+.scr-num{font:600 10px ui-monospace,monospace;background:#1a1a1a;color:#fff;padding:2px 6px;border-radius:3px}
+.box{border:1.5px dashed #8a8a8a;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#555;font-size:12px;text-align:center;padding:8px}
+.btn{border:2px solid #1a1a1a;border-radius:8px;padding:10px;text-align:center;font-weight:700;font-size:13px;background:#fff}
+.btn.primary{background:#1a1a1a;color:#fff}
+.btn.ghost{border-style:dashed;border-width:1.5px;font-weight:500;color:#555}
+.note{font-size:11px;line-height:1.45;color:#666;max-width:300px}
+.arrow{font-size:12px;color:#1a1a1a;display:flex;flex-direction:column;align-items:center;gap:4px;align-self:center;min-width:74px;text-align:center;font-weight:500}
+.flowlab{font:600 9.5px ui-monospace,monospace;background:rgba(0,0,0,.08);padding:2px 6px;border-radius:3px}
+</style></helmet>
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">kanahero — skeleton: 4 screens, one path (from SPEC.md)</span></div>
+<div class="dv-opts" style="align-items:center">
+  <div class="dv-opt" id="1a">
+    <div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Home</div>
+    <div class="phone" data-screen-label="1 Home">
+      <div class="scr-title">Home <span class="scr-num">1</span></div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+        <div style="font-size:96px;font-weight:700;line-height:1">38</div>
+        <div style="font-size:13px;color:#555">of 71 written from memory</div>
+      </div>
+      <div style="display:flex;border:1.5px solid #1a1a1a;border-radius:8px;overflow:hidden;font-size:12px;text-align:center">
+        <div style="flex:1;padding:8px;background:#1a1a1a;color:#fff;font-weight:700">All 71</div>
+        <div style="flex:1;padding:8px">Base 46</div>
+      </div>
+      <div class="btn primary">Start</div>
+      <div class="box" style="min-height:34px;border-width:1px;font-size:10px">footer: stroke data attribution (only place it appears)</div>
+    </div>
+    <p class="note">The number is the app — hero size, dominant. Set toggle remembers last choice. No nav bar anywhere.</p>
+  </div>
+  <div class="arrow"><span class="flowlab">Start</span><span>⟶</span><span style="font-size:10px;color:#666">set shuffled into queue</span></div>
+  <div class="dv-opt" id="1b">
+    <div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Session · Prompt</div>
+    <div class="phone" data-screen-label="2 Session Prompt">
+      <div class="scr-title">Session · Prompt <span class="scr-num">2</span></div>
+      <div style="font-size:12px;color:#555">12 left <span style="color:#999">(text only, no bar)</span></div>
+      <div class="box" style="height:110px"><div style="font-size:40px;color:#1a1a1a;font-weight:500">ka</div><div>prompt card — romaji only</div></div>
+      <div class="box" style="flex:1;aspect-ratio:1;position:relative">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:26px;pointer-events:none">+</div>
+        <div>canvas 1:1 — write here<br>faint centre crosshair<br>ink follows finger / stylus</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="btn ghost" style="flex:1">Clear</div>
+        <div class="btn ghost" style="flex:1">Undo</div>
+      </div>
+      <div class="btn primary">Show</div>
+    </div>
+    <p class="note">No hints: no stroke count, no ghost outline, no skip. Canvas in lower half, thumb reach; actions in bottom third.</p>
+  </div>
+  <div class="arrow"><span class="flowlab">Show</span><span>⟶</span><span style="font-size:10px;color:#666">card flips in place, canvas does not move</span></div>
+  <div class="dv-opt" id="1c">
+    <div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Session · Reveal <span style="color:#999">(same screen, flipped state)</span></div>
+    <div class="phone" data-screen-label="3 Session Reveal">
+      <div class="scr-title">Session · Reveal <span class="scr-num">3</span></div>
+      <div style="font-size:12px;color:#555">12 left</div>
+      <div class="box" style="height:110px;border-style:solid;border-color:#1a1a1a"><div style="font-size:40px;font-weight:500;color:#1a1a1a">か</div><div>ka · 3 strokes</div></div>
+      <div class="box" style="flex:1;aspect-ratio:1">
+        <div style="color:#bbb">your ink, dimmed ~30%</div>
+        <div style="color:#1a1a1a;font-weight:500">correct character animates<br>stroke-by-stroke on top</div>
+      </div>
+      <div class="btn ghost">Replay</div>
+      <div style="display:flex;gap:8px">
+        <div class="btn" style="flex:1">Got it</div>
+        <div class="btn" style="flex:1">Missed</div>
+      </div>
+    </div>
+    <p class="note">Got it / Missed equal weight. Nothing reflows between 1b and 1c — animation lands on your ink at same size/position.</p>
+  </div>
+  <div class="arrow"><span class="flowlab">queue empty</span><span>⟶</span></div>
+  <div class="dv-opt" id="1d">
+    <div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Session complete</div>
+    <div class="phone" data-screen-label="4 Complete">
+      <div class="scr-title">Complete <span class="scr-num">4</span></div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+        <div style="font-size:96px;font-weight:700;line-height:1">41</div>
+        <div style="font-size:13px;color:#555">of 71 written from memory</div>
+        <div style="font-size:14px;margin-top:8px">+3 this session</div>
+      </div>
+      <div class="btn primary">Again</div>
+      <div class="btn ghost">Done</div>
+    </div>
+    <p class="note">Count: same position + size as Home, so the number visibly moved. Again → reshuffled session. Done → Home.</p>
+  </div>
+</div>
+<div style="margin-top:36px;max-width:1200px">
+  <div style="font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px">User flow — the loop</div>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:12px">
+    <span class="flowlab" style="background:#1a1a1a;color:#fff">Home</span><span>→ Start →</span>
+    <span class="flowlab">Prompt</span><span>→ write → Show →</span>
+    <span class="flowlab">Reveal</span><span>→ grade →</span>
+    <span style="border:1.5px dashed #8a8a8a;border-radius:6px;padding:6px 10px">Got it → next card</span>
+    <span style="border:1.5px dashed #8a8a8a;border-radius:6px;padding:6px 10px">Missed → requeued ~5 positions later, returns until Got it</span>
+    <span>→ queue empty →</span><span class="flowlab" style="background:#1a1a1a;color:#fff">Complete</span>
+    <span>→ Again ↺ / Done → Home</span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:24px;margin-top:18px;font-size:11.5px;line-height:1.5;color:#555;max-width:1100px">
+    <div style="flex:1;min-width:260px;border:1.5px dashed #8a8a8a;border-radius:8px;padding:12px 14px"><strong style="color:#1a1a1a">The number:</strong> a kana counts only on a first-attempt Got it. Requeued clears don't mint it (you copied the animation). Cumulative, never goes down.</div>
+    <div style="flex:1;min-width:260px;border:1.5px dashed #8a8a8a;border-radius:8px;padding:12px 14px"><strong style="color:#1a1a1a">Interrupted session:</strong> closing discards the queue; earned kana persist at grading moment. No resume.</div>
+    <div style="flex:1;min-width:260px;border:1.5px dashed #8a8a8a;border-radius:8px;padding:12px 14px"><strong style="color:#1a1a1a">Not building:</strong> recognition, hints, skip, nav bar, settings, accounts, streaks, percentages, timers.</div>
+  </div>
+</div>
+<p class="dv-next">Try next: "riff on the reveal state — 2 alternatives for how the animation overlay reads" · "make the canvas bigger relative to the card" · "move to hi-fi using the-log reference styling"</p>
+</section>
+</x-dc>
+</body>
+</html>

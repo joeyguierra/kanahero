@@ -46,6 +46,211 @@ button {
   color: inherit;
 }
 
+/* ---- app screens: functional only, design pass comes later ---- */
+
+.screen {
+  margin: auto;
+  width: 100%;
+  max-width: 26rem;
+  padding: 2rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.hero {
+  font-size: 6rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  min-height: 6rem;
+}
+
+.heroSub {
+  color: var(--muted);
+}
+
+.delta {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.segmented {
+  display: flex;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.segment {
+  background: none;
+  border: none;
+  padding: 0.5rem 1.1rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.segmentOn {
+  background: var(--surface);
+  color: var(--foreground);
+}
+
+.btn {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.btnPrimary {
+  background: var(--foreground);
+  color: var(--background);
+  border-color: var(--foreground);
+}
+
+.btnStart {
+  min-width: 10rem;
+}
+
+.homeFooter {
+  margin-top: 2rem;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.homeFooter a {
+  text-decoration: underline;
+}
+
+/* session (screens 2 & 3) */
+
+.session {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 26rem;
+  padding: 1rem 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.sessionLeft {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  min-height: 7.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.cardRomaji {
+  font-size: 3rem;
+  font-weight: 600;
+}
+
+.cardKana {
+  font-size: 3.4rem;
+  line-height: 1.1;
+}
+
+.cardSub {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.canvasBox {
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+/* faint centre crosshair */
+.canvasBox::before,
+.canvasBox::after {
+  content: "";
+  position: absolute;
+  background: var(--line);
+  pointer-events: none;
+}
+
+.canvasBox::before {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.canvasBox::after {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.ink {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  z-index: 1;
+}
+
+.inkFrozen {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.canvasOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  /* the attempt underneath is the comparison target — hide the ghost,
+     only the drawn strokes appear */
+  --shadow: transparent;
+}
+
+.canvasOverlay svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.row {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.row .btn {
+  flex: 1;
+}
+
+.btnGrade {
+  flex: 1.4;
+}
+
 /* ---- /verify: stroke-data acceptance grid ---- */
 
 .verify {
