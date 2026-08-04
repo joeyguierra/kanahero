@@ -1,11 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Klee_One } from "next/font/google";
 import "./globals.css";
 
+// Klee One renders the kana (same font the stroke data derives from).
 // next/font self-hosts at build time — no runtime font requests, offline-safe.
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const klee = Klee_One({
+  weight: ["400", "600"],
+  subsets: ["latin"], // JP glyphs arrive via unicode-range slices
+  variable: "--font-klee",
+  preload: false,
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -23,7 +27,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#131215",
+  themeColor: "#0A0A0B",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1, // pinch-zoom off: the writing canvas must own all touch gestures
@@ -33,7 +37,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={geistSans.variable}>
+    <html lang="en" className={klee.variable}>
       <body>{children}</body>
     </html>
   );

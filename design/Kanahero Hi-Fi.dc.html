@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&amp;display=swap" rel="stylesheet"><style>
+:root{--strike:#FF2E88;--chassis:#0A0A0B;--bone:#F2F0EB;--live:#00E58A;--caution:#FFB300;--blueprint:#2E9DFF;--rail:#8C8C93;--print:#B9B6B1;--carbon:#5A5A5F;--seam:#2A2A2E;--plate:#141416;--mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;--display:"Helvetica Neue",system-ui,-apple-system,Arial,sans-serif}
+body{margin:0;background:#1a1a1e;font-family:var(--display);color:var(--bone);-webkit-font-smoothing:antialiased}
+a{color:var(--blueprint)}a:hover{color:#6cb8ff}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(255,255,255,.07);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 24px}
+.dv-tid{font:600 10px var(--mono);padding:3px 7px;background:var(--strike);color:#000;border-radius:0;text-decoration:none}
+.dv-tname{font:600 13px/1.2 var(--display);color:var(--bone)}
+.dv-opts{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px var(--mono);padding:3px 7px;background:rgba(255,255,255,.12);color:var(--bone);border-radius:0;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 var(--display);color:var(--rail)}
+.dv-next{margin:26px 0 0;font:12px/1.5 var(--display);color:var(--rail)}
+.mono{font-family:var(--mono);text-transform:uppercase;letter-spacing:.09em;font-size:10px;line-height:1.4}
+.phone{width:390px;height:844px;background:var(--chassis);border:1px solid var(--seam);display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 18px 44px rgba(0,0,0,.5)}
+.chamfer{clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)}
+.note{font-size:11px;line-height:1.5;color:var(--rail);max-width:390px}
+.note b{color:var(--print);font-weight:600}
+.btn-strike{background:var(--strike);color:#000;font-family:var(--mono);font-size:14px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:20px;text-align:center;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)}
+.btn-seam{border:1px solid var(--seam);color:var(--rail);font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:15px;text-align:center;background:transparent}
+.seg{flex:1;padding:11px;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.led{width:8px;height:8px;background:var(--live);box-shadow:0 0 9px var(--live);display:inline-block}
+.canvas-reg{position:absolute;font-family:var(--mono);font-size:11px;color:var(--carbon);line-height:1}
+</style></helmet>
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">kanahero hi-fi — THE LOG doctrine, kanahero's own pass. Structure = <a class="dv-oid" href="#1a">1a</a>–<a class="dv-oid" href="#1d">1d</a></span></div>
+<div class="dv-opts">
+
+  <div class="dv-opt" id="2a">
+    <div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Home</div>
+    <div class="phone" data-screen-label="1 Home">
+      <div style="position:absolute;top:0;left:0;right:0;height:52px;background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--strike) 7%,transparent) 0 10px,transparent 10px 20px);border-bottom:1px solid var(--seam);pointer-events:none"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;position:relative">
+        <span class="mono" style="color:var(--bone);font-weight:700;letter-spacing:.16em">KANAHERO</span>
+        <span style="display:flex;align-items:center;gap:8px"><span class="led"></span><span class="mono" style="color:var(--live)">ON-DEVICE</span></span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative">
+        <span style="position:absolute;right:-38px;top:-8px;font-weight:900;font-size:300px;line-height:.8;color:transparent;-webkit-text-stroke:1px #1D1D21;font-family:'Klee One',serif;pointer-events:none;user-select:none">あ</span>
+        <div style="font-weight:900;font-size:186px;line-height:.85;letter-spacing:-.05em;position:relative">38</div>
+        <div class="mono" style="background:var(--strike);color:#000;padding:6px 10px;letter-spacing:.13em;margin-top:14px;position:relative">OF 71 WRITTEN FROM MEMORY</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;padding:0 20px 18px">
+        <div style="display:flex;border:1px solid var(--seam)">
+          <div class="seg" style="border-right:1px solid var(--seam);color:var(--blueprint);border-color:var(--blueprint);border:1px solid var(--blueprint);margin:-1px;background:color-mix(in srgb,var(--blueprint) 14%,transparent)">ALL 71</div>
+          <div class="seg" style="color:var(--rail)">BASE 46</div>
+        </div>
+        <div class="btn-strike">START</div>
+        <div class="mono" style="color:var(--rail);font-size:8.5px;letter-spacing:.08em;text-align:center;line-height:1.7">STROKE DATA FROM STROKESVG (MIT) · DERIVED FROM KLEE ONE (SIL OFL 1.1)</div>
+      </div>
+    </div>
+    <p class="note"><b>The number is the machine's one readout</b> — 186px, Bone on Chassis. Strike chip names what it counts. Set toggle selected state = Blueprint border + 14% fill (§2.1b). Ghost あ = air pressure, cropped. Attribution = Rail mono, the only place it appears.</p>
+  </div>
+
+  <div class="dv-opt" id="2b">
+    <div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Session · Prompt</div>
+    <div class="phone" data-screen-label="2 Session Prompt">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px">
+        <span class="mono" style="color:var(--bone);font-size:12px;letter-spacing:.12em">12 LEFT</span>
+        <span class="mono" style="color:var(--rail)">SET · ALL 71</span>
+      </div>
+      <div class="chamfer" style="background:var(--plate);border:1px solid var(--seam);margin:0 20px;padding:26px 20px 22px;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative">
+        <span class="canvas-reg" style="top:8px;left:10px">+</span><span class="canvas-reg" style="bottom:8px;right:10px;color:var(--seam)">+</span>
+        <div style="font-weight:900;font-size:76px;line-height:.9;letter-spacing:-.03em">ka</div>
+        <div class="mono" style="color:var(--rail)">WRITE IT FROM MEMORY</div>
+      </div>
+      <div style="flex:1;display:flex;align-items:flex-end;padding:16px 20px 0">
+        <div style="width:350px;height:350px;background:var(--bone);position:relative">
+          <div style="position:absolute;left:50%;top:6%;bottom:6%;width:0;border-left:1px dashed #DAD7D0"></div>
+          <div style="position:absolute;top:50%;left:6%;right:6%;height:0;border-top:1px dashed #DAD7D0"></div>
+          <span class="canvas-reg" style="top:7px;left:8px">+</span><span class="canvas-reg" style="top:7px;right:8px">+</span><span class="canvas-reg" style="bottom:7px;left:8px">+</span><span class="canvas-reg" style="bottom:7px;right:8px">+</span>
+          <svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%">
+            <path d="M24 30 C36 25 50 24 57 28 C60 47 53 70 37 81" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+            <path d="M38 16 C40 34 39 58 30 74" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+            <path d="M70 26 C76 32 79 38 80 45" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+          </svg>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;padding:16px 20px 18px">
+        <div style="display:flex;gap:12px">
+          <div class="btn-seam" style="flex:1">CLEAR</div>
+          <div class="btn-seam" style="flex:1">UNDO</div>
+        </div>
+        <div class="btn-strike">SHOW</div>
+      </div>
+    </div>
+    <p class="note"><b>The canvas is the LIFE layer</b> — Bone paper, your ink, never covered by chrome. Crosshair is Carbon-on-Bone (legal ground). Everything else is the instrument: mono, mounted, right angles. Canvas + all actions in thumb reach. No hints anywhere — no stroke count, no ghost glyph.</p>
+  </div>
+
+  <div class="dv-opt" id="2c">
+    <div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>Session · Reveal <span style="color:var(--carbon)">— same screen, card flipped, canvas frozen</span></div>
+    <div class="phone" data-screen-label="3 Session Reveal">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px">
+        <span class="mono" style="color:var(--bone);font-size:12px;letter-spacing:.12em">12 LEFT</span>
+        <span class="mono" style="color:var(--rail)">SET · ALL 71</span>
+      </div>
+      <div class="chamfer" style="background:var(--plate);border:1px solid var(--strike);margin:0 20px;padding:18px 20px;display:flex;align-items:center;justify-content:center;gap:22px">
+        <div style="font-family:'Klee One',serif;font-weight:600;font-size:84px;line-height:1;color:var(--bone)">か</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-weight:900;font-size:30px;letter-spacing:-.02em">ka</div>
+          <div class="mono" style="border:1px solid var(--seam);color:var(--rail);padding:5px 8px">3 STROKES</div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;align-items:flex-end;padding:16px 20px 0">
+        <div style="width:350px;height:350px;background:var(--bone);position:relative">
+          <div style="position:absolute;left:50%;top:6%;bottom:6%;width:0;border-left:1px dashed #DAD7D0"></div>
+          <div style="position:absolute;top:50%;left:6%;right:6%;height:0;border-top:1px dashed #DAD7D0"></div>
+          <span class="canvas-reg" style="top:7px;left:8px">+</span><span class="canvas-reg" style="top:7px;right:8px">+</span><span class="canvas-reg" style="bottom:7px;left:8px">+</span><span class="canvas-reg" style="bottom:7px;right:8px">+</span>
+          <svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%;opacity:.3">
+            <path d="M24 30 C36 25 50 24 57 28 C60 47 53 70 37 81" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+            <path d="M38 16 C40 34 39 58 30 74" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+            <path d="M70 26 C76 32 79 38 80 45" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Klee One',serif;font-weight:600;font-size:250px;line-height:1;color:var(--strike);pointer-events:none">か</div>
+          <div class="mono" style="position:absolute;bottom:9px;right:26px;color:var(--carbon)">STROKE 3/3</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;padding:16px 20px 18px">
+        <div class="btn-seam">REPLAY</div>
+        <div style="display:flex;gap:12px">
+          <div class="btn-seam" style="flex:1;border:1px solid var(--live);color:var(--live);background:color-mix(in srgb,var(--live) 14%,transparent);font-weight:700;padding:19px">GOT IT</div>
+          <div class="btn-seam" style="flex:1;border:1px solid var(--caution);color:var(--caution);background:color-mix(in srgb,var(--caution) 14%,transparent);font-weight:700;padding:19px">MISSED</div>
+        </div>
+      </div>
+    </div>
+    <p class="note"><b>Nothing reflows from <a class="dv-oid" href="#2b">2b</a></b> — card flips in place (Strike border marks the flipped state), canvas never moves. Your ink dims to 30%; the model か prints over it in Strike — applied, never filmed. Got it = Live, Missed = Caution (the stumble, an honesty beat): tint-ladder chips, equal weight.</p>
+  </div>
+
+  <div class="dv-opt" id="2d">
+    <div class="dv-olabel"><a class="dv-oid" href="#2d">2d</a>Session complete</div>
+    <div class="phone" data-screen-label="4 Complete">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px">
+        <span class="mono" style="color:var(--bone);font-weight:700;letter-spacing:.16em">KANAHERO</span>
+        <span class="mono" style="color:var(--rail)">QUEUE CLEARED</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative">
+        <div style="font-weight:900;font-size:186px;line-height:.85;letter-spacing:-.05em;position:relative">41</div>
+        <div class="mono" style="background:var(--strike);color:#000;padding:6px 10px;letter-spacing:.13em;margin-top:14px">OF 71 WRITTEN FROM MEMORY</div>
+        <div class="mono" style="border:1px solid var(--live);color:var(--live);background:color-mix(in srgb,var(--live) 14%,transparent);padding:8px 12px;margin-top:20px;font-size:12px;letter-spacing:.13em">+3 THIS SESSION</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;padding:0 20px 18px">
+        <div class="btn-strike">AGAIN</div>
+        <div class="btn-seam" style="padding:19px">DONE</div>
+      </div>
+    </div>
+    <p class="note"><b>Same number, same position, same size as <a class="dv-oid" href="#2a">2a</a></b> — the only thing that changed is the value. Delta chip is Live: +3 is a verified fact, first-attempt Got its only. Again = Strike primary (reshuffles), Done = quiet seam.</p>
+  </div>
+
+</div>
+<p class="dv-next">Try next: "show the reveal mid-animation (stroke 2 of 3)" · "riff on the Home hero — 2 alternatives" · "make it tappable as a prototype"</p>
+</section>
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Low-fi skeleton — see <a class="dv-oid" href="#1a">Kanahero Wireframes.dc.html</a> (kept separate)</span></div>
+<p class="note" style="max-width:640px">Turn 1 lives in the wireframes file: <a href="Kanahero Wireframes.dc.html">Kanahero Wireframes.dc.html</a> — ids <a class="dv-oid" href="#1a">1a</a>–<a class="dv-oid" href="#1d">1d</a> map to <a class="dv-oid" href="#2a">2a</a>–<a class="dv-oid" href="#2d">2d</a> above.</p>
+</section>
+</x-dc>
+</body>
+</html>

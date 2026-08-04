@@ -23,8 +23,9 @@ interface Segment {
 export interface StrokePlayer {
   /** number of pen strokes (not path segments) */
   strokeCount: number;
-  /** hide all strokes, then draw them in order; resolves when done */
-  play(): Promise<void>;
+  /** hide all strokes, then draw them in order; resolves when done.
+      onStroke fires with the 1-based stroke number as each begins. */
+  play(onStroke?: (n: number) => void): Promise<void>;
   /** show the finished character without animating */
   finish(): void;
   /** stop and detach; safe to call more than once */
@@ -65,11 +66,13 @@ export function createStrokePlayer(svg: SVGSVGElement): StrokePlayer {
 
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-  async function play() {
+  async function play(onStroke?: (n: number) => void) {
     cancelled = false;
     hideAll();
     for (let i = 0; i < strokes.length; i++) {
       if (i > 0) await sleep(GAP_MS);
+      if (cancelled) return;
+      onStroke?.(i + 1);
       for (const seg of strokes[i]) {
         if (cancelled) return;
         const duration = Math.max(MIN_MS, (seg.len / SPEED) * 1000);

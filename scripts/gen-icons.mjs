@@ -7,8 +7,8 @@ import path from "node:path";
 import sharp from "sharp";
 
 const ROOT = path.join(import.meta.dirname, "..");
-const BG = "#131215";
-const INK = "#ece9e4";
+const BG = "#0a0a0b"; // chassis
+const INK = "#ff2e88"; // strike — the model-stroke color is the brand mark
 
 // か with all strokes shown (shadows hidden, strokes at full ink)
 const ka = await readFile(path.join(ROOT, "public", "strokes", "304b.svg"), "utf8");

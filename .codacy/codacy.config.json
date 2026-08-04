@@ -7,7 +7,7 @@
     "repositoryId": null,
     "repositoryName": null,
     "createdAt": "2026-08-04T10:00:33.627Z",
-    "updatedAt": "2026-08-04T10:01:06.021Z",
+    "updatedAt": "2026-08-04T10:10:03.967Z",
     "languages": [
       "CSS",
       "HTML",
@@ -380,6 +380,24 @@
         },
         {
           "patternId": "Semgrep_typescript.react.security.react-markdown-insecure-html.react-markdown-insecure-html"
+        },
+        {
+          "patternId": "Semgrep_javascript.playwright.security.audit.playwright-addinitscript-code-injection.playwright-addinitscript-code-injection"
+        },
+        {
+          "patternId": "Semgrep_javascript.playwright.security.audit.playwright-evaluate-arg-injection.playwright-evaluate-arg-injection"
+        },
+        {
+          "patternId": "Semgrep_javascript.playwright.security.audit.playwright-evaluate-code-injection.playwright-evaluate-code-injection"
+        },
+        {
+          "patternId": "Semgrep_javascript.playwright.security.audit.playwright-exposed-chrome-devtools.playwright-exposed-chrome-devtools"
+        },
+        {
+          "patternId": "Semgrep_javascript.playwright.security.audit.playwright-goto-injection.playwright-goto-injection"
+        },
+        {
+          "patternId": "Semgrep_javascript.playwright.security.audit.playwright-setcontent-injection.playwright-setcontent-injection"
         }
       ]
     },
@@ -5241,6 +5259,39 @@
         },
         {
           "patternId": "Biome_lint_suspicious_useNamespaceKeyword"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightElementHandle"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightEval"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightForceOption"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightMissingAwait"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightNetworkidle"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightPagePause"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightUselessAwait"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightWaitForNavigation"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightWaitForSelector"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightWaitForTimeout"
+        },
+        {
+          "patternId": "Biome_lint_nursery_usePlaywrightValidDescribeCallback"
         }
       ]
     },

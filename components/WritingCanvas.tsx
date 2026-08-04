@@ -24,7 +24,7 @@ interface Point {
   t: number;
 }
 
-const INK = "#ece9e4";
+const INK = "#0a0a0b"; // dark ink on the bone paper canvas
 const W_MAX = 9; // slow pen
 const W_MIN = 3.5; // fast pen
 const SPEED_FULL_THIN = 2.2; // px/ms at which the line is thinnest

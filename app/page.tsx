@@ -10,7 +10,6 @@ import {
   getServerProgress,
   subscribeProgress,
   updateProgress,
-  type SetChoice,
 } from "@/lib/progress";
 import { shuffle } from "@/lib/session";
 import Session from "@/components/Session";
@@ -35,6 +34,7 @@ export default function App() {
   // the hydration render uses the stable server snapshot; a real read replaces it
   const loaded = progress !== getServerProgress();
   const count = progress.earned.size;
+  const setLabel = progress.setChoice === "base" ? "base 46" : "all 71";
 
   function start() {
     setDeck(shuffle(progress.setChoice === "base" ? BASE_46 : KANA));
@@ -47,6 +47,7 @@ export default function App() {
       <Session
         key={deck.map((k) => k.hex).join()}
         deck={deck}
+        setLabel={setLabel}
         earnKana={earnKana}
         onFinish={(delta) => {
           setSessionDelta(delta);
@@ -58,17 +59,25 @@ export default function App() {
 
   if (phase === "complete") {
     return (
-      <main className="screen">
-        <div className="hero">{count}</div>
-        <div className="heroSub">of {KANA.length} written from memory</div>
-        <div className="delta">
-          {sessionDelta > 0 ? `+${sessionDelta} this session` : "nothing new this session"}
+      <main className="frame">
+        <header className="appHead">
+          <span className="brand">kanahero</span>
+          <span className="sessionSet">queue cleared</span>
+        </header>
+        <div className="homeCenter">
+          <div className="hero">{count}</div>
+          <div className="chipStrike">of {KANA.length} written from memory</div>
+          {sessionDelta > 0 ? (
+            <div className="chipLive">+{sessionDelta} this session</div>
+          ) : (
+            <div className="chipRail">nothing new this session</div>
+          )}
         </div>
-        <div className="row">
-          <button type="button" className="btn btnPrimary" onClick={start}>
+        <div className="homeBottom">
+          <button type="button" className="btnStrike" onClick={start}>
             Again
           </button>
-          <button type="button" className="btn" onClick={() => setPhase("home")}>
+          <button type="button" className="btnSeam" style={{ padding: 19 }} onClick={() => setPhase("home")}>
             Done
           </button>
         </div>
@@ -77,35 +86,48 @@ export default function App() {
   }
 
   return (
-    <main className="screen">
-      <div className="hero">{loaded ? count : " "}</div>
-      <div className="heroSub">of {KANA.length} written from memory</div>
+    <main className="frame">
+      <div className="hazard" />
+      <header className="appHead">
+        <span className="brand">kanahero</span>
+        <span className="onDevice">
+          <span className="led" />
+          on-device
+        </span>
+      </header>
 
-      <div className="segmented" role="radiogroup" aria-label="kana set">
-        <button
-          type="button"
-          className={`segment${progress.setChoice === "all" ? " segmentOn" : ""}`}
-          onClick={() => updateProgress({ setChoice: "all" satisfies SetChoice })}
-        >
-          All 71
-        </button>
-        <button
-          type="button"
-          className={`segment${progress.setChoice === "base" ? " segmentOn" : ""}`}
-          onClick={() => updateProgress({ setChoice: "base" satisfies SetChoice })}
-        >
-          Base 46
-        </button>
+      <div className="homeCenter">
+        <span className="ghostKana" aria-hidden>
+          あ
+        </span>
+        <div className="hero">{loaded ? count : ""}</div>
+        <div className="chipStrike">of {KANA.length} written from memory</div>
       </div>
 
-      <button type="button" className="btn btnPrimary btnStart" onClick={start} disabled={!loaded}>
-        Start
-      </button>
-
-      <footer className="homeFooter">
-        Stroke data from strokesvg (MIT), derived from Klee One (SIL OFL 1.1) —{" "}
-        <a href="/licenses/strokesvg-LICENSE.txt">licenses</a>
-      </footer>
+      <div className="homeBottom">
+        <div className="segmented" role="radiogroup" aria-label="kana set">
+          <button
+            type="button"
+            className={`segment${progress.setChoice === "all" ? " segmentOn" : ""}`}
+            onClick={() => updateProgress({ setChoice: "all" })}
+          >
+            All 71
+          </button>
+          <button
+            type="button"
+            className={`segment${progress.setChoice === "base" ? " segmentOn" : ""}`}
+            onClick={() => updateProgress({ setChoice: "base" })}
+          >
+            Base 46
+          </button>
+        </div>
+        <button type="button" className="btnStrike" onClick={start} disabled={!loaded}>
+          Start
+        </button>
+        <a className="attribution" href="/licenses/strokesvg-LICENSE.txt">
+          stroke data from strokesvg (MIT) · derived from Klee One (SIL OFL 1.1)
+        </a>
+      </div>
     </main>
   );
 }

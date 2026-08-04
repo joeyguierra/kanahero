@@ -6,8 +6,8 @@
     "organization": null,
     "repositoryId": null,
     "repositoryName": null,
-    "createdAt": "2026-08-04T10:01:06.017Z",
-    "updatedAt": "2026-08-04T10:01:06.017Z",
+    "createdAt": "2026-08-04T10:10:03.959Z",
+    "updatedAt": "2026-08-04T10:10:03.959Z",
     "languages": [
       "CSS",
       "HTML",
@@ -290,6 +290,24 @@
         },
         {
           "patternId": "Semgrep_javascript.passport-jwt.security.passport-hardcode.hardcoded-passport-secret"
+        },
+        {
+          "patternId": "Semgrep_javascript.playwright.security.audit.playwright-addinitscript-code-injection.playwright-addinitscript-code-injection"
+        },
+        {
+          "patternId": "Semgrep_javascript.playwright.security.audit.playwright-evaluate-arg-injection.playwright-evaluate-arg-injection"
+        },
+        {
+          "patternId": "Semgrep_javascript.playwright.security.audit.playwright-evaluate-code-injection.playwright-evaluate-code-injection"
+        },
+        {
+          "patternId": "Semgrep_javascript.playwright.security.audit.playwright-exposed-chrome-devtools.playwright-exposed-chrome-devtools"
+        },
+        {
+          "patternId": "Semgrep_javascript.playwright.security.audit.playwright-goto-injection.playwright-goto-injection"
+        },
+        {
+          "patternId": "Semgrep_javascript.playwright.security.audit.playwright-setcontent-injection.playwright-setcontent-injection"
         },
         {
           "patternId": "Semgrep_javascript.react.correctness.hooks.set-state-no-op.calling-set-state-on-current-state"
@@ -4931,6 +4949,36 @@
           "patternId": "Biome_lint_nursery_noLeakedRender"
         },
         {
+          "patternId": "Biome_lint_nursery_noPlaywrightElementHandle"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightEval"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightForceOption"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightMissingAwait"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightNetworkidle"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightPagePause"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightUselessAwait"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightWaitForNavigation"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightWaitForSelector"
+        },
+        {
+          "patternId": "Biome_lint_nursery_noPlaywrightWaitForTimeout"
+        },
+        {
           "patternId": "Biome_lint_nursery_noSyncScripts"
         },
         {
@@ -4938,6 +4986,9 @@
         },
         {
           "patternId": "Biome_lint_nursery_useInlineScriptId"
+        },
+        {
+          "patternId": "Biome_lint_nursery_usePlaywrightValidDescribeCallback"
         },
         {
           "patternId": "Biome_lint_performance_noAccumulatingSpread"

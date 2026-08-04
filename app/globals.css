@@ -1,12 +1,29 @@
+/* THE LOG doctrine — tokens from design/Kanahero Hi-Fi.dc.html */
 :root {
-  --background: #131215;
-  --foreground: #ece9e4;
-  --muted: #8a867f;
-  --surface: #1d1c20;
-  --line: #2b2a2f;
+  --strike: #ff2e88;
+  --chassis: #0a0a0b;
+  --bone: #f2f0eb;
+  --live: #00e58a;
+  --caution: #ffb300;
+  --blueprint: #2e9dff;
+  --rail: #8c8c93;
+  --print: #b9b6b1;
+  --carbon: #5a5a5f;
+  --seam: #2a2a2e;
+  --plate: #141416;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --display: "Helvetica Neue", system-ui, -apple-system, Arial, sans-serif;
+  --kana: var(--font-klee), "Klee One", serif;
+
+  /* legacy names still used by /verify */
+  --background: var(--chassis);
+  --foreground: var(--bone);
+  --muted: var(--rail);
+  --surface: var(--plate);
+  --line: var(--seam);
   /* strokesvg hooks: shadow = ghost of the full glyph, stroke = the drawn ink */
-  --shadow: #2f2d33;
-  --stroke: #ece9e4;
+  --shadow: #232327;
+  --stroke: var(--bone);
 }
 
 html {
@@ -24,9 +41,9 @@ body {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  color: var(--bone);
+  background: var(--chassis);
+  font-family: var(--display);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -44,168 +61,400 @@ a {
 button {
   font: inherit;
   color: inherit;
-}
-
-/* ---- app screens: functional only, design pass comes later ---- */
-
-.screen {
-  margin: auto;
-  width: 100%;
-  max-width: 26rem;
-  padding: 2rem 1.25rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  text-align: center;
-}
-
-.hero {
-  font-size: 6rem;
-  font-weight: 700;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  min-height: 6rem;
-}
-
-.heroSub {
-  color: var(--muted);
-}
-
-.delta {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.segmented {
-  display: flex;
-  border: 1px solid var(--line);
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-
-.segment {
   background: none;
   border: none;
-  padding: 0.5rem 1.1rem;
-  cursor: pointer;
-  color: var(--muted);
-}
-
-.segmentOn {
-  background: var(--surface);
-  color: var(--foreground);
-}
-
-.btn {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 0.5rem;
-  padding: 0.7rem 1.2rem;
   cursor: pointer;
 }
 
-.btn:disabled {
-  opacity: 0.4;
+button:disabled {
+  opacity: 0.35;
   cursor: default;
 }
 
-.btnPrimary {
-  background: var(--foreground);
-  color: var(--background);
-  border-color: var(--foreground);
+button:not(:disabled):active {
+  transform: translateY(1px);
 }
 
-.btnStart {
-  min-width: 10rem;
+/* ---- shared instrument bits ---- */
+
+.mono {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-size: 10px;
+  line-height: 1.4;
 }
 
-.homeFooter {
-  margin-top: 2rem;
-  font-size: 0.72rem;
-  color: var(--muted);
+.chamfer {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
 }
 
-.homeFooter a {
-  text-decoration: underline;
+.btnStrike {
+  background: var(--strike);
+  color: #000;
+  font-family: var(--mono);
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 20px;
+  text-align: center;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
 }
 
-/* session (screens 2 & 3) */
+.btnSeam {
+  border: 1px solid var(--seam);
+  color: var(--rail);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 15px;
+  text-align: center;
+  background: transparent;
+}
 
-.session {
-  margin: 0 auto;
-  width: 100%;
-  max-width: 26rem;
-  padding: 1rem 1.25rem 1.5rem;
+.btnLive {
+  border-color: var(--live);
+  color: var(--live);
+  background: color-mix(in srgb, var(--live) 14%, transparent);
+  font-weight: 700;
+  padding: 19px;
+}
+
+.btnCaution {
+  border-color: var(--caution);
+  color: var(--caution);
+  background: color-mix(in srgb, var(--caution) 14%, transparent);
+  font-weight: 700;
+  padding: 19px;
+}
+
+.led {
+  width: 8px;
+  height: 8px;
+  background: var(--live);
+  box-shadow: 0 0 9px var(--live);
+  display: inline-block;
+}
+
+.reg {
+  position: absolute;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--carbon);
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* ---- home & complete (screens 1 & 4) ---- */
+
+.frame {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  position: relative;
+  min-height: 100dvh;
+}
+
+.hazard {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
+  background: repeating-linear-gradient(
+    45deg,
+    color-mix(in srgb, var(--strike) 7%, transparent) 0 10px,
+    transparent 10px 20px
+  );
+  border-bottom: 1px solid var(--seam);
+  pointer-events: none;
+}
+
+.appHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(18px + env(safe-area-inset-top)) 20px 18px;
+  position: relative;
+}
+
+.brand {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  font-size: 10px;
+  color: var(--bone);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.onDevice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  color: var(--live);
+}
+
+.homeCenter {
   flex: 1;
-}
-
-.sessionLeft {
-  color: var(--muted);
-  font-size: 0.85rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.card {
-  border: 1px solid var(--line);
-  border-radius: 0.75rem;
-  min-height: 7.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
+  position: relative;
+}
+
+.ghostKana {
+  position: absolute;
+  right: -38px;
+  top: -8px;
+  font-weight: 900;
+  font-size: 300px;
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1px #1d1d21;
+  font-family: var(--kana);
+  pointer-events: none;
+  user-select: none;
+}
+
+.hero {
+  font-weight: 900;
+  font-size: clamp(120px, 48vw, 186px);
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  position: relative;
+  font-variant-numeric: tabular-nums;
+  min-height: 0.85em;
+}
+
+.chipStrike {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  font-size: 10px;
+  background: var(--strike);
+  color: #000;
+  padding: 6px 10px;
+  letter-spacing: 0.13em;
+  margin-top: 14px;
+  position: relative;
+}
+
+.chipLive {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  border: 1px solid var(--live);
+  color: var(--live);
+  background: color-mix(in srgb, var(--live) 14%, transparent);
+  padding: 8px 12px;
+  margin-top: 20px;
+  font-size: 12px;
+  letter-spacing: 0.13em;
+}
+
+.chipRail {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  border: 1px solid var(--seam);
+  color: var(--rail);
+  padding: 8px 12px;
+  margin-top: 20px;
+  font-size: 12px;
+  letter-spacing: 0.13em;
+}
+
+.homeBottom {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 20px calc(18px + env(safe-area-inset-bottom));
+}
+
+.segmented {
+  display: flex;
+  border: 1px solid var(--seam);
+}
+
+.segment {
+  flex: 1;
+  padding: 11px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rail);
+}
+
+.segmentOn {
+  border: 1px solid var(--blueprint);
+  margin: -1px;
+  color: var(--blueprint);
+  background: color-mix(in srgb, var(--blueprint) 14%, transparent);
+  position: relative;
+  z-index: 1;
+}
+
+.attribution {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  color: var(--rail);
+  font-size: 8.5px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  line-height: 1.7;
+  text-decoration: none;
+}
+
+/* ---- session (screens 2 & 3) ---- */
+
+.session {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100dvh;
+}
+
+.sessionHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(18px + env(safe-area-inset-top)) 20px 18px;
+}
+
+.sessionLeft {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  color: var(--bone);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+}
+
+.sessionSet {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  color: var(--rail);
+  font-size: 10px;
+  letter-spacing: 0.09em;
+}
+
+.card {
+  background: var(--plate);
+  border: 1px solid var(--seam);
+  margin: 0 20px;
+  padding: 26px 20px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+  min-height: 148px;
+  justify-content: center;
+  transition: border-color 0.15s;
+}
+
+.cardFlipped {
+  border-color: var(--strike);
+  flex-direction: row;
+  gap: 22px;
+  padding: 18px 20px;
 }
 
 .cardRomaji {
-  font-size: 3rem;
-  font-weight: 600;
+  font-weight: 900;
+  font-size: 76px;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+
+.cardHint {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  color: var(--rail);
+  font-size: 10px;
+  letter-spacing: 0.09em;
 }
 
 .cardKana {
-  font-size: 3.4rem;
-  line-height: 1.1;
+  font-family: var(--kana);
+  font-weight: 600;
+  font-size: 84px;
+  line-height: 1;
+  color: var(--bone);
 }
 
-.cardSub {
-  color: var(--muted);
-  font-size: 0.9rem;
+.cardRevealCol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.cardRomajiSmall {
+  font-weight: 900;
+  font-size: 30px;
+  letter-spacing: -0.02em;
+}
+
+.chipSeam {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  border: 1px solid var(--seam);
+  color: var(--rail);
+  padding: 5px 8px;
+  font-size: 10px;
+  letter-spacing: 0.09em;
+}
+
+.canvasWrap {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  padding: 16px 20px 0;
 }
 
 .canvasBox {
   position: relative;
   aspect-ratio: 1;
   width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 0.75rem;
-  overflow: hidden;
+  background: var(--bone);
 }
 
-/* faint centre crosshair */
+/* dashed centre crosshair, carbon-on-bone */
 .canvasBox::before,
 .canvasBox::after {
   content: "";
   position: absolute;
-  background: var(--line);
   pointer-events: none;
 }
 
 .canvasBox::before {
   left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 1px;
+  top: 6%;
+  bottom: 6%;
+  width: 0;
+  border-left: 1px dashed #dad7d0;
 }
 
 .canvasBox::after {
   top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
+  left: 6%;
+  right: 6%;
+  height: 0;
+  border-top: 1px dashed #dad7d0;
 }
 
 .ink {
@@ -222,14 +471,14 @@ button {
   pointer-events: none;
 }
 
+/* the model character prints over the attempt in Strike — no ghost glyph */
 .canvasOverlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 2;
-  /* the attempt underneath is the comparison target — hide the ghost,
-     only the drawn strokes appear */
   --shadow: transparent;
+  --stroke: var(--strike);
 }
 
 .canvasOverlay svg {
@@ -238,17 +487,33 @@ button {
   height: 100%;
 }
 
+.strokeCounter {
+  position: absolute;
+  bottom: 9px;
+  right: 26px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  color: var(--carbon);
+  z-index: 3;
+  font-variant-numeric: tabular-nums;
+}
+
+.sessionActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px calc(18px + env(safe-area-inset-bottom));
+}
+
 .row {
   display: flex;
-  gap: 0.6rem;
+  gap: 12px;
 }
 
-.row .btn {
+.row > * {
   flex: 1;
-}
-
-.btnGrade {
-  flex: 1.4;
 }
 
 /* ---- /verify: stroke-data acceptance grid ---- */
@@ -278,11 +543,6 @@ button {
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
-  cursor: pointer;
-}
-
-.verifyReplay:active {
-  transform: translateY(1px);
 }
 
 .verifyGrid {
@@ -297,7 +557,6 @@ button {
   border: 1px solid var(--line);
   border-radius: 0.6rem;
   padding: 0.5rem 0.5rem 0.4rem;
-  cursor: pointer;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;

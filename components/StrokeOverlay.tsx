@@ -11,9 +11,12 @@ import { strokeSvgPath, type Kana } from "@/lib/kana";
 export default function StrokeOverlay({
   kana,
   onReady,
+  onStroke,
 }: {
   kana: Kana;
   onReady?: (player: StrokePlayer) => void;
+  /** 1-based stroke number as each begins drawing */
+  onStroke?: (n: number) => void;
 }) {
   const holder = useRef<HTMLDivElement>(null);
   const playerRef = useRef<StrokePlayer | null>(null);
@@ -34,7 +37,7 @@ export default function StrokeOverlay({
         const player = createStrokePlayer(svg as SVGSVGElement);
         playerRef.current = player;
         onReady?.(player);
-        player.play();
+        player.play(onStroke);
       } catch {
         // stroke file missing — reveal still shows the kana on the card
       }
