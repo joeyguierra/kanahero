@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 190" width="1280" height="190" role="img" aria-label="THE LOG doctrine palette">
+  <rect width="1280" height="190" fill="#0a0a0b"/>
+  <text x="40" y="32" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="700" letter-spacing="3" fill="#f2f0eb">THE LOG DOCTRINE</text>
+  <text x="1240" y="32" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="1.8" fill="#5a5a5f">7 GREYS · 4 SIGNALS</text>
+  <rect x="40.0" y="52" width="98.2" height="66" fill="#0a0a0b" stroke="#2a2a2e"/>
+    <text x="40.0" y="140" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="1.4" fill="#f2f0eb">CHASSIS</text>
+    <text x="40.0" y="158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" letter-spacing="0.8" fill="#5a5a5f">#0A0A0B</text>
+    <rect x="150.2" y="52" width="98.2" height="66" fill="#141416" stroke="#2a2a2e"/>
+    <text x="150.2" y="140" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="1.4" fill="#f2f0eb">PLATE</text>
+    <text x="150.2" y="158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" letter-spacing="0.8" fill="#5a5a5f">#141416</text>
+    <rect x="260.4" y="52" width="98.2" height="66" fill="#2a2a2e" stroke="#2a2a2e"/>
+    <text x="260.4" y="140" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="1.4" fill="#f2f0eb">SEAM</text>
+    <text x="260.4" y="158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" letter-spacing="0.8" fill="#5a5a5f">#2A2A2E</text>
+    <rect x="370.5" y="52" width="98.2" height="66" fill="#5a5a5f" stroke="#2a2a2e"/>
+    <text x="370.5" y="140" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="1.4" fill="#f2f0eb">CARBON</text>
+    <text x="370.5" y="158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" letter-spacing="0.8" fill="#5a5a5f">#5A5A5F</text>
+    <rect x="480.7" y="52" width="98.2" height="66" fill="#8c8c93" stroke="#2a2a2e"/>
+    <text x="480.7" y="140" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="1.4" fill="#f2f0eb">RAIL</text>
+    <text x="480.7" y="158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" letter-spacing="0.8" fill="#5a5a5f">#8C8C93</text>
+    <rect x="590.9" y="52" width="98.2" height="66" fill="#b9b6b1" stroke="#2a2a2e"/>
+    <text x="590.9" y="140" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="1.4" fill="#f2f0eb">PRINT</text>
+    <text x="590.9" y="158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" letter-spacing="0.8" fill="#5a5a5f">#B9B6B1</text>
+    <rect x="701.1" y="52" width="98.2" height="66" fill="#f2f0eb" stroke="#2a2a2e"/>
+    <text x="701.1" y="140" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="1.4" fill="#f2f0eb">BONE</text>
+    <text x="701.1" y="158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" letter-spacing="0.8" fill="#5a5a5f">#F2F0EB</text>
+    <rect x="811.3" y="52" width="98.2" height="66" fill="#ff2e88" stroke="#2a2a2e"/>
+    <text x="811.3" y="140" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="1.4" fill="#f2f0eb">STRIKE</text>
+    <text x="811.3" y="158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" letter-spacing="0.8" fill="#5a5a5f">#FF2E88</text>
+    <rect x="921.5" y="52" width="98.2" height="66" fill="#00e58a" stroke="#2a2a2e"/>
+    <text x="921.5" y="140" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="1.4" fill="#f2f0eb">LIVE</text>
+    <text x="921.5" y="158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" letter-spacing="0.8" fill="#5a5a5f">#00E58A</text>
+    <rect x="1031.6" y="52" width="98.2" height="66" fill="#ffb300" stroke="#2a2a2e"/>
+    <text x="1031.6" y="140" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="1.4" fill="#f2f0eb">CAUTION</text>
+    <text x="1031.6" y="158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" letter-spacing="0.8" fill="#5a5a5f">#FFB300</text>
+    <rect x="1141.8" y="52" width="98.2" height="66" fill="#2e9dff" stroke="#2a2a2e"/>
+    <text x="1141.8" y="140" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="1.4" fill="#f2f0eb">BLUEPRINT</text>
+    <text x="1141.8" y="158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" letter-spacing="0.8" fill="#5a5a5f">#2E9DFF</text>
+</svg>
