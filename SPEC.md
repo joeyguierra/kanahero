@@ -1,10 +1,10 @@
 # kanahero — build brief
 
-A Next.js PWA that drills **writing hiragana from memory**. Romaji prompt on top, blank canvas below, you write it by hand, flip the card, the real stroke order animates over your attempt, you grade yourself. Missed cards return until you get them.
+A Next.js PWA that drills **writing kana from memory** — hiragana or katakana, one script per session. Romaji prompt on top, blank canvas below, you write it by hand, flip the card, the real stroke order animates over your attempt, you grade yourself. Missed cards return until you get them.
 
 No backend, no network calls, no accounts. Fully offline after first load — it works on a plane.
 
-**The number:** how many of the 71 kana you have ever written correctly from memory, stored on device. It is the reason the app exists, so it is the largest element on the home screen.
+**The number:** how many of the 71 kana you have ever written correctly from memory, stored on device. It is the reason the app exists, so it is the largest element on the home screen. It is **per script** — あ and ア are different characters to write, so knowing one tells you nothing about the other, and a single merged count out of 142 would hide which half you are actually weak in.
 
 ---
 
@@ -12,8 +12,8 @@ No backend, no network calls, no accounts. Fully offline after first load — it
 
 | # | Screen | Contains (top → bottom) | Actions |
 |---|---|---|---|
-| **1** | **Home** | `38` — the count, hero size, dominant element · label `of 71 written from memory` · set toggle: `All 71` / `Base 46` (segmented, remembers last choice) · `Start` button · footer: attribution line, small | `Start` → 2 |
-| **2** | **Session · Prompt** | Progress: `12 left` (text only, no bar) · **Prompt card** — romaji `ka`, large, centered · **Canvas** — square, 1:1, ruled with faint centre crosshair, ink follows finger/stylus · `Clear` · `Undo` · **`Show`** (primary) | `Show` → 3 · `Clear` wipes canvas · `Undo` removes last stroke |
+| **1** | **Home** | `38` — the count for the selected script, hero size, dominant element · label `of 71 hiragana written from memory` · script toggle: `Hiragana` / `Katakana` · set toggle: `All 71` / `Base 46` (both segmented, both remember the last choice) · `Start` button · footer: attribution line, small | `Start` → 2 |
+| **2** | **Session · Prompt** | Progress: `12 left` (text only, no bar) · set line: `set · katakana · all 71` · **Prompt card** — romaji `ka`, large, centered · **Canvas** — square, 1:1, ruled with faint centre crosshair, ink follows finger/stylus · `Clear` · `Undo` · **`Show`** (primary) | `Show` → 3 · `Clear` wipes canvas · `Undo` removes last stroke |
 | **3** | **Session · Reveal** | Same `12 left` · **Prompt card, flipped** — kana `か` + romaji `ka` + `3 strokes` · **Canvas, frozen** — your ink dimmed, correct character animates stroke-by-stroke on top of it, one stroke at a time · `Replay` · **`Got it`** / **`Missed`** (equal weight, side by side) | `Got it` / `Missed` → next card, or → 4 if queue empty · `Replay` re-runs animation |
 | **4** | **Session complete** | `41` — the count, hero size, same position and size as screen 1 · `of 71 written from memory` · delta line: `+3 this session` · `Again` · `Done` | `Again` → 2 (reshuffled) · `Done` → 1 |
 
@@ -25,7 +25,9 @@ No nav bar. No settings screen. No card is reachable except through the session 
 
 ### Why only four screens
 
-Every screen that is not the writing loop is a place to not be writing. Home exists to show the number and start; complete exists to show the number moved. The set toggle lives on Home rather than in settings because it is a two-state choice made once per session, not a preference.
+Every screen that is not the writing loop is a place to not be writing. Home exists to show the number and start; complete exists to show the number moved. The set and script toggles live on Home rather than in settings because each is a two-state choice made once per session, not a preference.
+
+A session is one script. A romaji prompt cannot say which script to write without the toggle already having said it, and a mixed deck would need the card to label every prompt `katakana` — a second thing to read on a screen whose whole job is one word. The header's `set · katakana · all 71` states it once and stays put.
 
 Screens 2 and 3 are the same screen in two states. The card flips in place, the canvas stays exactly where it is. Nothing reflows between prompt and reveal — the animation has to land on top of your ink at the same size and position, so the canvas cannot move.
 
@@ -49,13 +51,15 @@ Consequence, and it is intentional: a kana you miss can only be earned in a *lat
 
 **Interrupted session:** closing mid-session discards the queue. Earned kana are already persisted at the moment of grading, so nothing is lost. There is no resume — resume is state to manage for a loop that takes minutes.
 
-### The 71
+### The 71, twice
 
-46 base + 25 marked = 71.
+46 base + 25 marked = 71, per script — 142 characters of stroke data in all.
 
 - **Base 46:** あいうえお かきくけこ さしすせそ たちつてと なにぬねの はひふへほ まみむめも やゆよ らりるれろ わを ん
 - **Dakuten 20:** がぎぐげご ざじずぜぞ だぢづでど ばびぶべぼ
 - **Handakuten 5:** ぱぴぷぺぽ
+
+Katakana mirrors this exactly: アイウエオ … ワヲン, ガギグゲゴ …, パピプペポ. Unicode lays the katakana block out as a copy of the hiragana block shifted by `0x60` (あ U+3042 → ア U+30A2), and the two scripts agree on reading and on which kana are base versus marked — so `lib/kana.ts` **derives** the katakana set from the hiragana one rather than restating it. Parity is then structural: a romaji fix or a set-membership change lands on both scripts at once, and the two lists cannot drift apart.
 
 Not included: yōon digraphs (きゃ), small kana (っゃ), katakana. The marked kana are worth keeping in the default set precisely because the dakuten is *two extra strokes at the end* — stroke count and order for が is か plus two, which is the kind of thing you only learn by writing it.
 
@@ -71,6 +75,8 @@ Verified against the repo: `dist/hiragana/` contains all 71 characters this app 
 
 Play strokes strictly in document order with a short pause between them. Stroke duration should scale with path length so a long sweep is not faster than a short tick — `getTotalLength()` divided by a fixed pixels-per-second.
 
+**A `<g>` child is one stroke, not several.** The nested group for a self-intersecting stroke holds the *same trajectory repeated once per clip region* — upstream's own animator notes that "all strokes in a group should be the same length". Its paths must therefore animate **concurrently, on one clock, over one shared length** (average the children's `getTotalLength()`; optimization rounds them slightly apart). Animating them in sequence draws the stroke, stops, and draws it again — which reads as the pen stalling midway. This affects 20 of the 71 hiragana and every looping katakana, so it is not an edge case. `scripts/e2e-loop.mjs` guards it by sampling `document.getAnimations()` during a reveal and asserting the copies overlap.
+
 **Attribution this obliges.** The SVGs are derived from **Klee One**, licensed under the **SIL Open Font License 1.1**; everything else in strokesvg is **MIT**. Both are permissive — neither is copyleft over your app code, unlike the alternative below. Obligations:
 
 - Ship the OFL text and the Klee One copyright notice with the app, and the MIT notice for strokesvg. A `/licenses` route or a bundled `NOTICES` file satisfies this.
@@ -79,6 +85,8 @@ Play strokes strictly in document order with a short pause between them. Stroke 
 
 Visible in the app: one small line in the Home footer — *"Stroke data from strokesvg (MIT), derived from Klee One (SIL OFL 1.1)"* — linking to the licenses. That is the only place attribution appears. It does not belong on the writing screen.
 
+Both `dist/hiragana/` and `dist/katakana/` are vendored by `npm run strokes`, into `public/strokes/<codepoint-hex>.svg`.
+
 **Fallback: [KanjiVG](https://kanjivg.tagaini.net/)** — also has kana (`kanji/03042.svg` for あ, `03050.svg` for が, confirmed present), also centerline paths with `fill:none; stroke-width:3`, one `<path>` per stroke in writing order. It animates correctly with the same technique, but renders as a uniform hairline rather than a brush, and it is **CC BY-SA 3.0** — share-alike, which reaches any derivative of the stroke data. Use only if strokesvg turns out to have a bad shape for a specific kana. If used, attribution is *"Kanji stroke data copyright © Ulrich Apel / KanjiVG, CC BY-SA 3.0"* and the derived data must stay under a compatible license.
 
 Both files get vendored into `public/` at build time. Nothing is fetched at runtime.
@@ -86,9 +94,9 @@ Both files get vendored into `public/` at build time. Nothing is fetched at runt
 ### Offline and platform
 
 - Next.js with `output: 'export'` — static files, no server, nothing to call.
-- Service worker precaches the app shell, the 71 SVGs, and any webfont on install. After the first load the app never touches the network.
+- Service worker precaches the app shell, the 142 SVGs, and any webfont on install. After the first load the app never touches the network.
 - Web app manifest: standalone display, portrait, icons, so it installs to the home screen and opens without browser chrome.
-- Persistence is `localStorage`: the set of earned kana, plus the last-used set choice. One small JSON blob, versioned so the shape can change later without wiping the number.
+- Persistence is `localStorage`: the set of earned kana (flat across both scripts — the codepoints never collide, and Home counts whichever script is selected), plus the last-used script and set choice. One small JSON blob, versioned so the shape can change later without wiping the number.
 - Canvas is Pointer Events — covers finger, stylus, and mouse. Stroke width varies with pointer speed for a pen-like line. `touch-action: none` on the canvas so writing never scrolls the page. Canvas backing store sized to `devicePixelRatio` so ink is not fuzzy.
 - Target is a phone held in one hand. The canvas sits in the lower half, inside thumb reach; `Show`, `Got it`, and `Missed` are all in the bottom third.
 
@@ -102,7 +110,7 @@ Both files get vendored into `public/` at build time. Nothing is fetched at runt
 - **Accounts, sync, any backend.** It has to work on a plane, and the number is worth more when it is yours on one device.
 - **Streaks, daily goals, notifications.** Retention theater. The number only goes up when you write a character, and that is the only reason to come back.
 - **Percentages, accuracy scores, per-kana stats, timers.** A percentage invites you to protect it. `38 of 71` says what is left to learn; `54%` says how much you are failing.
-- **Katakana, yōon, kanji, vocabulary, reading practice.** Not this app.
+- **Yōon, small kana, kanji, vocabulary, reading practice.** Not this app. Katakana *is* now in — it is the same drill on the same stroke data, and it is the other half of the kana you have to be able to write. A mixed hiragana+katakana deck is not: see the one-script-per-session note above.
 - **Session length settings.** A session is the shuffled set, and it ends when the queue is empty.
 
 ### Assumptions to confirm

@@ -9,10 +9,28 @@
 //   5. Finish all 71 -> complete screen shows count 70, "+70 this session"
 //   6. Reload -> count persisted
 //   7. Second session: the once-missed kana earns on its new first attempt -> 71
+//   8. Base 46 and Katakana toggles produce the right deck, and the katakana
+//      count is scored separately from the hiragana one
+//   9. A self-intersecting stroke animates as ONE pen stroke: its clipped
+//      copies run concurrently, not one after the other
 
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { readFile, readdir } from "node:fs/promises";
+import path from "node:path";
 import { chromium } from "playwright";
+
+// Kana whose stroke file has a <g style="--i:N"> — one pen stroke drawn as
+// several clipped copies. These are the ones the animator used to stall on.
+const STROKES_DIR = path.join(import.meta.dirname, "..", "public", "strokes");
+const grouped = new Set();
+for (const file of await readdir(STROKES_DIR)) {
+  if (!file.endsWith(".svg")) continue;
+  const svg = await readFile(path.join(STROKES_DIR, file), "utf8");
+  if (svg.includes('<g style="--i')) {
+    grouped.add(String.fromCodePoint(parseInt(file.slice(0, -4), 16)));
+  }
+}
 
 const PORT = 3211;
 const URL = `http://localhost:${PORT}`;
@@ -41,6 +59,34 @@ const hero = () => page.locator(".hero").innerText();
 const leftCount = async () =>
   parseInt(await page.locator(".sessionLeft").innerText(), 10);
 const promptRomaji = () => page.locator(".cardRomaji").innerText();
+// several chips are uppercased in CSS; compare on the underlying text
+const text = async (sel) => (await page.locator(sel).innerText()).toLowerCase();
+const atComplete = () => page.locator("button:has-text('Again')").count();
+
+/** max stroke animations running at once inside the reveal overlay */
+function peakConcurrency(ms) {
+  return page.evaluate(
+    (ms) =>
+      new Promise((resolve) => {
+        let peak = 0;
+        const t0 = performance.now();
+        const tick = () => {
+          const n = document
+            .getAnimations()
+            .filter(
+              (a) =>
+                a.playState === "running" &&
+                a.effect?.target?.closest?.(".canvasOverlay"),
+            ).length;
+          if (n > peak) peak = n;
+          if (performance.now() - t0 < ms) requestAnimationFrame(tick);
+          else resolve(peak);
+        };
+        requestAnimationFrame(tick);
+      }),
+    ms,
+  );
+}
 
 async function draw() {
   const box = await page.locator("canvas.ink").boundingBox();
@@ -51,20 +97,24 @@ async function draw() {
   await page.mouse.up();
 }
 
-async function showAndGrade(grade) {
+async function showAndGrade(grade, watch = false) {
   await draw();
   await page.click("button:has-text('Show')");
   await page.waitForSelector(".canvasOverlay svg"); // reveal animation mounted
-  await page.waitForSelector(".cardSub"); // kana + stroke count on the card
+  await page.waitForSelector(".cardKana"); // kana on the flipped card
+  const kana = await page.locator(".cardKana").innerText();
+  let peak = 0;
+  if (watch && grouped.has(kana)) peak = await peakConcurrency(3500);
   await page.click(`button:has-text('${grade}')`);
+  return { kana, peak };
 }
 
 // --- 1. home ---
 await page.goto(URL);
 await page.waitForFunction(() => document.querySelector(".hero")?.textContent?.trim() === "0");
 console.log("home: count starts at 0");
-await page.waitForSelector("button.btnStart:not([disabled])");
-await page.click("button.btnStart");
+await page.waitForSelector(".homeBottom button.btnStrike:not([disabled])");
+await page.click(".homeBottom button.btnStrike");
 
 // --- 2. ink gating ---
 assert.equal(await leftCount(), 71, "session starts with 71 cards");
@@ -92,18 +142,37 @@ await showAndGrade("Got it"); // got it on requeue — must NOT count
 
 // --- 5. finish the rest ---
 let guard = 0;
-while ((await page.locator(".delta").count()) === 0) {
+let watched = 0;
+const peaks = [];
+while ((await atComplete()) === 0) {
   assert.ok(++guard < 80, "session should finish within 80 cards");
-  await showAndGrade("Got it");
+  // spot-check the first few looping kana for concurrent stroke copies
+  const { kana, peak } = await showAndGrade("Got it", watched < 3);
+  if (peak > 0) {
+    peaks.push(`${kana}:${peak}`);
+    watched++;
+  }
   if (guard % 10 === 0) console.log(`...${guard} more cards graded`);
 }
 assert.equal(await hero(), "70", "complete screen: 70 of 71 (requeued got-it did not count)");
 assert.equal(
-  await page.locator(".delta").innerText(),
+  await text(".chipLive"),
   "+70 this session",
   "delta reflects first-attempt earns only",
 );
 console.log("session 1 complete: 70/71, first-attempt rule holds");
+
+// --- 9. a looping stroke is one stroke, drawn by concurrent clipped copies ---
+assert.ok(watched > 0, "session should have revealed at least one looping kana");
+for (const entry of peaks) {
+  const [kana, peak] = entry.split(":");
+  assert.ok(
+    Number(peak) >= 2,
+    `${kana}: clipped copies of a self-intersecting stroke must animate together, ` +
+      `saw only ${peak} at once (sequential copies stall the stroke midway)`,
+  );
+}
+console.log(`stroke concurrency: ${peaks.join("  ")}`);
 
 // --- 6. persistence across reload ---
 await page.click("button:has-text('Done')");
@@ -113,24 +182,49 @@ await page.waitForFunction(() => document.querySelector(".hero")?.textContent?.t
 console.log("persistence: count survives reload");
 
 // --- 7. second session: the missed kana can now be earned ---
-await page.waitForSelector("button.btnStart:not([disabled])");
-await page.click("button.btnStart");
+await page.waitForSelector(".homeBottom button.btnStrike:not([disabled])");
+await page.click(".homeBottom button.btnStrike");
 guard = 0;
-while ((await page.locator(".delta").count()) === 0) {
+while ((await atComplete()) === 0) {
   assert.ok(++guard < 80, "session 2 should finish within 80 cards");
   await showAndGrade("Got it");
   if (guard % 10 === 0) console.log(`...${guard} cards`);
 }
 assert.equal(await hero(), "71", "the once-missed kana earns in a later session");
-assert.equal(await page.locator(".delta").innerText(), "+1 this session");
+assert.equal(await text(".chipLive"), "+1 this session");
 console.log("session 2 complete: 71/71, later-session earn works");
 
-// --- base 46 toggle ---
+// --- 8. base 46 toggle ---
 await page.click("button:has-text('Done')");
 await page.click("button:has-text('Base 46')");
-await page.click("button.btnStart");
+await page.click(".homeBottom button.btnStrike");
 assert.equal(await leftCount(), 46, "Base 46 deck has 46 cards");
 console.log("base 46 toggle: ok");
+await page.goto(URL); // abandon the session
+
+// --- 8b. katakana is a separate script with its own count ---
+await page.waitForSelector(".homeBottom button.btnStrike:not([disabled])");
+await page.click("button:has-text('Katakana')");
+await page.waitForFunction(() => document.querySelector(".hero")?.textContent?.trim() === "0");
+assert.match(
+  await text(".chipStrike"),
+  /of 71 katakana/,
+  "home labels the selected script",
+);
+console.log("katakana: count is scored separately from hiragana (0, not 71)");
+
+await page.click("button:has-text('All 71')");
+await page.click(".homeBottom button.btnStrike");
+assert.equal(await leftCount(), 71, "katakana deck has 71 cards");
+const first = await showAndGrade("Got it");
+assert.match(first.kana, /^[\u30a1-\u30f6]$/, `reveal shows a katakana, got '${first.kana}'`);
+await page.goto(URL);
+await page.waitForFunction(() => document.querySelector(".hero")?.textContent?.trim() === "1");
+console.log("katakana: deck is 71 katakana, earning one moves the katakana number to 1");
+
+await page.click("button:has-text('Hiragana')");
+await page.waitForFunction(() => document.querySelector(".hero")?.textContent?.trim() === "71");
+console.log("script toggle: hiragana number is untouched at 71");
 
 await browser.close();
 kill();

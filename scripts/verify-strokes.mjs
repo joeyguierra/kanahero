@@ -1,5 +1,5 @@
 // Sanity-checks the vendored stroke SVGs in public/strokes:
-// - all 71 present
+// - all 142 present (71 hiragana + 71 katakana)
 // - viewBox is 0 0 1024 1024 (the canvas is square because of this)
 // - has a shadows group and a strokes group
 // - stroke path count >= visible stroke count is plausible (1..10)
@@ -9,9 +9,12 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 const DIR = path.join(import.meta.dirname, "..", "public", "strokes");
-const KANA =
+const HIRAGANA =
   "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん" +
   "がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ";
+const KANA =
+  HIRAGANA +
+  [...HIRAGANA].map((c) => String.fromCodePoint(c.codePointAt(0) + 0x60)).join("");
 
 let bad = 0;
 const rows = [];

@@ -1,19 +1,27 @@
-// The 71 hiragana this app drills: 46 base + 20 dakuten + 5 handakuten.
-// Romaji is Hepburn (shi, chi, tsu, fu, ji, zu); を is "wo", ん is "n".
+// The 71 hiragana this app drills: 46 base + 20 dakuten + 5 handakuten,
+// and the 71 katakana that mirror them one for one.
+// Romaji is Hepburn (shi, chi, tsu, fu, ji, zu); を/ヲ is "wo", ん/ン is "n".
 // `hex` is the Unicode codepoint, used as the stroke SVG filename.
+
+export type Script = "hiragana" | "katakana";
 
 export interface Kana {
   kana: string;
   romaji: string;
   hex: string;
   base: boolean; // member of the base 46
+  script: Script;
+}
+
+function hex(kana: string): string {
+  return kana.codePointAt(0)!.toString(16).padStart(4, "0");
 }
 
 function k(kana: string, romaji: string, base: boolean): Kana {
-  return { kana, romaji, hex: kana.codePointAt(0)!.toString(16).padStart(4, "0"), base };
+  return { kana, romaji, hex: hex(kana), base, script: "hiragana" };
 }
 
-export const KANA: Kana[] = [
+export const HIRAGANA: Kana[] = [
   // base 46
   k("あ", "a", true), k("い", "i", true), k("う", "u", true), k("え", "e", true), k("お", "o", true),
   k("か", "ka", true), k("き", "ki", true), k("く", "ku", true), k("け", "ke", true), k("こ", "ko", true),
@@ -34,7 +42,27 @@ export const KANA: Kana[] = [
   k("ぱ", "pa", false), k("ぴ", "pi", false), k("ぷ", "pu", false), k("ぺ", "pe", false), k("ぽ", "po", false),
 ];
 
-export const BASE_46 = KANA.filter((x) => x.base);
+// Unicode lays katakana out as a copy of the hiragana block shifted by 0x60
+// (あ U+3042 → ア U+30A2, ん U+3093 → ン U+30F3), and the two scripts agree on
+// reading and on which kana are base vs marked. So the katakana set is derived
+// rather than retyped: parity is then structural, not something to keep in sync.
+const KATAKANA_OFFSET = 0x60;
+
+export const KATAKANA: Kana[] = HIRAGANA.map((h) => {
+  const kana = String.fromCodePoint(h.kana.codePointAt(0)! + KATAKANA_OFFSET);
+  return { kana, romaji: h.romaji, hex: hex(kana), base: h.base, script: "katakana" };
+});
+
+export const BY_SCRIPT: Record<Script, Kana[]> = {
+  hiragana: HIRAGANA,
+  katakana: KATAKANA,
+};
+
+/** the deck for a home-screen choice */
+export function kanaSet(script: Script, base: boolean): Kana[] {
+  const all = BY_SCRIPT[script];
+  return base ? all.filter((x) => x.base) : all;
+}
 
 export function strokeSvgPath(kana: Kana): string {
   return `/strokes/${kana.hex}.svg`;

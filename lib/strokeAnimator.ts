@@ -3,9 +3,16 @@
 // File anatomy (see public/strokes/*.svg):
 //   <g data-strokesvg="shadows"> — filled outline of each stroke, used as clip
 //     paths and as the faint "ghost" of the full character (fill: var(--shadow))
-//   <g data-strokesvg="strokes"> — one child per stroke, in writing order,
+//   <g data-strokesvg="strokes"> — one child per pen stroke, in writing order,
 //     tagged style="--i:N". A child is a single centerline <path>, or a <g> of
 //     several paths when the stroke self-intersects (loops in あ, ま, ほ...).
+//
+// A <g> child is NOT a sequence of sub-strokes: it is the *same* trajectory
+// repeated once per clip region, so the crossing layers correctly. Upstream's
+// own animator says as much — "all strokes in a group should be the same
+// length". So its paths animate together, as one pen stroke, over one shared
+// length. Drawing them one after another redraws the stroke and reads as a
+// stall partway through.
 //
 // Each centerline is revealed start-to-end with stroke-dasharray/-dashoffset,
 // clipped to its shadow, so the stroke grows in the direction the pen moves.
@@ -15,8 +22,10 @@ const SPEED = 1600; // svg user units per second (viewBox is 1024)
 const MIN_MS = 140; // floor so tiny ticks don't blink
 const GAP_MS = 260; // pen-lift pause between strokes
 
-interface Segment {
-  path: SVGPathElement;
+interface Stroke {
+  /** every path that draws this one pen stroke; >1 when it self-intersects */
+  paths: SVGPathElement[];
+  /** shared length for all of them — see the note above */
   len: number;
 }
 
@@ -34,33 +43,41 @@ export interface StrokePlayer {
 
 export function createStrokePlayer(svg: SVGSVGElement): StrokePlayer {
   const strokesGroup = svg.querySelector<SVGGElement>('[data-strokesvg="strokes"]');
-  // one entry per pen stroke; loops are split into sequential segments
-  const strokes: Segment[][] = [];
+  const strokes: Stroke[] = [];
   for (const unit of Array.from(strokesGroup?.children ?? [])) {
     const paths =
       unit instanceof SVGPathElement
         ? [unit]
         : Array.from(unit.querySelectorAll<SVGPathElement>("path"));
     if (paths.length === 0) continue;
-    strokes.push(paths.map((path) => ({ path, len: path.getTotalLength() })));
+    // The clipped copies are meant to be identical in length; optimization
+    // rounds them apart. Averaging keeps the worst desync to half the spread,
+    // so no copy is left short of its endpoint.
+    const len =
+      paths.reduce((sum, p) => sum + p.getTotalLength(), 0) / paths.length;
+    strokes.push({ paths, len });
   }
 
   let cancelled = false;
-  let running: Animation | null = null;
+  let running: Animation[] = [];
 
   // Hide by parking the dash fully off the path. Offsets deliberately overshoot
   // by 1 unit on each side: a dash boundary sitting exactly on a path endpoint
   // paints a round-cap dot.
+  const hidden = (len: number) => `${len + 3}`;
+
   function hideAll() {
-    for (const seg of strokes.flat()) {
-      seg.path.style.strokeDasharray = `${seg.len + 2} ${seg.len + 2}`;
-      seg.path.style.strokeDashoffset = `${seg.len + 3}`;
+    for (const stroke of strokes) {
+      for (const path of stroke.paths) {
+        path.style.strokeDasharray = `${stroke.len + 2} ${stroke.len + 2}`;
+        path.style.strokeDashoffset = hidden(stroke.len);
+      }
     }
   }
 
   function showAll() {
-    for (const seg of strokes.flat()) {
-      seg.path.style.strokeDashoffset = "1";
+    for (const stroke of strokes) {
+      for (const path of stroke.paths) path.style.strokeDashoffset = "1";
     }
   }
 
@@ -72,35 +89,38 @@ export function createStrokePlayer(svg: SVGSVGElement): StrokePlayer {
     for (let i = 0; i < strokes.length; i++) {
       if (i > 0) await sleep(GAP_MS);
       if (cancelled) return;
+      const stroke = strokes[i];
       onStroke?.(i + 1);
-      for (const seg of strokes[i]) {
-        if (cancelled) return;
-        const duration = Math.max(MIN_MS, (seg.len / SPEED) * 1000);
-        running = seg.path.animate(
-          [{ strokeDashoffset: `${seg.len + 3}` }, { strokeDashoffset: "1" }],
+      const duration = Math.max(MIN_MS, (stroke.len / SPEED) * 1000);
+      // one pen stroke: every copy runs on the same clock
+      running = stroke.paths.map((path) =>
+        path.animate(
+          [{ strokeDashoffset: hidden(stroke.len) }, { strokeDashoffset: "1" }],
           { duration, easing: "ease-in-out", fill: "none" },
-        );
-        try {
-          await running.finished;
-        } catch {
-          return; // cancelled mid-stroke
-        }
-        seg.path.style.strokeDashoffset = "1"; // commit final state
+        ),
+      );
+      try {
+        await Promise.all(running.map((a) => a.finished));
+      } catch {
+        return; // cancelled mid-stroke
       }
+      for (const path of stroke.paths) path.style.strokeDashoffset = "1"; // commit
     }
+  }
+
+  function stop() {
+    cancelled = true;
+    for (const a of running) a.cancel();
+    running = [];
   }
 
   return {
     strokeCount: strokes.length,
     play,
     finish() {
-      cancelled = true;
-      running?.cancel();
+      stop();
       showAll();
     },
-    cancel() {
-      cancelled = true;
-      running?.cancel();
-    },
+    cancel: stop,
   };
 }
