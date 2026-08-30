@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics=""><meta name="design_doc_mode" content="canvas"><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&amp;family=JetBrains+Mono:wght@400;600;800&amp;family=Noto+Sans+JP:wght@400;700;900&amp;display=swap" rel="stylesheet"><style>
+body{margin:0;background:#151517;font-family:Archivo,system-ui,sans-serif;color:#F2F0EB;-webkit-font-smoothing:antialiased}
+a{color:#FF2E88}a:hover{color:#F2F0EB}
+</style></helmet>
+
+<section style="padding:44px 48px 40px;border-bottom:1px solid rgba(255,255,255,.08)">
+<div style="display:flex;align-items:baseline;gap:11px;margin-bottom:8px">
+  <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#FF2E88;color:#000">V2</span>
+  <span style="font:700 14px Archivo,sans-serif;color:#F2F0EB">kanahero v2 — handoff build spec</span>
+</div>
+<div style="font:400 12px/1.6 'JetBrains Mono',monospace;color:#8C8C93;max-width:760px;letter-spacing:.02em;margin-bottom:32px">THREE TRACKS: HIRAGANA · KATAKANA · KANJI. WIREFRAMES TURN 3 VISUAL SYSTEM + SHIPPED APP SESSION MECHANICS. NO SPLASH.</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:38px;align-items:flex-start">
+
+<div style="flex:none;display:flex;flex-direction:column;gap:11px">
+  <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93"><span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S1</span>Home — three tracks</div>
+  <div data-screen-label="S1 Home" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;font-family:Archivo,sans-serif;position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;padding:54px 28px 36px;box-sizing:border-box;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+    
+    <div style="position:absolute;z-index:-1;right:-64px;top:-58px;font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:290px;line-height:1;color:transparent;-webkit-text-stroke:1px #1D1D21;pointer-events:none;user-select:none">あ</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;position:relative">
+      <div style="font-size:30px;font-weight:900;letter-spacing:-.03em;white-space:nowrap">KANA HERO</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;color:#8C8C93">OFFLINE · $0</div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;color:#8C8C93;margin-top:30px">TRACK</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+      <div style="border:1px solid #FF2E88;background:linear-gradient(180deg,rgba(255,46,136,.2),rgba(255,46,136,.05));padding:16px 18px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between">
+          <div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:26px;color:#FF2E88">あ</span><span style="font-size:20px;font-weight:900;letter-spacing:.01em">HIRAGANA</span></div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#FF2E88">46/71</span>
+        </div>
+        <div style="height:7px;background:#0A0A0B;border:1px solid #2A2A2E;margin-top:12px"><div style="width:65%;height:100%;background:#FF2E88"></div></div>
+        <div style="display:flex;gap:7px;margin-top:12px">
+          <span style="border:1px solid #2A2A2E;background:#141416;color:#8C8C93;padding:7px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em">BASE 46</span>
+          <span style="border:1px solid #FF2E88;background:rgba(255,46,136,.14);color:#FF2E88;padding:7px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em">ALL 71</span>
+        </div>
+      </div>
+      <div style="border:1px solid #2A2A2E;background:#141416;padding:16px 18px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between">
+          <div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:26px;color:#8C8C93">ア</span><span style="font-size:20px;font-weight:900;letter-spacing:.01em">KATAKANA</span></div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8C8C93">12/71</span>
+        </div>
+        <div style="height:7px;background:#0A0A0B;border:1px solid #2A2A2E;margin-top:12px"><div style="width:17%;height:100%;background:#8C8C93"></div></div>
+      </div>
+      <div style="border:1px solid #2A2A2E;background:#141416;padding:16px 18px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between">
+          <div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:26px;color:#8C8C93">漢</span><span style="font-size:20px;font-weight:900;letter-spacing:.01em">KANJI</span></div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8C8C93">3 PRESETS →</span>
+        </div>
+        <div style="height:7px;background:#0A0A0B;border:1px solid #2A2A2E;margin-top:12px"><div style="width:30%;height:100%;background:#8C8C93"></div></div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.8;letter-spacing:.08em;color:#8C8C93;margin-top:26px">HIRAGANA — ALL 71, DAKUTEN INCLUDED.<br>MISSED CARDS REPLAY UNTIL ZERO.</div>
+    <div style="flex:1"></div>
+    <div style="background:#FF2E88;color:#000;text-align:center;padding:22px;font-size:22px;font-weight:900;letter-spacing:.02em;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px))">START SESSION</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.1em;color:#5A5A5F;text-align:center;line-height:1.7;margin-top:14px">STROKESVG (MIT) / KLEE ONE (SIL OFL 1.1) · KANJIVG (CC BY-SA 3.0)</div>
+  </div>
+  <p style="font-size:11.5px;line-height:1.55;color:#8C8C93;max-width:390px;margin:0"><b style="color:#B9B6B1;font-weight:600">Three track cards, each with its own count.</b> Selected track = strike border + tinted fill and reveals its inline set toggle; unselected collapse to a seam card and a gray bar. Kana starts directly. Kanji routes to S1b. Attribution is the only footer, per spec. Ambient livery: ghost glyphs (1px outline, behind all content) on chrome screens S1/S1b/S4; the right-edge stripe rail on session screens S2/S3, clear of the canvas. Nothing else.</p>
+</div>
+
+<div style="flex:none;display:flex;flex-direction:column;gap:11px">
+  <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93"><span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S1b</span>Kanji presets <span style="color:#FF2E88">placeholder categories</span></div>
+  <div data-screen-label="S1b Kanji presets" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;font-family:Archivo,sans-serif;position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;padding:54px 28px 36px;box-sizing:border-box;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+    
+    <div style="position:absolute;z-index:-1;right:-66px;top:88px;font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:270px;line-height:1;color:transparent;-webkit-text-stroke:1px #1D1D21;pointer-events:none;user-select:none">漢</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;position:relative">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:#8C8C93;padding:12px;margin:-12px">← BACK</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;color:#8C8C93">PLACEHOLDER SETS</div>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:10px;margin-top:26px">
+      <span style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:34px;color:#FF2E88">漢</span>
+      <span style="font-size:34px;font-weight:900;letter-spacing:-.03em">KANJI</span>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;color:#8C8C93;margin-top:20px">PICK A PRESET</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px">
+      <div style="border:1px solid #2A2A2E;background:#141416;padding:14px">
+        <div style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:22px;color:#8C8C93">数</div>
+        <div style="font-size:15px;font-weight:900;margin-top:8px">NUMBERS</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8C8C93;margin-top:5px">8 / 12</div>
+        <div style="height:5px;background:#0A0A0B;border:1px solid #2A2A2E;margin-top:9px"><div style="width:66%;height:100%;background:#8C8C93"></div></div>
+      </div>
+      <div style="border:1px solid #2A2A2E;background:#141416;padding:14px">
+        <div style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:22px;color:#8C8C93">日</div>
+        <div style="font-size:15px;font-weight:900;margin-top:8px">DAYS &amp; TIME</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8C8C93;margin-top:5px">0 / 14</div>
+        <div style="height:5px;background:#0A0A0B;border:1px solid #2A2A2E;margin-top:9px"><div style="width:0%;height:100%;background:#8C8C93"></div></div>
+      </div>
+      <div style="border:1px solid #2A2A2E;background:#141416;padding:14px">
+        <div style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:22px;color:#8C8C93">人</div>
+        <div style="font-size:15px;font-weight:900;margin-top:8px">PEOPLE</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8C8C93;margin-top:5px">4 / 10</div>
+        <div style="height:5px;background:#0A0A0B;border:1px solid #2A2A2E;margin-top:9px"><div style="width:40%;height:100%;background:#8C8C93"></div></div>
+      </div>
+      <div style="border:1px solid #FF2E88;background:linear-gradient(180deg,rgba(255,46,136,.2),rgba(255,46,136,.05));padding:14px">
+        <div style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:22px;color:#FF2E88">山</div>
+        <div style="font-size:15px;font-weight:900;margin-top:8px">NATURE</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#FF2E88;margin-top:5px">11 / 16</div>
+        <div style="height:5px;background:#0A0A0B;border:1px solid #2A2A2E;margin-top:9px"><div style="width:69%;height:100%;background:#FF2E88"></div></div>
+      </div>
+      <div style="border:1px solid #2A2A2E;background:#141416;padding:14px">
+        <div style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:22px;color:#8C8C93">食</div>
+        <div style="font-size:15px;font-weight:900;margin-top:8px">FOOD</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8C8C93;margin-top:5px">0 / 11</div>
+        <div style="height:5px;background:#0A0A0B;border:1px solid #2A2A2E;margin-top:9px"><div style="width:0%;height:100%;background:#8C8C93"></div></div>
+      </div>
+      <div style="border:1px solid #2A2A2E;background:#141416;padding:14px">
+        <div style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:22px;color:#8C8C93">駅</div>
+        <div style="font-size:15px;font-weight:900;margin-top:8px">GETTING AROUND</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8C8C93;margin-top:5px">0 / 13</div>
+        <div style="height:5px;background:#0A0A0B;border:1px solid #2A2A2E;margin-top:9px"><div style="width:0%;height:100%;background:#8C8C93"></div></div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:9px;border:1px dashed #2A2A2E;padding:13px;margin-top:9px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8C8C93">
+      <span style="width:7px;height:7px;background:#2A2A2E;display:inline-block"></span>CATEGORIES ARE PLACEHOLDER — FINAL GROUPING TBD
+    </div>
+    <div style="flex:1"></div>
+    <div style="background:#FF2E88;color:#000;text-align:center;padding:22px;font-size:20px;font-weight:900;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px))">START · NATURE (16)</div>
+  </div>
+  <p style="font-size:11.5px;line-height:1.55;color:#8C8C93;max-width:390px;margin:0"><b style="color:#B9B6B1;font-weight:600">One preset per session</b> — the kana one-script rule extended. Six placeholder categories, 76 characters total; names, membership and counts are all TBD. Grid takes 3–9 chips before it needs a scroll. Each chip carries its own earned count.</p>
+</div>
+
+<div style="flex:none;display:flex;flex-direction:column;gap:11px">
+  <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93"><span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S2a</span>Prompt + write · katakana</div>
+  <div data-screen-label="S2a Write katakana" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;font-family:Archivo,sans-serif;position:relative;overflow:hidden;display:flex;flex-direction:column;padding:54px 28px 36px;box-sizing:border-box;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+    <div style="position:absolute;top:0;bottom:0;right:0;width:13px;background:repeating-linear-gradient(45deg,#FF2E88 0 7px,transparent 7px 14px);opacity:.18;border-left:1px solid #2A2A2E;pointer-events:none"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="background:#F2F0EB;color:#0A0A0B;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;letter-spacing:.16em;padding:4px 7px">KATAKANA</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:#8C8C93">12 LEFT</span>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:#8C8C93;padding:12px;margin:-12px">✕ QUIT</div>
+    </div>
+    <div style="height:116px;margin-top:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.24em;color:#FF2E88">WRITE</div>
+      <div style="font-size:88px;font-weight:900;line-height:1;margin-top:6px">ka</div>
+    </div>
+    <div style="width:334px;height:334px;background:#F2F0EB;margin-top:24px;position:relative;box-shadow:inset 0 0 0 1px #2A2A2E">
+      <div style="position:absolute;left:50%;top:6%;bottom:6%;width:0;border-left:1px dashed rgba(10,10,11,.16)"></div>
+      <div style="position:absolute;top:50%;left:6%;right:6%;height:0;border-top:1px dashed rgba(10,10,11,.16)"></div>
+      <div style="position:absolute;left:10px;top:8px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(10,10,11,.4)">DRAW</div>
+      <svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%">
+        <path d="M22 31 L75 30" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+        <path d="M59 20 C57 45 49 69 28 83" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+      </svg>
+    </div>
+    <div style="flex:1"></div>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <div style="flex:1;border:1px solid #2A2A2E;background:#141416;color:#8C8C93;text-align:center;padding:17px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em">CLEAR</div>
+      <div style="flex:1;border:1px solid #2A2A2E;background:#141416;color:#8C8C93;text-align:center;padding:17px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em">UNDO</div>
+    </div>
+    <div style="background:#FF2E88;color:#000;text-align:center;padding:20px;font-size:20px;font-weight:900;margin-top:10px;clip-path:polygon(0 0,100% 0,100% 100%,16px 100%,0 calc(100% - 16px))">SHOW</div>
+  </div>
+  <p style="font-size:11.5px;line-height:1.55;color:#8C8C93;max-width:390px;margin:0"><b style="color:#B9B6B1;font-weight:600">Clear / Undo / Show</b> — the shipped action row, replacing the wireframes' Clear/Flip. Undo drops the last stroke. Canvas is square 334×334, fixed position, and does <b style="color:#B9B6B1;font-weight:600">not move</b> into the reveal. No hints: no stroke count, no ghost glyph, no first-stroke peek.</p>
+</div>
+
+<div style="flex:none;display:flex;flex-direction:column;gap:11px">
+  <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93"><span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S2b</span>Prompt + write · kanji <span style="color:#FF2E88">meaning prompt</span></div>
+  <div data-screen-label="S2b Write kanji" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;font-family:Archivo,sans-serif;position:relative;overflow:hidden;display:flex;flex-direction:column;padding:54px 28px 36px;box-sizing:border-box;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+    <div style="position:absolute;top:0;bottom:0;right:0;width:13px;background:repeating-linear-gradient(45deg,#FF2E88 0 7px,transparent 7px 14px);opacity:.18;border-left:1px solid #2A2A2E;pointer-events:none"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="background:#FF2E88;color:#000;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;letter-spacing:.16em;padding:4px 7px">KANJI · NATURE</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:#8C8C93">12 LEFT</span>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:#8C8C93;padding:12px;margin:-12px">✕ QUIT</div>
+    </div>
+    <div style="height:116px;margin-top:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.24em;color:#FF2E88">WRITE THE KANJI FOR</div>
+      <div style="font-size:76px;font-weight:900;line-height:1;margin-top:6px;letter-spacing:-.035em">water</div>
+    </div>
+    <div style="width:334px;height:334px;background:#F2F0EB;margin-top:24px;position:relative;box-shadow:inset 0 0 0 1px #2A2A2E">
+      <div style="position:absolute;left:50%;top:6%;bottom:6%;width:0;border-left:1px dashed rgba(10,10,11,.16)"></div>
+      <div style="position:absolute;top:50%;left:6%;right:6%;height:0;border-top:1px dashed rgba(10,10,11,.16)"></div>
+      <div style="position:absolute;left:10px;top:8px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(10,10,11,.4)">DRAW</div>
+      <svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%">
+        <path d="M51 15 C51 40 51 62 45 78 C43 85 38 87 32 83" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+        <path d="M33 33 C31 46 26 59 17 71" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+        <path d="M35 41 C42 47 45 53 46 60" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+        <path d="M57 47 C65 41 73 34 80 25" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+      </svg>
+    </div>
+    <div style="flex:1"></div>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <div style="flex:1;border:1px solid #2A2A2E;background:#141416;color:#8C8C93;text-align:center;padding:17px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em">CLEAR</div>
+      <div style="flex:1;border:1px solid #2A2A2E;background:#141416;color:#8C8C93;text-align:center;padding:17px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em">UNDO</div>
+    </div>
+    <div style="background:#FF2E88;color:#000;text-align:center;padding:20px;font-size:20px;font-weight:900;margin-top:10px;clip-path:polygon(0 0,100% 0,100% 100%,16px 100%,0 calc(100% - 16px))">SHOW</div>
+  </div>
+  <p style="font-size:11.5px;line-height:1.55;color:#8C8C93;max-width:390px;margin:0"><b style="color:#B9B6B1;font-weight:600">One string differs from S2a.</b> English meaning replaces romaji in the same slot — long meanings shrink to fit, never wrap to two lines. Everything below the prompt is byte-identical to the kana screen, so screen 2 renders one field and never branches on track.</p>
+</div>
+
+<div style="flex:none;display:flex;flex-direction:column;gap:11px">
+  <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93"><span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S3a</span>Reveal · katakana <span style="color:#FF2E88">model over your ink</span></div>
+  <div data-screen-label="S3a Reveal katakana" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;font-family:Archivo,sans-serif;position:relative;overflow:hidden;display:flex;flex-direction:column;padding:54px 28px 36px;box-sizing:border-box;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+    <div style="position:absolute;top:0;bottom:0;right:0;width:13px;background:repeating-linear-gradient(45deg,#FF2E88 0 7px,transparent 7px 14px);opacity:.18;border-left:1px solid #2A2A2E;pointer-events:none"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="background:#F2F0EB;color:#0A0A0B;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;letter-spacing:.16em;padding:4px 7px">KATAKANA</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:#8C8C93">12 LEFT</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#00E58A"><span style="width:7px;height:7px;background:#00E58A;box-shadow:0 0 8px #00E58A"></span>REVEALING</div>
+    </div>
+    <div style="height:116px;margin-top:26px;display:flex">
+    <div style="flex:1;border:1px solid #FF2E88;background:linear-gradient(180deg,rgba(255,46,136,.16),rgba(255,46,136,.04));padding:14px 18px;display:flex;align-items:center;gap:18px;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%)">
+      <div style="font-family:'Noto Sans JP',sans-serif;font-weight:700;font-size:58px;line-height:1;color:#F2F0EB">カ</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="font-size:28px;font-weight:900;letter-spacing:-.02em;line-height:1">ka</div>
+        <div style="border:1px solid #2A2A2E;background:#141416;color:#8C8C93;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;padding:5px 8px;align-self:flex-start">2 STROKES</div>
+      </div>
+    </div>
+    </div>
+    <div style="width:334px;height:334px;background:#F2F0EB;margin-top:24px;position:relative;box-shadow:inset 0 0 0 1px #2A2A2E">
+      <div style="position:absolute;left:50%;top:6%;bottom:6%;width:0;border-left:1px dashed rgba(10,10,11,.16)"></div>
+      <div style="position:absolute;top:50%;left:6%;right:6%;height:0;border-top:1px dashed rgba(10,10,11,.16)"></div>
+      <div style="position:absolute;left:10px;top:8px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(10,10,11,.35)">YOUR INK · 30%</div>
+      <svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%;opacity:.3">
+        <path d="M22 31 L75 30" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+        <path d="M59 20 C57 45 49 69 28 83" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+      </svg>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Noto Sans JP',sans-serif;font-weight:700;font-size:250px;line-height:1;color:#FF2E88;pointer-events:none">カ</div>
+      <div style="position:absolute;bottom:8px;right:10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;color:rgba(10,10,11,.45)">STROKE 2/2</div>
+    </div>
+    <div style="flex:1"></div>
+    <div style="border:1px solid #2A2A2E;background:#141416;color:#8C8C93;text-align:center;padding:15px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;margin-top:20px">↻ REPLAY</div>
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <div style="flex:1;border:1px solid #00E58A;background:linear-gradient(180deg,rgba(0,229,138,.22),rgba(0,229,138,.06));color:#00E58A;text-align:center;padding:19px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;letter-spacing:.14em">GOT IT</div>
+      <div style="flex:1;border:1px solid #FFB300;background:linear-gradient(180deg,rgba(255,179,0,.2),rgba(255,179,0,.05));color:#FFB300;text-align:center;padding:19px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;letter-spacing:.14em">MISSED</div>
+    </div>
+  </div>
+  <p style="font-size:11.5px;line-height:1.55;color:#8C8C93;max-width:390px;margin:0"><b style="color:#B9B6B1;font-weight:600">Same screen as S2a, card flipped in place.</b> The canvas does not move, resize, or reflow — your ink drops to 30% where it sits and the model character animates <b style="color:#B9B6B1;font-weight:600">on top of it</b> in strike, stroke by stroke in writing order, at full canvas size. No side-by-side, no minimized attempt. Grades are equal weight.</p>
+</div>
+
+<div style="flex:none;display:flex;flex-direction:column;gap:11px">
+  <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93"><span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S3b</span>Reveal · kanji <span style="color:#FF2E88">+ readings</span></div>
+  <div data-screen-label="S3b Reveal kanji" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;font-family:Archivo,sans-serif;position:relative;overflow:hidden;display:flex;flex-direction:column;padding:54px 28px 36px;box-sizing:border-box;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+    <div style="position:absolute;top:0;bottom:0;right:0;width:13px;background:repeating-linear-gradient(45deg,#FF2E88 0 7px,transparent 7px 14px);opacity:.18;border-left:1px solid #2A2A2E;pointer-events:none"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="background:#FF2E88;color:#000;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;letter-spacing:.16em;padding:4px 7px">KANJI · NATURE</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:#8C8C93">12 LEFT</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#00E58A"><span style="width:7px;height:7px;background:#00E58A;box-shadow:0 0 8px #00E58A"></span>REVEALING</div>
+    </div>
+    <div style="height:116px;margin-top:26px;display:flex">
+    <div style="flex:1;border:1px solid #FF2E88;background:linear-gradient(180deg,rgba(255,46,136,.16),rgba(255,46,136,.04));padding:12px 18px;display:flex;align-items:center;gap:18px;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%)">
+      <div style="font-family:'Noto Sans JP',sans-serif;font-weight:700;font-size:58px;line-height:1;color:#F2F0EB">水</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="font-size:28px;font-weight:900;letter-spacing:-.02em;line-height:1">water</div>
+        <div style="font-family:'Noto Sans JP',sans-serif;font-size:15px;font-weight:400;color:#B9B6B1;letter-spacing:.04em">みず · スイ</div>
+        <div style="border:1px solid #2A2A2E;background:#141416;color:#8C8C93;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;padding:5px 8px;align-self:flex-start">4 STROKES</div>
+      </div>
+    </div>
+    </div>
+    <div style="width:334px;height:334px;background:#F2F0EB;margin-top:24px;position:relative;box-shadow:inset 0 0 0 1px #2A2A2E">
+      <div style="position:absolute;left:50%;top:6%;bottom:6%;width:0;border-left:1px dashed rgba(10,10,11,.16)"></div>
+      <div style="position:absolute;top:50%;left:6%;right:6%;height:0;border-top:1px dashed rgba(10,10,11,.16)"></div>
+      <div style="position:absolute;left:10px;top:8px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(10,10,11,.35)">YOUR INK · 30%</div>
+      <svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%;opacity:.3">
+        <path d="M51 15 C51 40 51 62 45 78 C43 85 38 87 32 83" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+        <path d="M33 33 C31 46 26 59 17 71" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+        <path d="M35 41 C42 47 45 53 46 60" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+        <path d="M57 47 C65 41 73 34 80 25" fill="none" stroke="#0A0A0B" stroke-width="4.5" stroke-linecap="round"></path>
+      </svg>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Noto Sans JP',sans-serif;font-weight:700;font-size:240px;line-height:1;color:#FF2E88;pointer-events:none">水</div>
+      <div style="position:absolute;bottom:8px;right:10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;color:rgba(10,10,11,.45)">STROKE 3/4</div>
+    </div>
+    <div style="flex:1"></div>
+    <div style="border:1px solid #2A2A2E;background:#141416;color:#8C8C93;text-align:center;padding:15px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;margin-top:16px">↻ REPLAY</div>
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <div style="flex:1;border:1px solid #00E58A;background:linear-gradient(180deg,rgba(0,229,138,.22),rgba(0,229,138,.06));color:#00E58A;text-align:center;padding:19px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;letter-spacing:.14em">GOT IT</div>
+      <div style="flex:1;border:1px solid #FFB300;background:linear-gradient(180deg,rgba(255,179,0,.2),rgba(255,179,0,.05));color:#FFB300;text-align:center;padding:19px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;letter-spacing:.14em">MISSED</div>
+    </div>
+  </div>
+  <p style="font-size:11.5px;line-height:1.55;color:#8C8C93;max-width:390px;margin:0"><b style="color:#B9B6B1;font-weight:600">Same overlay reveal, one extra line.</b> Kun/on sit under the meaning — after the fact, so they cannot help you cheat. Kanji run long, so Replay earns its place here more than it does for kana. Canvas geometry is identical to S2b to the pixel.</p>
+</div>
+
+<div style="flex:none;display:flex;flex-direction:column;gap:11px">
+  <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93"><span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S4</span>Session complete</div>
+  <div data-screen-label="S4 Complete" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;font-family:Archivo,sans-serif;position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;padding:54px 28px 36px;box-sizing:border-box;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+    
+    <div style="position:absolute;z-index:-1;right:-58px;bottom:176px;font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:230px;line-height:1;color:transparent;-webkit-text-stroke:1px #1D1D21;pointer-events:none;user-select:none">山</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;color:#8C8C93;position:relative">KANJI · NATURE — 16 CARDS</div>
+    <div style="font-size:44px;font-weight:900;letter-spacing:-.03em;margin-top:10px">Session done.</div>
+    <div style="display:flex;gap:10px;margin-top:26px">
+      <div style="flex:1;background:#141416;border:1px solid #2A2A2E;padding:18px">
+        <div style="display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;color:#00E58A"><span style="width:7px;height:7px;background:#00E58A"></span>GOT IT</div>
+        <div style="font-size:56px;font-weight:900;line-height:1;margin-top:10px">11</div>
+      </div>
+      <div style="flex:1;background:#141416;border:1px solid #2A2A2E;padding:18px">
+        <div style="display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;color:#FFB300"><span style="width:7px;height:7px;background:#FFB300"></span>MISSED</div>
+        <div style="font-size:56px;font-weight:900;line-height:1;margin-top:10px">5</div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;color:#8C8C93;margin-top:28px">MISSED — WILL REPLAY</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
+      <span style="border:1px solid #FFB300;color:#FFB300;font-family:'Noto Sans JP',sans-serif;font-size:24px;padding:8px 12px">森</span>
+      <span style="border:1px solid #FFB300;color:#FFB300;font-family:'Noto Sans JP',sans-serif;font-size:24px;padding:8px 12px">岩</span>
+      <span style="border:1px solid #FFB300;color:#FFB300;font-family:'Noto Sans JP',sans-serif;font-size:24px;padding:8px 12px">雲</span>
+      <span style="border:1px solid #FFB300;color:#FFB300;font-family:'Noto Sans JP',sans-serif;font-size:24px;padding:8px 12px">氷</span>
+      <span style="border:1px solid #FFB300;color:#FFB300;font-family:'Noto Sans JP',sans-serif;font-size:24px;padding:8px 12px">畑</span>
+    </div>
+    <div style="border:1px solid #2A2A2E;background:#141416;padding:14px 16px;margin-top:26px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;color:#8C8C93">KANJI TRACK</span>
+        <span style="border:1px solid #00E58A;background:rgba(0,229,138,.12);color:#00E58A;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;padding:3px 7px">+4 FROM MEMORY</span>
+      </div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:10px">
+        <span style="font-size:18px;font-weight:900">2 of 6 presets cleared</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8C93">27/76</span>
+      </div>
+      <div style="height:7px;background:#0A0A0B;border:1px solid #2A2A2E;margin-top:11px"><div style="width:36%;height:100%;background:#FF2E88"></div></div>
+    </div>
+    <div style="flex:1"></div>
+    <div style="background:#FF2E88;color:#000;text-align:center;padding:22px;font-size:20px;font-weight:900;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px))">REPLAY MISSED (5)</div>
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <div style="flex:1;border:1px solid #2A2A2E;background:#141416;text-align:center;padding:15px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:#8C8C93">NEXT PRESET →</div>
+      <div style="flex:1;border:1px solid #2A2A2E;background:#141416;text-align:center;padding:15px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:#8C8C93">HOME</div>
+    </div>
+  </div>
+  <p style="font-size:11.5px;line-height:1.55;color:#8C8C93;max-width:390px;margin:0"><b style="color:#B9B6B1;font-weight:600">Real counts only.</b> The <span style="color:#00E58A">+4 from memory</span> chip is the spec's first-attempt rule made visible — it is smaller than the session counts because it is the only number that mints. Replay is the default action; <i>next preset</i> keeps a kanji run going without a trip home.</p>
+</div>
+
+</div>
+</section>
+
+<section style="padding:44px 48px 56px">
+<div style="display:flex;align-items:baseline;gap:11px;margin-bottom:24px">
+  <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:rgba(255,255,255,.11);color:#F2F0EB">SPEC</span>
+  <span style="font:700 14px Archivo,sans-serif">Flows, deltas, and build notes</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start">
+
+<div style="flex:1 1 420px;max-width:560px;background:#141416;border:1px solid #2A2A2E;padding:26px 28px;font-size:13.5px;line-height:1.65;color:#B9B6B1">
+  <div style="font:800 11px 'JetBrains Mono',monospace;letter-spacing:.16em;color:#FF2E88;margin-bottom:14px">USER FLOWS</div>
+  <div style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:6px">F1 · MAIN LOOP — IDENTICAL ACROSS TRACKS</div>
+  <p style="margin:0 0 16px">S1 → pick track → (kanji only: S1b pick preset) → <b style="color:#F2F0EB">Start</b>. Deck shuffles into a queue.<br>→ S2 prompt, blank canvas, you write it<br>→ <b style="color:#F2F0EB">Show</b> → S3 card flips, ink dims, model animates over it<br>→ <b style="color:#F2F0EB">Got it</b> / <b style="color:#F2F0EB">Missed</b> → canvas clears, next card<br>→ queue empty → S4</p>
+  <div style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:6px">F2 · REQUEUE</div>
+  <p style="margin:0 0 16px">Missed reinserts ~5 positions later — far enough to clear short-term memory. Keeps returning until graded Got it. Unchanged for kanji.</p>
+  <div style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:6px">F3 · DECK PICK — THE ONLY BRANCH</div>
+  <p style="margin:0 0 16px">hiragana / katakana → base 46 ↔ all 71, inline on S1<br>kanji → S1b preset grid, one preset per session<br>Both remember the last choice.</p>
+  <div style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:6px">F4 · WHAT MINTS THE NUMBER</div>
+  <p style="margin:0 0 16px">A character is <i>written from memory</i> only on a <b style="color:#F2F0EB">first-attempt Got it</b> within a session. A requeued clear does not count — you copied what you just watched. Cumulative per track, never decays. A character you fumble can only be earned in a later session: that is the spaced return.</p>
+  <div style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:6px">F5 · INTERRUPTION</div>
+  <p style="margin:0">Closing mid-session discards the queue. Earned characters persist at the moment of grading, so nothing is lost. No resume.</p>
+</div>
+
+<div style="flex:1 1 420px;max-width:560px;background:#141416;border:1px solid #2A2A2E;padding:26px 28px;font-size:13.5px;line-height:1.65;color:#B9B6B1">
+  <div style="font:800 11px 'JetBrains Mono',monospace;letter-spacing:.16em;color:#FF2E88;margin-bottom:14px">DELTA AGAINST SPEC.MD</div>
+  <p style="margin:0 0 14px">SPEC.md's “deliberately not building” list names <b style="color:#F2F0EB">kanji</b>. That line is now spent, on the terms katakana was spent: same drill, same canvas, same self-grade, same stroke-animation mechanism. Everything else in that list stands — yōon, small kana, vocabulary, reading practice, recognition, hints, skip, streaks, percentages, accounts, nav bar, settings.</p>
+  <ul style="margin:0 0 14px;padding-left:18px">
+    <li style="margin-bottom:7px"><b style="color:#F2F0EB">4 screens → 5.</b> S1b is the one addition, and only kanji reaches it. Kana still goes Home → session.</li>
+    <li style="margin-bottom:7px"><b style="color:#F2F0EB">Home is a three-track switchboard</b> rather than a single hero count. Each track carries its own progress; counts are never merged, per the spec's あ/ア argument extended to 漢.</li>
+    <li style="margin-bottom:7px"><b style="color:#F2F0EB">Screens 2 and 3 keep the shipped mechanics exactly</b> — Clear / Undo / Show, then flip-in-place with the model drawn over dimmed ink. Only the visual system changed.</li>
+    <li style="margin-bottom:7px"><b style="color:#F2F0EB">One deck per session.</b> No mixed kanji deck, no kana+kanji deck.</li>
+  </ul>
+  <div style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin:20px 0 6px">OPEN QUESTIONS</div>
+  <ul style="margin:0;padding-left:18px">
+    <li style="margin-bottom:7px">Kanji <b style="color:#F2F0EB">readings on the reveal</b> — kun/on, or meaning only? Drawn here; cut if it reads as vocabulary study creeping into a writing app.</li>
+    <li style="margin-bottom:7px"><b style="color:#F2F0EB">Preset size.</b> 10–16 cards is drawn, roughly one train ride. Confirm before authoring real sets.</li>
+    <li style="margin-bottom:7px"><b style="color:#F2F0EB">Homophone meanings.</b> Several kanji share an English gloss. Either disambiguate the prompt or guarantee uniqueness within a preset.</li>
+    <li>The kanji denominator is the sum of all presets. If presets ever become user-addable the denominator moves — which the spec's argument against percentages would dislike. Fixed corpus recommended.</li>
+  </ul>
+</div>
+
+<div style="flex:1 1 420px;max-width:560px;background:#141416;border:1px solid #2A2A2E;padding:26px 28px;font-size:13.5px;line-height:1.65;color:#B9B6B1">
+  <div style="font:800 11px 'JetBrains Mono',monospace;letter-spacing:.16em;color:#FF2E88;margin-bottom:14px">BUILD NOTES</div>
+  <div style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:6px">DATA MODEL</div>
+  <p style="margin:0 0 14px"><code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">lib/kana.ts</code> → <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">lib/decks.ts</code>, one card shape for all three tracks:<br><code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">{ id, track, char, prompt, strokeCount, deck }</code> plus <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">readings:{kun,on}</code> on kanji only. <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">prompt</code> is romaji for kana and English meaning for kanji, so S2 renders one field and never branches on track.</p>
+  <p style="margin:0 0 14px">Keep the existing derivation — katakana generates from the hiragana table by <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">+0x60</code>, never restated. Kanji is a separate authored table; meanings and readings cannot be derived.</p>
+  <div style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:6px">PRESETS</div>
+  <p style="margin:0 0 14px">A preset is <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">{ id, label, glyph, chars[] }</code> in one JSON file. <b style="color:#F2F0EB">All six categories and their membership are placeholders</b> — expect wholesale replacement. Do not hardcode six anywhere; the S1b grid is <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">1fr 1fr</code> auto-flow and scrolls past eight.</p>
+  <div style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:6px">PERSISTENCE</div>
+  <p style="margin:0 0 14px">Same <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">localStorage</code> blob, version bumped. Earned characters stay a flat codepoint set — kana and kanji codepoints never collide, and each track counts its own. Add <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">lastTrack</code> and <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">lastPreset</code> beside <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">lastSet</code>.</p>
+  <div style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:6px">STROKE DATA — THE ONE REAL DEPENDENCY CHANGE</div>
+  <p style="margin:0 0 10px">strokesvg has no kanji. Kanji stroke data comes from <b style="color:#F2F0EB">KanjiVG</b>, which SPEC.md already names as the kana fallback: centerline paths, one <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">&lt;path&gt;</code> per stroke in writing order, animates with the same dasharray technique. Two decisions before building:</p>
+  <ul style="margin:0 0 14px;padding-left:18px">
+    <li style="margin-bottom:7px"><b style="color:#F2F0EB">License.</b> KanjiVG is CC BY-SA 3.0 — share-alike reaching any derivative of the stroke data. It does not reach app code, but the vendored SVGs and anything generated from them stay under a compatible license, and Home's attribution line must name it (drawn in S1).</li>
+    <li><b style="color:#F2F0EB">Look.</b> KanjiVG renders a uniform hairline, not the brush-weight line strokesvg gives kana. Kana and kanji reveals will not match unless the kanji stroke is thickened and rounded — worth a call, exact parity may not be reachable.</li>
+  </ul>
+  <p style="margin:0 0 14px">ViewBox is <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">0 0 109 109</code> (KanjiVG) vs <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">0 0 1024 1024</code> (strokesvg) — normalize at vendor time so the overlay math stays one code path. Vendored to <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">public/strokes/&lt;codepoint-hex&gt;.svg</code>; the service worker precache list grows by the kanji count.</p>
+  <div style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:6px">LOAD-BEARING, UNCHANGED</div>
+  <p style="margin:0">The canvas is square, 334×334 at 390 width, and holds the same box on S2 and S3 — the animation lands on top of your ink at the same size and position, so nothing may reflow between them. Concurrent animation of a group's repeated trajectories still applies; kanji have more self-intersecting strokes than kana, so the <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">e2e-loop.mjs</code> guard matters more, not less. Pointer Events, <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF;background:rgba(46,157,255,.1);padding:1px 5px">touch-action:none</code>, DPR-sized backing store, all actions in the bottom third.</p>
+</div>
+
+</div>
+</section>
+</x-dc>
+</body>
+</html>

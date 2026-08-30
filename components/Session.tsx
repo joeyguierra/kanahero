@@ -12,17 +12,28 @@ import type { StrokePlayer } from "@/lib/strokeAnimator";
 import WritingCanvas, { type WritingCanvasHandle } from "./WritingCanvas";
 import StrokeOverlay from "./StrokeOverlay";
 
+export interface SessionSummary {
+  /** newly written from memory — first-attempt Got it, not already earned */
+  earned: number;
+  /** cards cleared on the first attempt */
+  got: number;
+  /** cards fumbled at least once, in the order they came up */
+  missed: Kana[];
+}
+
 export default function Session({
   deck,
-  setLabel,
+  trackLabel,
   earnKana,
+  onQuit,
   onFinish,
 }: {
   deck: Kana[];
-  setLabel: string;
+  trackLabel: string;
   /** returns true if this kana was newly earned */
   earnKana: (kana: string) => boolean;
-  onFinish: (earnedThisSession: number) => void;
+  onQuit: () => void;
+  onFinish: (summary: SessionSummary) => void;
 }) {
   const [queue, setQueue] = useState<Kana[]>(deck);
   const [phase, setPhase] = useState<"prompt" | "reveal">("prompt");
@@ -35,14 +46,21 @@ export default function Session({
   // from memory, so only first attempts can mint the number
   const attempted = useRef(new Set<string>());
   const earnedThisSession = useRef(0);
+  const gotFirstTry = useRef(0);
+  const missed = useRef<Kana[]>([]);
 
   const current = queue[0];
 
   function grade(gotIt: boolean) {
     const firstAttempt = !attempted.current.has(current.kana);
     attempted.current.add(current.kana);
-    if (gotIt && firstAttempt && earnKana(current.kana)) {
-      earnedThisSession.current++;
+    if (firstAttempt) {
+      if (gotIt) {
+        gotFirstTry.current++;
+        if (earnKana(current.kana)) earnedThisSession.current++;
+      } else {
+        missed.current.push(current);
+      }
     }
     const next = gotIt ? queue.slice(1) : requeue(queue);
     canvasRef.current?.clear();
@@ -51,7 +69,11 @@ export default function Session({
     playerRef.current = null;
     setPhase("prompt");
     if (next.length === 0) {
-      onFinish(earnedThisSession.current);
+      onFinish({
+        earned: earnedThisSession.current,
+        got: gotFirstTry.current,
+        missed: missed.current,
+      });
     } else {
       setQueue(next);
     }
@@ -61,46 +83,50 @@ export default function Session({
 
   return (
     <main className="session">
+      <div className="rail" aria-hidden />
       <div className="sessionHead">
-        <span className="sessionLeft">{queue.length} left</span>
-        <span className="sessionSet">set · {setLabel}</span>
+        <div className="sessionTrack">
+          <span className="trackBadge">{trackLabel}</span>
+          <span className="sessionLeft">{queue.length} left</span>
+        </div>
+        {reveal ? (
+          <span className="revealing">
+            <span className="led" />
+            revealing
+          </span>
+        ) : (
+          <button type="button" className="quit" onClick={onQuit}>
+            ✕ quit
+          </button>
+        )}
       </div>
 
-      {/* prompt card, flips in place */}
-      <div className={`card${reveal ? " cardFlipped" : ""}`}>
+      {/* fixed-height slot; the prompt flips into the reveal card in place */}
+      <div className="promptSlot">
         {reveal ? (
-          <>
-            <div className="cardKana">{current.kana}</div>
-            <div className="cardRevealCol">
-              <div className="cardRomajiSmall">{current.romaji}</div>
-              <div className="chipSeam">
+          <div className="revealCard">
+            <div className="revealKana">{current.kana}</div>
+            <div className="revealCol">
+              <div className="revealRomaji">{current.romaji}</div>
+              <span className="chipSeam">
                 {strokeCount === null
                   ? "…"
                   : `${strokeCount} stroke${strokeCount === 1 ? "" : "s"}`}
-              </div>
+              </span>
             </div>
-          </>
+          </div>
         ) : (
-          <>
-            <span className="reg" style={{ top: 8, left: 10 }}>
-              +
-            </span>
-            <span className="reg" style={{ bottom: 8, right: 10, color: "var(--seam)" }}>
-              +
-            </span>
-            <div className="cardRomaji">{current.romaji}</div>
-            <div className="cardHint">write it from memory</div>
-          </>
+          <div className="prompt">
+            <div className="promptLabel">write</div>
+            <div className="promptRomaji">{current.romaji}</div>
+          </div>
         )}
       </div>
 
       {/* canvas stays put across the flip */}
       <div className="canvasWrap">
         <div className="canvasBox">
-          <span className="reg" style={{ top: 7, left: 8 }}>+</span>
-          <span className="reg" style={{ top: 7, right: 8 }}>+</span>
-          <span className="reg" style={{ bottom: 7, left: 8 }}>+</span>
-          <span className="reg" style={{ bottom: 7, right: 8 }}>+</span>
+          <span className="canvasTag">{reveal ? "your ink · 30%" : "draw"}</span>
           <WritingCanvas ref={canvasRef} frozen={reveal} onInkChange={setHasInk} />
           {reveal && (
             <StrokeOverlay
@@ -120,16 +146,18 @@ export default function Session({
         </div>
       </div>
 
+      <div className="grow" />
+
       {reveal ? (
         <div className="sessionActions">
           <button
             type="button"
-            className="btnSeam"
+            className="btnSeam actionBar"
             onClick={() => playerRef.current?.play(setStrokeNow)}
           >
-            Replay
+            ↻ replay
           </button>
-          <div className="row">
+          <div className="actionRow">
             <button type="button" className="btnSeam btnLive" onClick={() => grade(true)}>
               Got it
             </button>
@@ -140,7 +168,7 @@ export default function Session({
         </div>
       ) : (
         <div className="sessionActions">
-          <div className="row">
+          <div className="actionRow">
             <button type="button" className="btnSeam" onClick={() => canvasRef.current?.clear()}>
               Clear
             </button>
@@ -150,7 +178,7 @@ export default function Session({
           </div>
           <button
             type="button"
-            className="btnStrike"
+            className="btnStrike actionBar"
             onClick={() => setPhase("reveal")}
             disabled={!hasInk}
           >
