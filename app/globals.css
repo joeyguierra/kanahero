@@ -821,6 +821,273 @@ button:not(:disabled):active {
   gap: 10px;
 }
 
+/* ---- the bank (screens 5 & 5b) ----
+   The one semantic rule: the bank is not a fourth track. Track cards are
+   closed fractions — denominator, bar, end state. The bank count has none of
+   those, so nothing here gets a progress bar and nothing here wears a track
+   card's silhouette. */
+
+/* home entry: a strip, half a track card's height, no chamfer */
+.bankStrip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--seam);
+  background: var(--plate);
+  padding: 12px 18px;
+  margin-top: 10px;
+  color: var(--rail);
+}
+
+.bankStripCount {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--strike);
+  font-variant-numeric: tabular-nums;
+}
+
+.bankStripCountZero {
+  color: var(--carbon);
+}
+
+.bankStripArrow {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--carbon);
+}
+
+/* the grid scrolls; the header and the action block stay put */
+.bankFrame,
+.detailFrame {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.bankHeadCount {
+  color: var(--strike);
+  font-variant-numeric: tabular-nums;
+}
+
+.bankHeadCountZero {
+  color: var(--carbon);
+}
+
+/* the montage beat: shutter, thumb, count ticks. One frame of inverse and
+   nothing else — no motion, no spring. */
+.bankFlash {
+  background: var(--bone);
+  color: var(--strike);
+}
+
+.bankEmpty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bankEmptyLine {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--rail);
+  text-align: center;
+}
+
+.bankGrid {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin-top: 20px;
+}
+
+/* contact sheet, not a list: 3-across, square, newest first at top-left */
+.bankSheet {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.thumb {
+  aspect-ratio: 1;
+  border: 1px solid var(--seam);
+  background: var(--plate);
+  overflow: hidden;
+  display: block;
+}
+
+.thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* a failed write is one blunt line pointing at EXPORT — never a toast,
+   nothing transient */
+.bankAlert {
+  border: 1px solid var(--caution);
+  background: color-mix(in srgb, var(--caution) 10%, transparent);
+  color: var(--caution);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  line-height: 1.6;
+  text-transform: uppercase;
+  padding: 11px 13px;
+  margin-top: 16px;
+}
+
+/* the native camera behind a strike button — same species as START SESSION */
+.bankCapture {
+  position: relative;
+  padding: 22px;
+  margin-top: 16px;
+  cursor: pointer;
+}
+
+.bankCapture:active {
+  transform: translateY(1px);
+}
+
+.bankInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.bankExport {
+  padding: 15px;
+  margin-top: 10px;
+}
+
+.bankFooter {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--carbon);
+  text-align: center;
+  margin-top: 14px;
+}
+
+.bankFooterWarn {
+  color: var(--caution);
+}
+
+/* ---- capture detail (screen 5b) ---- */
+
+.detailPosition {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--carbon);
+  font-variant-numeric: tabular-nums;
+}
+
+/* the photo is the subject: natural aspect, seam frame, nothing behind it */
+.detailPhoto {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.detailPhoto img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border: 1px solid var(--seam);
+}
+
+/* card species: the notch goes top-right */
+.detailMeta {
+  border: 1px solid var(--seam);
+  background: var(--plate);
+  padding: 15px 17px;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+}
+
+.detailStamp {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--print);
+  font-variant-numeric: tabular-nums;
+}
+
+.noteAdd {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rail);
+  margin-top: 11px;
+}
+
+.noteText {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--bone);
+  margin-top: 10px;
+}
+
+/* active state wears the strike border, same grammar as the flipped card */
+.noteInput {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--strike);
+  background: var(--chassis);
+  color: var(--bone);
+  caret-color: var(--strike);
+  font-family: var(--display);
+  font-size: 13px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  outline: none;
+}
+
+/* caution-bordered, never strike — deletion is permitted, not wanted */
+.btnDelete {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--caution);
+  background: var(--plate);
+  color: var(--caution);
+  text-align: center;
+  padding: 17px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-top: 12px;
+}
+
+.btnDeleteArmed {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--caution) 22%, transparent),
+    color-mix(in srgb, var(--caution) 8%, transparent)
+  );
+}
+
 /* ---- /verify: stroke-data acceptance grid ---- */
 
 .verify {

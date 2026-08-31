@@ -11,10 +11,15 @@ import {
   subscribeProgress,
   updateProgress,
 } from "@/lib/progress";
+import { getBank, getServerBank, subscribeBank } from "@/lib/bank";
 import { shuffle } from "@/lib/session";
 import Session, { type SessionSummary } from "@/components/Session";
+import Bank from "@/components/Bank";
+import CaptureDetail from "@/components/CaptureDetail";
 
-type Phase = "home" | "session" | "complete";
+// The bank is a cul-de-sac off home: one button in, one back per screen, and
+// no session screen can reach it.
+type Phase = "home" | "session" | "complete" | "bank";
 
 const TRACKS: { id: Script; label: string; glyph: string }[] = [
   { id: "hiragana", label: "Hiragana", glyph: "あ" },
@@ -41,8 +46,10 @@ export default function App() {
   const [phase, setPhase] = useState<Phase>("home");
   const [deck, setDeck] = useState<Kana[]>([]);
   const [summary, setSummary] = useState<SessionSummary | null>(null);
+  const [openCapture, setOpenCapture] = useState<string | null>(null);
 
   const progress = useSyncExternalStore(subscribeProgress, getProgress, getServerProgress);
+  const bank = useSyncExternalStore(subscribeBank, getBank, getServerBank);
   // the hydration render uses the stable server snapshot; a real read replaces it
   const loaded = progress !== getServerProgress();
 
@@ -53,11 +60,30 @@ export default function App() {
   const total = scriptKana.length;
   const track = TRACKS.find((t) => t.id === script)!;
   const base = progress.setChoice === "base";
+  // the only unbounded number in the app — it grows in the field, and its
+  // growth is the point
+  const bankCount = bank.captures.length;
 
   function run(cards: Kana[]) {
     setDeck(shuffle(cards));
     setSummary(null);
     setPhase("session");
+  }
+
+  if (phase === "bank") {
+    const index = bank.captures.findIndex((c) => c.id === openCapture);
+    if (openCapture !== null && index !== -1) {
+      return (
+        <CaptureDetail
+          capture={bank.captures[index]}
+          // the grid runs newest first; the ordinal counts from the oldest
+          ordinal={bank.captures.length - index}
+          total={bank.captures.length}
+          onBack={() => setOpenCapture(null)}
+        />
+      );
+    }
+    return <Bank onBack={() => setPhase("home")} onOpen={setOpenCapture} />;
   }
 
   if (phase === "session") {
@@ -261,13 +287,31 @@ export default function App() {
         })}
       </div>
 
+      {/* A strip, not a fourth track — no chamfer, no bar, no denominator. */}
+      <button
+        type="button"
+        className="bankStrip"
+        onClick={() => {
+          setOpenCapture(null);
+          setPhase("bank");
+        }}
+      >
+        <svg width="19" height="16" viewBox="0 0 20 17" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+          <rect x="1" y="4.2" width="18" height="11.8" />
+          <circle cx="10" cy="10" r="3.4" />
+          <path d="M6.8 4.2 L8.4 1.3 H11.6 L13.2 4.2" />
+        </svg>
+        <span className="legend">Bank</span>
+        <span className="grow" />
+        <span className={`bankStripCount${bankCount === 0 ? " bankStripCountZero" : ""}`}>
+          {bank.ready ? bankCount : "—"}
+        </span>
+        <span className="bankStripArrow">→</span>
+      </button>
+
       <div className="grow" />
 
-      <div className="homeNote">
-        {script} — {base ? "base 46, no dakuten." : "all 71, dakuten included."}
-        <br />
-        Missed cards replay until zero.
-      </div>
+      <div className="homeNote">Missed cards replay until zero.</div>
 
       <button
         type="button"

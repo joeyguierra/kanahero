@@ -241,10 +241,12 @@ await page.goto(URL); // abandon the session
 await page.waitForSelector("button:has-text('Start session'):not([disabled])");
 await page.click("button:has-text('Katakana')");
 await waitTrack("katakana", 0);
-assert.match(
+// v3 cut the note to one line to pay for the BANK strip's height; the set
+// chips on the selected track now carry which set is armed
+assert.equal(
   await text(".homeNote"),
-  /^katakana —/,
-  "home note follows the selected track",
+  "missed cards replay until zero.",
+  "the home note is one line",
 );
 assert.equal(
   await page.locator(".track:has-text('Katakana') .setToggle").count(),
