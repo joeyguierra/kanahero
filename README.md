@@ -137,6 +137,14 @@ exactly like a stuck splash screen on a train.
 > The precache is ~15.5 MB, most of it font slices, so the first load needs a
 > real connection long enough to finish installing. After that, nothing does.
 
+`vercel.json` deploys this as a plain static site — `"framework": null`, output
+`out/`, no clean-URL rewriting. The Next.js preset would run its own build
+command, skipping `scripts/gen-sw.mjs` and shipping no service worker at all,
+which is a deploy that succeeds and is silently not offline. Turning the preset
+off also makes the deployed origin behave exactly like the `serve out` the
+verification scripts run against. (`vercel.json` rejects unknown keys, comments
+included, which is why this note lives here.)
+
 ## What it does not have
 
 | | |
