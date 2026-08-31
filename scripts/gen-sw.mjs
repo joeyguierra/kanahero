@@ -15,7 +15,9 @@ import { readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const OUT = path.join(import.meta.dirname, "..", "out");
-const SHELL = "/index.html";
+// the URL a launch actually requests, and the one a host is guaranteed to
+// serve — /index.html is hidden behind a clean-URL rule on some hosts
+const SHELL = "/";
 
 async function walk(dir) {
   const found = [];
@@ -58,10 +60,25 @@ const PRECACHE = ${JSON.stringify(precache, null, 2)};
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE)
-      .then((cache) => cache.addAll(PRECACHE))
-      .then(() => self.skipWaiting()),
+    (async () => {
+      const cache = await caches.open(CACHE);
+      const missed = [];
+      // Deliberately not addAll: that is atomic, so a single URL the host
+      // rewrites or hides — /index.html behind a clean-URL rule, say — would
+      // cost the entire offline install. A cache missing one font slice is
+      // worth having; no cache at all is a stuck splash screen on a train.
+      for (let i = 0; i < PRECACHE.length; i += 12) {
+        const batch = PRECACHE.slice(i, i + 12);
+        const results = await Promise.allSettled(batch.map((url) => cache.add(url)));
+        results.forEach((r, j) => r.status === "rejected" && missed.push(batch[j]));
+      }
+      // the shell is the one entry there is no app without
+      if (!(await cache.match(SHELL))) {
+        throw new Error("precache: shell missing, refusing to install");
+      }
+      if (missed.length) console.warn("precache: skipped " + missed.length, missed.slice(0, 10));
+      await self.skipWaiting();
+    })(),
   );
 });
 

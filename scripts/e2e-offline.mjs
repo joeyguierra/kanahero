@@ -8,10 +8,11 @@
 //      bundled — the precache is what makes it arrive)
 //   4. Offline: a capture saves, the count ticks, and it survives a reload
 //   5. Only one cache exists, and it is the current content hash
+//   6. A URL the host does not serve costs that URL, not the whole install
 
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { mkdtemp, readFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import sharp from "sharp";
@@ -107,6 +108,39 @@ assert.deepEqual(keys, [cacheName], `exactly one cache, the current hash — got
 console.log("5. exactly one cache, named for the content hash of this export");
 
 await context.setOffline(false);
+
+// --- 6. a hidden URL must not cost the whole offline install ---
+// This is the shape of the real failure: a host with a clean-URL rule answers
+// 404 for /index.html, and an atomic addAll would take the entire cache down
+// with it — a stuck splash screen on a train, for one missing file.
+const swPath = path.join(import.meta.dirname, "..", "out", "sw.js");
+const original = await readFile(swPath, "utf8");
+try {
+  await writeFile(
+    swPath,
+    original.replace('const PRECACHE = [\n  "/"', 'const PRECACHE = [\n  "/no-such-file-here.txt",\n  "/"'),
+  );
+  const hostile = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page2 = await hostile.newPage();
+  page2.setDefaultTimeout(60000);
+  await page2.goto(URL);
+  await page2.evaluate(() => navigator.serviceWorker.ready);
+  await page2.waitForFunction(() => navigator.serviceWorker.controller !== null);
+  const survived = await page2.evaluate(
+    async (name) => (await (await caches.open(name)).keys()).length,
+    cacheName,
+  );
+  assert.ok(survived > 500, `the rest of the export still installed, got ${survived}`);
+  await hostile.setOffline(true);
+  await page2.reload();
+  await page2.waitForSelector("button:has-text('Start session'):not([disabled])");
+  await hostile.setOffline(false);
+  await hostile.close();
+  console.log(`6. one unserved URL costs one URL: ${survived} cached, the app still boots offline`);
+} finally {
+  await writeFile(swPath, original);
+}
+
 await browser.close();
 kill();
 console.log("\nALL CHECKS PASSED");
