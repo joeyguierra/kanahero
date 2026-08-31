@@ -15,7 +15,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { execFile } from "node:child_process";
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import os from "node:os";
 import path from "node:path";

@@ -321,7 +321,7 @@ export default function App() {
       >
         Start session
       </button>
-      <a className="attribution" href="/licenses/strokesvg-LICENSE.txt">
+      <a className="attribution" href="/licenses/NOTICE.txt">
         strokesvg (MIT) / Klee One (SIL OFL 1.1)
       </a>
     </main>

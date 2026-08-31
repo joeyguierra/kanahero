@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, JetBrains_Mono, Klee_One, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
+import ServiceWorker from "@/components/ServiceWorker";
 
 // Klee One renders the kana (same font the stroke data derives from).
 // next/font self-hosts at build time — no runtime font requests, offline-safe.
@@ -41,7 +42,7 @@ const jp = Noto_Sans_JP({
 
 export const metadata: Metadata = {
   title: "kanahero",
-  description: "Write hiragana from memory. Prompt, write, reveal, self-grade.",
+  description: "Write hiragana and katakana from memory — prompt, write, reveal, self-grade — and bank photos of the characters you can't read yet.",
   applicationName: "kanahero",
   appleWebApp: {
     capable: true,
@@ -65,7 +66,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${klee.variable} ${archivo.variable} ${mono.variable} ${jp.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <ServiceWorker />
+      </body>
     </html>
   );
 }

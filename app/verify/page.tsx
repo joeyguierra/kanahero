@@ -32,7 +32,7 @@ export default function VerifyPage() {
       </div>
       <footer className="verifyFooter">
         Stroke data from strokesvg (MIT), derived from Klee One (SIL OFL 1.1) —{" "}
-        <a href="/licenses/strokesvg-LICENSE.txt">licenses</a>
+        <a href="/licenses/NOTICE.txt">licenses</a>
       </footer>
     </main>
   );
