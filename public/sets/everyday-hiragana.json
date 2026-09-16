@@ -1,0 +1,12 @@
+{"id":"everyday-hiragana","name":"EVERYDAY WORDS","glyph":"あ","script":"hiragana","origin":"platform","words":[
+{"word":"ありがとう","reading":"ありがとう","romaji":"arigatou","meaning":"thank you"},
+{"word":"おはよう","reading":"おはよう","romaji":"ohayou","meaning":"good morning"},
+{"word":"こんにちは","reading":"こんにちは","romaji":"konnichiwa","meaning":"hello"},
+{"word":"すみません","reading":"すみません","romaji":"sumimasen","meaning":"excuse me"},
+{"word":"ください","reading":"ください","romaji":"kudasai","meaning":"please"},
+{"word":"ちょっと","reading":"ちょっと","romaji":"chotto","meaning":"a little"},
+{"word":"きょう","reading":"きょう","romaji":"kyou","meaning":"today"},
+{"word":"おやすみ","reading":"おやすみ","romaji":"oyasumi","meaning":"good night"},
+{"word":"いいえ","reading":"いいえ","romaji":"iie","meaning":"no"},
+{"word":"はい","reading":"はい","romaji":"hai","meaning":"yes"}
+]}

@@ -1,4 +1,4 @@
-![kanahero — write all 71 hiragana from memory](.github/media/lockup.svg)
+![kanahero — from can't read to can write](.github/media/lockup.svg)
 
 Write kana from memory — all 71 hiragana, all 71 katakana. A romaji prompt, a
 blank canvas, and the real stroke order animating over whatever you just drew.

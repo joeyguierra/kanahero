@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img" aria-label="kanahero — write all 71 hiragana from memory">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img" aria-label="kanahero — from can't read to can write">
   <defs>
     <clipPath id="plate"><path d="M0 0H1254L1280 26V400H0Z"/></clipPath>
     <clipPath id="kaMask"><path d="M587 439v-6q0-31-17-49a87 87 0 0 0-39-27 126 126 0 0 0-66-7l-61 11-73 18q-52 13-97 28l-69 21-8 2h-18l-9-1h-6l-6-1q-10 0-10 6v2q0 4 7 18 8 12 20 23 13 11 30 11 15 1 30-8l35-13 74-23 75-19a739 739 0 0 1 103-19q23 0 31 12 8 13 8 28-1 60-15 126a1029 1029 0 0 1-72 229q-20 42-38 53l-6 1h-5l-27-21-92-72q-8 0-8 10 0 7 6 22l14 22 55 79 25 30q19 18 41 18t51-36q29-35 57-101 29-66 50-159 23-93 30-208"/><path d="M404 361a1399 1399 0 0 0 61-190l-1-10q-1-10-13-18a116 116 0 0 0-48-15q-9 0-12 5l-2 5q0 5 3 8 3 4 4 10 3 4 3 13 0 8-6 31a1201 1201 0 0 1-35 104l-27 75-27 65a1942 1942 0 0 1-121 242q-6 12-7 25 0 17 14 28 10 6 19 6 21 0 32-21a5773 5773 0 0 0 138-299z"/><path d="M956 641q0-16-15-45-14-29-39-64-24-34-53-69-28-35-55-65-28-29-50-47-20-18-29-18-8 0-19 8-9 9-9 19 0 14 14 27 25 22 55 58 29 36 57 77 29 40 49 77 21 36 27 57 6 20 29 20 14 0 26-9 12-11 12-26"/></clipPath>
@@ -10,9 +10,9 @@
       <g clip-path="url(#kaMask)" fill="none" stroke="#ff2e88" stroke-width="128" stroke-linecap="round"><path d="M50 491s469-216 502-63c34 152-86 552-183 479-55-42-77-101-77-101"/><path d="M468 73 225 697"/><path d="m652 284 252 342"/></g>
     </g>
     <text x="356" y="198" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="62" font-weight="700" letter-spacing="9.9" fill="#f2f0eb">KANAHERO</text>
-    <text x="358" y="241" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="17" letter-spacing="2.4" fill="#b9b6b1">WRITE ALL 71 HIRAGANA FROM MEMORY</text>
-    <rect x="356" y="268" width="341.59999999999997" height="34" fill="#ff2e88"/>
-    <text x="370" y="291" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" font-weight="700" letter-spacing="2" fill="#000">38 OF 71 WRITTEN FROM MEMORY</text>
+    <text x="358" y="241" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="17" letter-spacing="2.4" fill="#b9b6b1">FROM CAN'T READ TO CAN WRITE</text>
+    <rect x="356" y="268" width="352.79999999999995" height="34" fill="#ff2e88"/>
+    <text x="370" y="291" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" font-weight="700" letter-spacing="2" fill="#000">LEARN THE CHARACTERS YOU MEET</text>
     <circle cx="866" cy="352" r="4.5" fill="#00e58a"/>
     <text x="884" y="357" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" letter-spacing="1.8" fill="#5a5a5f">ON DEVICE · NO ACCOUNT · NO BACKEND</text>
     <path d="M25 30h10M30 25v10" stroke="#5a5a5f" stroke-width="1"/><path d="M1245 30h10M1250 25v10" stroke="#5a5a5f" stroke-width="1"/><path d="M25 370h10M30 365v10" stroke="#5a5a5f" stroke-width="1"/><path d="M1245 370h10M1250 365v10" stroke="#5a5a5f" stroke-width="1"/>

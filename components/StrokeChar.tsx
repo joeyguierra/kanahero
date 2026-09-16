@@ -1,18 +1,25 @@
 "use client";
 
 // Inlines a vendored stroke SVG and animates it with createStrokePlayer.
-// Used by /verify (grid of all 71) and later by the reveal screen.
+// Character-keyed, not kana-keyed: /verify plays kanji through the same tile,
+// which is the whole point of the acceptance check — one hand, two sources.
 
 import { useEffect, useRef, useState } from "react";
 import { createStrokePlayer, type StrokePlayer } from "@/lib/strokeAnimator";
-import { strokeSvgPath, type Kana } from "@/lib/kana";
+import { strokeSvgPath } from "@/lib/strokes";
 
 export default function StrokeChar({
-  kana,
+  char,
+  label,
+  size,
   autoplay = true,
   onReady,
 }: {
-  kana: Kana;
+  char: string;
+  /** what to print under the tile — romaji for kana, the word for a kanji */
+  label: string;
+  /** tile width; the default fills its grid cell */
+  size?: number;
   autoplay?: boolean;
   onReady?: (player: StrokePlayer) => void;
 }) {
@@ -25,7 +32,7 @@ export default function StrokeChar({
     let dead = false;
     (async () => {
       try {
-        const res = await fetch(strokeSvgPath(kana));
+        const res = await fetch(strokeSvgPath(char));
         if (!res.ok) throw new Error(String(res.status));
         const text = await res.text();
         if (dead || !holder.current) return;
@@ -49,14 +56,15 @@ export default function StrokeChar({
       playerRef.current?.cancel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kana.hex]);
+  }, [char]);
 
   return (
     <button
       type="button"
       className="strokeChar"
+      style={size ? { width: size } : undefined}
       onClick={() => playerRef.current?.play()}
-      title={`${kana.romaji} — tap to replay`}
+      title={`${char} ${label} — tap to replay`}
     >
       <div ref={holder} className="strokeCharSvg" />
       <div className="strokeCharLabel">
@@ -64,7 +72,7 @@ export default function StrokeChar({
           <span className="strokeCharError">failed to load</span>
         ) : (
           <>
-            <span>{kana.romaji}</span>
+            <span>{label}</span>
             <span className="strokeCharCount">
               {strokeCount === null ? "…" : `${strokeCount} stroke${strokeCount === 1 ? "" : "s"}`}
             </span>

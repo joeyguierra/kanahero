@@ -1,0 +1,11 @@
+{"id":"station-kanji","name":"STATION","glyph":"駅","place":"駅","script":"kanji","origin":"platform","words":[
+{"word":"出口","reading":"でぐち","romaji":"deguchi","meaning":"exit","kind":"place"},
+{"word":"入口","reading":"いりぐち","romaji":"iriguchi","meaning":"entrance","kind":"place"},
+{"word":"新幹線","reading":"しんかんせん","romaji":"shinkansen","meaning":"shinkansen","kind":"thing"},
+{"word":"禁煙","reading":"きんえん","romaji":"kin'en","meaning":"no smoking","kind":"sign"},
+{"word":"東口","reading":"ひがしぐち","romaji":"higashiguchi","meaning":"east exit","kind":"place"},
+{"word":"中央口","reading":"ちゅうおうぐち","romaji":"chuuouguchi","meaning":"central exit","kind":"place"},
+{"word":"西口","reading":"にしぐち","romaji":"nishiguchi","meaning":"west exit","kind":"place"},
+{"word":"南口","reading":"みなみぐち","romaji":"minamiguchi","meaning":"south exit","kind":"place"},
+{"word":"北口","reading":"きたぐち","romaji":"kitaguchi","meaning":"north exit","kind":"place"}
+]}

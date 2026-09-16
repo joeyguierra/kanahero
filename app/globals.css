@@ -1168,3 +1168,37 @@ button:not(:disabled):active {
 .verifyFooter a {
   text-decoration: underline;
 }
+
+.verifyCompare,
+.verifySet {
+  margin-top: 2.25rem;
+}
+
+.verifyCompare h2,
+.verifySet h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.verifySetMeta {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 400;
+  margin-left: 0.4rem;
+}
+
+.verifyCompare p,
+.verifySet p {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+  max-width: 40rem;
+}
+
+/* the gate: one kana and one kanji at the same size, nothing between them */
+.verifyPair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}

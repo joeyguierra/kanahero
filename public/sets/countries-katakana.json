@@ -1,0 +1,14 @@
+{"id":"countries-katakana","name":"COUNTRIES","glyph":"ア","script":"katakana","origin":"platform","words":[
+{"word":"アメリカ","reading":"アメリカ","romaji":"amerika","meaning":"america"},
+{"word":"カナダ","reading":"カナダ","romaji":"kanada","meaning":"canada"},
+{"word":"フランス","reading":"フランス","romaji":"furansu","meaning":"france"},
+{"word":"ドイツ","reading":"ドイツ","romaji":"doitsu","meaning":"germany"},
+{"word":"イタリア","reading":"イタリア","romaji":"itaria","meaning":"italy"},
+{"word":"スペイン","reading":"スペイン","romaji":"supein","meaning":"spain"},
+{"word":"タイ","reading":"タイ","romaji":"tai","meaning":"thailand"},
+{"word":"インド","reading":"インド","romaji":"indo","meaning":"india"},
+{"word":"ブラジル","reading":"ブラジル","romaji":"burajiru","meaning":"brazil"},
+{"word":"メキシコ","reading":"メキシコ","romaji":"mekishiko","meaning":"mexico"},
+{"word":"フィリピン","reading":"フィリピン","romaji":"firipin","meaning":"philippines"},
+{"word":"ベトナム","reading":"ベトナム","romaji":"betonamu","meaning":"vietnam"}
+]}

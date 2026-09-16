@@ -18,6 +18,19 @@ The upstream notice, the MIT text and the OFL text are reproduced in full in:
 
     strokesvg — https://github.com/zhengkyl/strokesvg
 
+Kanji stroke SVGs come from KanjiVG by Ulrich Apel and contributors, licensed
+under Creative Commons Attribution-Share Alike 3.0. They are modified: the
+109-unit viewBox is scaled to 1024, the stroke-number layer is removed, and
+the stroke weight is set to match the kana data. Those derived files remain
+under CC BY-SA 3.0. The license text is reproduced in full in:
+
+    licenses/kanjivg-LICENSE.txt
+
+    KanjiVG — https://kanjivg.tagaini.net/
+
+CC BY-SA asks for attribution in a reasonable manner: the app carries it on
+the CREDITS screen, not only here.
+
 
 FONTS
 -----

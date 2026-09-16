@@ -65,10 +65,12 @@ function lockup() {
   const ghost = a.shadows.map((d) => `<path d="${d}"/>`).join("");
   const marks = ka.strokes.map((d) => `<path d="${d}"/>`).join("");
 
-  const chip = "38 OF 71 WRITTEN FROM MEMORY";
+  // 29 chars: the chip is sized chars * 11.2 + 28 from x=356, so anything past
+  // 32 runs into the ghost あ at 742
+  const chip = "LEARN THE CHARACTERS YOU MEET";
   const chipW = chip.length * 11.2 + 28;
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img" aria-label="kanahero — write all 71 hiragana from memory">
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img" aria-label="kanahero — from can't read to can write">
   <defs>
     <clipPath id="plate"><path d="${chamfer(1280, 400, 26)}"/></clipPath>
     <clipPath id="kaMask">${clips}</clipPath>
@@ -80,7 +82,7 @@ function lockup() {
       <g clip-path="url(#kaMask)" fill="none" stroke="${C.strike}" stroke-width="128" stroke-linecap="round">${marks}</g>
     </g>
     <text x="356" y="198" font-family="${MONO}" font-size="62" font-weight="700" letter-spacing="9.9" fill="${C.bone}">KANAHERO</text>
-    <text x="358" y="241" font-family="${MONO}" font-size="17" letter-spacing="2.4" fill="${C.print}">WRITE ALL 71 HIRAGANA FROM MEMORY</text>
+    <text x="358" y="241" font-family="${MONO}" font-size="17" letter-spacing="2.4" fill="${C.print}">FROM CAN'T READ TO CAN WRITE</text>
     <rect x="356" y="268" width="${chipW}" height="34" fill="${C.strike}"/>
     <text x="370" y="291" font-family="${MONO}" font-size="15" font-weight="700" letter-spacing="2" fill="#000">${chip}</text>
     <circle cx="866" cy="352" r="4.5" fill="${C.live}"/>
