@@ -59,7 +59,11 @@ export default function WordReveal({
         if (!svg) return;
         svg.setAttribute("width", "100%");
         svg.setAttribute("height", "100%");
-        ready.push(createStrokePlayer(svg as SVGSVGElement));
+        const player = createStrokePlayer(svg as SVGSVGElement);
+        // hide it the moment it mounts: a cell that has not had its turn must
+        // be blank, not a finished character waiting to be animated over
+        player.hide();
+        ready.push(player);
       });
       players.current = ready;
 

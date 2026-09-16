@@ -32,6 +32,10 @@ interface Stroke {
 export interface StrokePlayer {
   /** number of pen strokes (not path segments) */
   strokeCount: number;
+  /** park every stroke off-screen without drawing any of it — for a character
+      that is mounted but has not had its turn yet (the word reveal loads all
+      its cells before the first one starts) */
+  hide(): void;
   /** hide all strokes, then draw them in order; resolves when done.
       onStroke fires with the 1-based stroke number as each begins. */
   play(onStroke?: (n: number) => void): Promise<void>;
@@ -116,6 +120,7 @@ export function createStrokePlayer(svg: SVGSVGElement): StrokePlayer {
 
   return {
     strokeCount: strokes.length,
+    hide: hideAll,
     play,
     finish() {
       stop();
