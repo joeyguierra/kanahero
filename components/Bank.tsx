@@ -18,6 +18,8 @@ import {
   subscribeBank,
   type Capture,
 } from "@/lib/bank";
+import { jokerLine } from "@/lib/joker-lines";
+import Joker from "./Joker";
 
 /** the count flash is one frame of inverse, no motion — anything springier is
     retention theater */
@@ -83,7 +85,7 @@ export default function Bank({
 
       <header className="appHead">
         <button type="button" className="quit" onClick={onBack}>
-          ← Back
+          ← HOME
         </button>
         <span className="legend">
           Bank ·{" "}
@@ -96,6 +98,8 @@ export default function Bank({
           </span>
         </span>
       </header>
+
+      <Joker line={jokerLine("bank")} className="jokerDeck" />
 
       {count === 0 ? (
         <div className="bankEmpty">

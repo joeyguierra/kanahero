@@ -1,9 +1,13 @@
 "use client";
 
-// Screens 1 & 4 plus the app state machine. No routing — no screen is
-// reachable except through the session queue.
+// S1 and the app state machine. No routing — every screen is reached through
+// this switch, and nothing is reachable except the way the flows say.
+//
+// S1 selects, the CTA commits: the three decks lead to their deck screen, the
+// bank strip leads to the bank. The ghost glyph and the Joker's line follow
+// the selection.
 
-import { useState, useSyncExternalStore, type CSSProperties } from "react";
+import { useEffect, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { BY_SCRIPT, kanaSet, type Kana, type Script } from "@/lib/kana";
 import {
   getProgress,
@@ -13,24 +17,50 @@ import {
 } from "@/lib/progress";
 import { getBank, getServerBank, subscribeBank } from "@/lib/bank";
 import { shuffle } from "@/lib/session";
+import { deal, earnedCount, newSeed } from "@/lib/joker";
+import { jokerLine, type JokerScreen } from "@/lib/joker-lines";
+import { loadPlatformSets, type SetWord, type WordSet } from "@/lib/sets";
 import Session, { type SessionSummary } from "@/components/Session";
 import Bank from "@/components/Bank";
 import CaptureDetail from "@/components/CaptureDetail";
+import Joker from "@/components/Joker";
+import Deck from "@/components/Deck";
+import SetScreen from "@/components/SetScreen";
+import Round, { type RoundCard } from "@/components/Round";
+import Result from "@/components/Result";
+import Credits from "@/components/Credits";
 
-// The bank is a cul-de-sac off home: one button in, one back per screen, and
-// no session screen can reach it.
-type Phase = "home" | "session" | "complete" | "bank";
+type Phase =
+  | "home"
+  | "deck"
+  | "set"
+  | "round"
+  | "result"
+  | "session"
+  | "complete"
+  | "bank"
+  | "credits";
 
-const TRACKS: { id: Script; label: string; glyph: string }[] = [
-  { id: "hiragana", label: "Hiragana", glyph: "あ" },
-  { id: "katakana", label: "Katakana", glyph: "ア" },
+type DeckId = Script | "kanji";
+type Selection = DeckId | "bank";
+
+const DECKS: { id: DeckId; label: string; glyph: string }[] = [
+  { id: "hiragana", label: "HIRAGANA", glyph: "あ" },
+  { id: "katakana", label: "KATAKANA", glyph: "ア" },
+  { id: "kanji", label: "KANJI", glyph: "漢" },
 ];
 
-/** the caution chips only have room for so many before the screen fills */
+/** the ghost behind S1 — 親 is the dealer, 未 the bank's "not yet" */
+const GHOST: Record<Selection | "none", string> = {
+  none: "親",
+  hiragana: "あ",
+  katakana: "ア",
+  kanji: "漢",
+  bank: "未",
+};
+
 const MISSED_CHIP_LIMIT = 12;
 
-/** returns true if newly earned; persists immediately so an interrupted
-    session loses nothing */
 function earnKana(kana: string): boolean {
   const { earned } = getProgress();
   if (earned.has(kana)) return false;
@@ -44,31 +74,125 @@ function fill(count: number, total: number): CSSProperties {
 
 export default function App() {
   const [phase, setPhase] = useState<Phase>("home");
-  const [deck, setDeck] = useState<Kana[]>([]);
+  const [selection, setSelection] = useState<Selection | null>(null);
+  const [sets, setSets] = useState<WordSet[]>([]);
+  const [deckId, setDeckId] = useState<DeckId>("hiragana");
+  const [activeSet, setActiveSet] = useState<WordSet | null>(null);
+  const [queue, setQueue] = useState<SetWord[]>([]);
+  const [hand, setHand] = useState<RoundCard[]>([]);
+  const [drill, setDrill] = useState<Kana[]>([]);
   const [summary, setSummary] = useState<SessionSummary | null>(null);
   const [openCapture, setOpenCapture] = useState<string | null>(null);
 
   const progress = useSyncExternalStore(subscribeProgress, getProgress, getServerProgress);
   const bank = useSyncExternalStore(subscribeBank, getBank, getServerBank);
-  // the hydration render uses the stable server snapshot; a real read replaces it
   const loaded = progress !== getServerProgress();
 
-  const script = progress.script;
-  const scriptKana = BY_SCRIPT[script];
-  // the number is per script: あ and ア are different characters to write
-  const count = scriptKana.filter((k) => progress.earned.has(k.kana)).length;
-  const total = scriptKana.length;
-  const track = TRACKS.find((t) => t.id === script)!;
-  const base = progress.setChoice === "base";
-  // the only unbounded number in the app — it grows in the field, and its
-  // growth is the point
-  const bankCount = bank.captures.length;
+  // the platform sets are static JSON, precached by the service worker; the
+  // decks show "—" for the fraction until they land, which is one frame
+  useEffect(() => {
+    loadPlatformSets().then(setSets, () => setSets([]));
+  }, []);
 
-  function run(cards: Kana[]) {
-    setDeck(shuffle(cards));
+  const script = progress.script;
+  const base = progress.setChoice === "base";
+  const bankCount = bank.captures.length;
+  const setsFor = (id: DeckId) => sets.filter((s) => s.script === id);
+  const deckGlyph = DECKS.find((d) => d.id === deckId)!.glyph;
+  const deckLabel = DECKS.find((d) => d.id === deckId)!.label;
+
+  function runDrill(cards: Kana[]) {
+    setDrill(shuffle(cards));
     setSummary(null);
     setPhase("session");
   }
+
+  function openDeck(id: DeckId) {
+    setDeckId(id);
+    if (id !== "kanji") updateProgress({ script: id });
+    setPhase("deck");
+  }
+
+  function commit() {
+    if (selection === null) return;
+    if (selection === "bank") {
+      setOpenCapture(null);
+      setPhase("bank");
+      return;
+    }
+    openDeck(selection);
+  }
+
+  // ---- the word-set screens ----
+
+  if (phase === "set" && activeSet) {
+    return (
+      <SetScreen
+        set={activeSet}
+        deckName={deckLabel}
+        onBack={() => setPhase("deck")}
+        onDeal={() => {
+          setQueue(deal(activeSet, newSeed()));
+          setHand([]);
+          setPhase("round");
+        }}
+      />
+    );
+  }
+
+  if (phase === "round" && activeSet && queue.length > 0) {
+    return (
+      <Round
+        key={activeSet.id + queue.length}
+        set={activeSet}
+        queue={queue}
+        onAbandon={() => setPhase("set")}
+        onFinish={(won) => {
+          setHand(won);
+          setPhase("result");
+        }}
+      />
+    );
+  }
+
+  if (phase === "result" && activeSet) {
+    return <Result set={activeSet} hand={hand} onBackToDeck={() => setPhase("deck")} />;
+  }
+
+  if (phase === "deck") {
+    const kana = deckId !== "kanji";
+    const chars = kana ? BY_SCRIPT[deckId as Script] : [];
+    return (
+      <Deck
+        script={deckId}
+        glyph={deckGlyph}
+        sets={setsFor(deckId)}
+        characters={
+          kana
+            ? {
+                label: base ? "BASE 46" : "ALL 71",
+                done: chars.filter((k) => progress.earned.has(k.kana)).length,
+                total: chars.length,
+                base,
+                onToggle: (b) => updateProgress({ setChoice: b ? "base" : "all" }),
+              }
+            : undefined
+        }
+        onHome={() => setPhase("home")}
+        onCharacters={() => runDrill(kanaSet(deckId as Script, base))}
+        onOpenSet={(set) => {
+          setActiveSet(set);
+          setPhase("set");
+        }}
+      />
+    );
+  }
+
+  if (phase === "credits") {
+    return <Credits onBack={() => setPhase("home")} />;
+  }
+
+  // ---- the v3 screens, unchanged but for the Joker ----
 
   if (phase === "bank") {
     const index = bank.captures.findIndex((c) => c.id === openCapture);
@@ -76,7 +200,6 @@ export default function App() {
       return (
         <CaptureDetail
           capture={bank.captures[index]}
-          // the grid runs newest first; the ordinal counts from the oldest
           ordinal={bank.captures.length - index}
           total={bank.captures.length}
           onBack={() => setOpenCapture(null)}
@@ -89,11 +212,11 @@ export default function App() {
   if (phase === "session") {
     return (
       <Session
-        key={deck.map((k) => k.hex).join()}
-        deck={deck}
-        trackLabel={track.label}
+        key={drill.map((k) => k.hex).join()}
+        deck={drill}
+        trackLabel={script.toUpperCase()}
         earnKana={earnKana}
-        onQuit={() => setPhase("home")}
+        onQuit={() => setPhase("deck")}
         onFinish={(result) => {
           setSummary(result);
           setPhase("complete");
@@ -105,13 +228,15 @@ export default function App() {
   if (phase === "complete" && summary) {
     const missed = summary.missed;
     const shown = missed.slice(0, MISSED_CHIP_LIMIT);
+    const chars = BY_SCRIPT[script];
+    const count = chars.filter((k) => progress.earned.has(k.kana)).length;
     return (
       <main className="frame">
         <div className="livery" aria-hidden>
-          <span className="ghost ghostDone">{track.glyph}</span>
+          <span className="ghost ghostDone">{deckGlyph}</span>
         </div>
         <div className="legend">
-          {script} · {base ? "base 46" : "all 71"} — {deck.length} cards
+          {script} · {base ? "base 46" : "all 71"} — {drill.length} cards
         </div>
         <div className="doneTitle">Session done.</div>
 
@@ -155,17 +280,15 @@ export default function App() {
             <span className="legend" style={{ fontSize: 9, letterSpacing: "0.18em" }}>
               {script} track
             </span>
-            {summary.earned > 0 && (
-              <span className="chipLive">+{summary.earned} from memory</span>
-            )}
+            {summary.earned > 0 && <span className="chipLive">+{summary.earned} from memory</span>}
           </div>
           <div className="trackSummaryRow">
             <b>Written from memory</b>
             <span>
-              {count}/{total}
+              {count}/{chars.length}
             </span>
           </div>
-          <div className="bar barOn" style={fill(count, total)}>
+          <div className="bar barOn" style={fill(count, chars.length)}>
             <i />
           </div>
         </div>
@@ -175,23 +298,19 @@ export default function App() {
         <div className="homeActions">
           {missed.length > 0 ? (
             <>
-              <button
-                type="button"
-                className="btnStrike homeStart"
-                onClick={() => run(missed)}
-              >
+              <button type="button" className="btnStrike homeStart" onClick={() => runDrill(missed)}>
                 Replay missed ({missed.length})
               </button>
               <div className="actionRow">
                 <button
                   type="button"
                   className="btnSeam"
-                  onClick={() => run(kanaSet(script, base))}
+                  onClick={() => runDrill(kanaSet(script, base))}
                 >
                   Again
                 </button>
-                <button type="button" className="btnSeam" onClick={() => setPhase("home")}>
-                  Home
+                <button type="button" className="btnSeam" onClick={() => setPhase("deck")}>
+                  Deck
                 </button>
               </div>
             </>
@@ -200,13 +319,13 @@ export default function App() {
               <button
                 type="button"
                 className="btnStrike homeStart"
-                onClick={() => run(kanaSet(script, base))}
+                onClick={() => runDrill(kanaSet(script, base))}
               >
                 Again
               </button>
               <div className="actionRow">
-                <button type="button" className="btnSeam" onClick={() => setPhase("home")}>
-                  Home
+                <button type="button" className="btnSeam" onClick={() => setPhase("deck")}>
+                  Deck
                 </button>
               </div>
             </>
@@ -216,114 +335,89 @@ export default function App() {
     );
   }
 
+  // ---- S1 ----
+
+  const line = jokerLine(selection === null ? "home" : (`home.${selection}` as JokerScreen));
+
   return (
     <main className="frame">
       <div className="livery" aria-hidden>
-        <span className="ghost ghostHome">{track.glyph}</span>
+        <span className="ghost ghostHome">{GHOST[selection ?? "none"]}</span>
       </div>
-      <header className="appHead">
-        <span className="brand">KANA HERO</span>
-        <span className="onDevice">offline · $0</span>
-      </header>
+      <div className="brand">KANA HERO</div>
 
-      <div className="legend" style={{ marginTop: 30 }}>
-        track
-      </div>
-      <div className="trackList">
-        {TRACKS.map((t) => {
-          const kana = BY_SCRIPT[t.id];
-          const done = kana.filter((k) => progress.earned.has(k.kana)).length;
-          const on = script === t.id;
+      {/* the canvas draws him 110 wide on S1 — 89 tall, his art being 1.25:1 */}
+      <Joker line={line} size={89} className="jokerHome" />
+
+      <div className="legend legendSpaced">DECKS</div>
+      <div className="deckList">
+        {DECKS.map((d) => {
+          const on = selection === d.id;
+          const kana = d.id !== "kanji";
+          const chars = kana ? BY_SCRIPT[d.id as Script] : [];
+          const done = kana ? chars.filter((k) => progress.earned.has(k.kana)).length : 0;
+          const deckSets = setsFor(d.id);
+          const setWords = deckSets.reduce((n, s) => n + s.words.length, 0);
+          const setDone = deckSets.reduce((n, s) => n + earnedCount(s), 0);
+          const value = kana
+            ? `${done}/${chars.length}`
+            : `${deckSets.length} SET${deckSets.length === 1 ? "" : "S"} · ${setDone}/${setWords}`;
           return (
-            <div key={t.id} className={`track${on ? " trackOn" : ""}`}>
-              <button
-                type="button"
-                className="trackSelect"
-                aria-pressed={on}
-                onClick={() => updateProgress({ script: t.id })}
+            <button
+              type="button"
+              key={d.id}
+              className={`deckRow${on ? " deckRowOn" : ""}`}
+              aria-pressed={on}
+              onClick={() => setSelection(d.id)}
+            >
+              <span className="deckRowTop">
+                <span className="deckRowName">
+                  <span className="deckGlyph">{d.glyph}</span>
+                  <span className="deckLabel">{d.label}</span>
+                </span>
+                <span className="deckCount">{loaded ? value : "—"}</span>
+              </span>
+              <span
+                className={`bar${on ? " barOn" : ""}`}
+                style={fill(
+                  loaded ? (kana ? done : setDone) : 0,
+                  kana ? chars.length : setWords || 1,
+                )}
               >
-                <span className="trackTop">
-                  <span className="trackName">
-                    <span className="trackGlyph">{t.glyph}</span>
-                    <span className="trackLabel">{t.label}</span>
-                  </span>
-                  <span className="trackCount">
-                    {loaded ? `${done}/${kana.length}` : "—"}
-                  </span>
-                </span>
-                <span
-                  className={`bar${on ? " barOn" : ""}`}
-                  style={fill(loaded ? done : 0, kana.length)}
-                >
-                  <i />
-                </span>
-              </button>
-
-              {/* the set toggle belongs to the selected track only */}
-              {on && (
-                <div className="setToggle" role="radiogroup" aria-label="kana set">
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={base}
-                    className={`setChip${base ? " setChipOn" : ""}`}
-                    onClick={() => updateProgress({ setChoice: "base" })}
-                  >
-                    Base 46
-                  </button>
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={!base}
-                    className={`setChip${!base ? " setChipOn" : ""}`}
-                    onClick={() => updateProgress({ setChoice: "all" })}
-                  >
-                    All 71
-                  </button>
-                </div>
-              )}
-            </div>
+                <i />
+              </span>
+            </button>
           );
         })}
-      </div>
 
-      {/* A strip, not a fourth track — no chamfer, no bar, no denominator. */}
-      <button
-        type="button"
-        className="bankStrip"
-        onClick={() => {
-          setOpenCapture(null);
-          setPhase("bank");
-        }}
-      >
-        <svg width="19" height="16" viewBox="0 0 20 17" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
-          <rect x="1" y="4.2" width="18" height="11.8" />
-          <circle cx="10" cy="10" r="3.4" />
-          <path d="M6.8 4.2 L8.4 1.3 H11.6 L13.2 4.2" />
-        </svg>
-        <span className="legend">Bank</span>
-        <span className="grow" />
-        <span className={`bankStripCount${bankCount === 0 ? " bankStripCountZero" : ""}`}>
-          {bank.ready ? bankCount : "—"}
-        </span>
-        <span className="bankStripArrow">→</span>
-      </button>
+        <button
+          type="button"
+          className={`bankStrip${selection === "bank" ? " bankStripOn" : ""}`}
+          aria-pressed={selection === "bank"}
+          onClick={() => setSelection("bank")}
+        >
+          <span className="legend">BANK</span>
+          <span className="grow" />
+          <span className={`bankStripCount${bankCount === 0 ? " bankStripCountZero" : ""}`}>
+            {bank.ready ? bankCount : "—"}
+          </span>
+          <span className="bankStripArrow">→</span>
+        </button>
+      </div>
 
       <div className="grow" />
 
-      <div className="homeNote">Missed cards replay until zero.</div>
-
       <button
         type="button"
-        className="btnStrike homeStart"
-        onClick={() => run(kanaSet(script, base))}
-        disabled={!loaded}
+        className={selection === null ? "btnInert homeStart" : "btnStrike homeStart"}
+        onClick={commit}
+        disabled={selection === null || !loaded}
       >
-        Start session
+        {selection === "bank" ? "OPEN BANK" : "START SESSION"}
       </button>
-      <a className="attribution" href="/licenses/NOTICE.txt">
-        strokesvg (MIT) / Klee One (SIL OFL 1.1)
-      </a>
+      <button type="button" className="attribution" onClick={() => setPhase("credits")}>
+        CREDITS
+      </button>
     </main>
   );
 }

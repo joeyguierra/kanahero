@@ -78,6 +78,6 @@ Supabase or any server · accounts · user-created sets / S6c · bank → card c
 | :-- | :-- | :-- | :-- |
 | station set size | title, S3, S8 | 9 | ✅ from `station-kanji.json` |
 | kana set sizes | S2, S2k | 10 · 12 | ✅ |
-| distinct kanji vendored | build log | 14 | ⚠️ confirm after fetch |
+| distinct kanji vendored | build log | 14 | ✅ vendored from KanjiVG at weight 58 |
 | build minutes | build log → title | — | ⚠️ owed |
 | first-run baseline (pen test on the 9) | video ring | — | ⚠️ owed, filmed |

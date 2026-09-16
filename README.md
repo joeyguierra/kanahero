@@ -204,30 +204,44 @@ centerline is revealed start to end, clipped to its own shadow, with a pen-lift
 pause between strokes and a duration that scales with path length — a long sweep
 takes longer than a tick.
 
-That is possible because the underlying data is centerlines, not glyph outlines:
+That is possible because the underlying data is centerlines, not glyph outlines.
+Two sources supply them, normalized to one 1024-unit box so a kanji and a kana
+look drawn by the same hand:
 
-> Stroke order data: **strokesvg** by zhengkyl (MIT) —
+> Kana stroke order data: **strokesvg** by zhengkyl (MIT) —
 > https://github.com/zhengkyl/strokesvg
 >
 > SVG paths derived from the **Klee One** font, licensed under the
 > SIL Open Font License 1.1 — https://openfontlicense.org/
+>
+> Kanji stroke order data: **KanjiVG** by Ulrich Apel and contributors,
+> licensed **CC BY-SA 3.0** — https://kanjivg.tagaini.net/ — modified: the
+> 109-unit viewBox is scaled to 1024, the stroke-number layer is dropped, and
+> the stroke weight is set to 58 to match the kana. The derived files in
+> `public/strokes/` remain under CC BY-SA 3.0.
 
-The upstream NOTICE ships with the app at
+The upstream notices ship with the app at
 [`public/licenses/strokesvg-LICENSE.txt`](public/licenses/strokesvg-LICENSE.txt)
-and is fetched by `scripts/fetch-strokes.mjs` alongside the SVGs, so vendoring
-the data and vendoring its license are the same step.
+and
+[`public/licenses/kanjivg-LICENSE.txt`](public/licenses/kanjivg-LICENSE.txt),
+fetched by `scripts/fetch-strokes.mjs` and `scripts/fetch-kanjivg.mjs` alongside
+the SVGs, so vendoring the data and vendoring its license are the same step.
+CC BY-SA also asks for a visible credit, which is why the app has a CREDITS
+screen and not only a licences file. `scripts/verify-strokes.mjs` fails the
+build if any character of any word in `public/sets/` has no stroke file.
 
 The four typefaces the app self-hosts — Klee One, Archivo, JetBrains Mono, Noto
 Sans JP — are all SIL OFL 1.1, and their notices plus the licence text are in
 [`public/licenses/NOTICE.txt`](public/licenses/NOTICE.txt), which the app links
-from its own footer and precaches like everything else.
+from its CREDITS screen and precaches like everything else.
 
 ## Design
 
 Four passes, each made before its build commit and each kept in `docs/design/`
 as standalone HTML: `Kanahero Wireframes.dc.html`, `Kanahero Hi-Fi.dc.html`,
-then `KanaHero v2 Handoff.dc.html` (THE LOG, the visual system) and
-`KanaHero v3 Handoff.dc.html` (the bank). The tokens they settled on are
+then `KanaHero v2 Handoff.dc.html` (THE LOG, the visual system),
+`KanaHero v3 Handoff.dc.html` (the bank) and `KanaHero v5 Handoff.dc.html`
+(the Joker, the decks and the set round). The tokens they settled on are
 declared once at the top of `app/globals.css`.
 
 ![THE LOG doctrine — seven greys and four signals](.github/media/palette.svg)

@@ -10,6 +10,7 @@
 // difference is that the read is async, so the first snapshot is `ready:
 // false` and a real one replaces it.
 
+import { progressBlob } from "./progress";
 import { zipStore, type ZipEntry } from "./zip";
 
 const DB_NAME = "kanahero-bank";
@@ -316,7 +317,7 @@ export interface ManifestEntry {
 
 export type ExportResult = "shared" | "downloaded" | "empty";
 
-/** One ZIP: `captures/<id>.jpg` plus a manifest. Never mutates the bank —
+/** One ZIP: `captures/<id>.jpg`, a manifest, and the progress blob. Never mutates the bank —
     it is a copy, repeatable and idempotent, and it is also the input format
     the later conversion build reads. */
 export async function exportBank(): Promise<ExportResult> {
@@ -355,6 +356,13 @@ export async function exportBank(): Promise<ExportResult> {
         2,
       ),
     ),
+  });
+
+  // The cards leave with the photos: a bank export that dropped the earned
+  // words would be half a backup (SPEC-v5 §2).
+  entries.push({
+    name: "progress.json",
+    data: new TextEncoder().encode(progressBlob()),
   });
 
   const zip = zipStore(entries, now);

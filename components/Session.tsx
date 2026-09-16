@@ -9,6 +9,8 @@ import { useRef, useState } from "react";
 import type { Kana } from "@/lib/kana";
 import { requeue } from "@/lib/session";
 import type { StrokePlayer } from "@/lib/strokeAnimator";
+import { jokerLine } from "@/lib/joker-lines";
+import Joker from "./Joker";
 import WritingCanvas, { type WritingCanvasHandle } from "./WritingCanvas";
 import StrokeOverlay from "./StrokeOverlay";
 
@@ -100,6 +102,9 @@ export default function Session({
           </button>
         )}
       </div>
+
+      {/* he is on this screen too, in the slot the v3 header left him */}
+      <Joker line={jokerLine(reveal ? "drill" : "drill.prompt")} className="jokerDrill" />
 
       {/* fixed-height slot; the prompt flips into the reveal card in place */}
       <div className="promptSlot">

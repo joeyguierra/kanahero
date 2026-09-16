@@ -99,6 +99,11 @@ const blobBytes = (id) =>
   );
 
 const stripCount = () => page.locator(".bankStripCount").innerText();
+// S1 selects and the CTA commits, so the strip is two taps now, not one
+const openBank = async () => {
+  await page.click(".bankStrip");
+  await page.click("button:has-text('Open bank')");
+};
 const headCount = () => page.locator(".bankHeadCount").innerText();
 const thumbs = () => page.locator(".thumb").count();
 const capture = async (file) => {
@@ -110,14 +115,14 @@ const capture = async (file) => {
 await page.goto(URL);
 
 // --- 1. the strip is the way in, and it is not a track card ---
-await page.waitForSelector("button:has-text('Start session'):not([disabled])");
+await page.waitForSelector(".bankStrip");
 assert.equal(await stripCount(), "0", "bank strip starts at zero");
 assert.equal(
-  await page.locator(".bankStrip .bar, .bankStrip .trackCount").count(),
+  await page.locator(".bankStrip .bar, .bankStrip .deckCount").count(),
   0,
-  "the strip carries no progress bar and no fraction — it is not a fourth track",
+  "the strip carries no progress bar and no fraction — it is not a fourth deck",
 );
-await page.click(".bankStrip");
+await openBank();
 assert.match(
   (await page.locator(".bankEmptyLine").innerText()).toLowerCase(),
   /snap what you can/,
@@ -149,7 +154,7 @@ console.log("2. capture saves with zero taps after the shutter, downscaled to 16
 
 // --- 3. it survives a cold reload ---
 await page.reload();
-await page.click(".bankStrip");
+await openBank();
 await page.waitForSelector(".thumb");
 assert.equal(await thumbs(), 1, "the capture is still there after a reload");
 console.log("3. the bank survives a reload — the photo is in IndexedDB, not memory");
@@ -192,6 +197,10 @@ await download.saveAs(zipPath);
 await run("unzip", ["-t", zipPath]);
 await run("unzip", ["-o", "-q", zipPath, "-d", path.join(tmp, "unpacked")]);
 const manifest = JSON.parse(await readFile(path.join(tmp, "unpacked", "manifest.json"), "utf8"));
+// v5: the cards leave with the photos, so a restore is a whole restore
+const exported = JSON.parse(await readFile(path.join(tmp, "unpacked", "progress.json"), "utf8"));
+assert.equal(exported.v, 2, "the export carries the current progress blob");
+assert.ok("joker" in exported, "including the Joker's earned cards, even when empty");
 assert.equal(manifest.format, "kanahero-bank");
 assert.equal(manifest.version, 1);
 assert.equal(manifest.captures.length, 1);
@@ -246,11 +255,11 @@ assert.equal(
 );
 assert.equal(two[0].w, 1200, "the portrait capture is the newest one");
 await page.click("button:has-text('Bank')");
-await page.click("button:has-text('Back')");
-await page.waitForSelector("button:has-text('Start session'):not([disabled])");
+await page.click("button:has-text('Home')");
+await page.waitForSelector(".bankStrip");
 assert.equal(await stripCount(), "2", "home strip carries the live count");
 assert.equal(
-  await page.locator(".track:has-text('Hiragana') .trackCount").innerText(),
+  await page.locator(".deckRow:has-text('HIRAGANA') .deckCount").innerText(),
   "0/71",
   "the writing loop never learned the bank exists",
 );

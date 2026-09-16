@@ -1202,3 +1202,1147 @@ button:not(:disabled):active {
   gap: 1rem;
   margin-top: 1rem;
 }
+
+/* ============================================================
+   v5 — the Joker, the decks, the set round
+   Tokens and rhythm from design/KanaHero v5 Handoff.dc.html.
+   ============================================================ */
+
+/* ---- screen chrome: back link left, what-you-are-in right ---- */
+
+.screenHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.backLink,
+.screenTitle {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--rail);
+  white-space: nowrap;
+}
+
+/* the tap target is bigger than the ink, without moving the ink */
+.backLink {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  padding: 12px;
+  margin: -12px;
+}
+
+.legendSpaced {
+  margin-top: 28px;
+}
+
+.legendFaint {
+  color: var(--carbon);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  margin-top: 12px;
+}
+
+/* ---- the Joker ---- */
+
+.joker {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+
+.joker-top {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* the mascot is a square PNG with transparent margins; JokerMark sizes the box
+   to the art inside it and carries the negative margins that crop it */
+.jokerMark {
+  flex: none;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 22px rgba(255, 46, 136, 0.28));
+}
+
+.jokerPanel {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--seam);
+  background: var(--plate);
+  padding: 10px 13px 11px;
+}
+
+/* square tail, rotated 45° — the panel is flat, so this is the only shape */
+.jokerTail {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--plate);
+  transform: rotate(45deg);
+}
+
+.joker-left .jokerTail {
+  left: -6px;
+  top: 50%;
+  margin-top: -5px;
+  border-left: 1px solid var(--seam);
+  border-bottom: 1px solid var(--seam);
+}
+
+.joker-top .jokerPanel {
+  width: 100%;
+  /* in a column the panel must not grow into the card's height beside it */
+  flex: none;
+}
+
+.joker-top .jokerTail {
+  left: 24px;
+  top: -6px;
+  border-left: 1px solid var(--seam);
+  border-top: 1px solid var(--seam);
+}
+
+.jokerTag {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  color: var(--strike);
+  margin-bottom: 4px;
+}
+
+.jokerLine {
+  /* he says 口 out loud now and then, and Archivo has no kanji — the JP face
+     is named before the generic fallbacks rather than left to the system's */
+  font-family: var(--font-archivo), Archivo, var(--jp);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--bone);
+}
+
+.jokerHome {
+  margin-top: 20px;
+}
+
+.jokerDeck {
+  margin-top: 22px;
+}
+
+.jokerRound {
+  flex: 1;
+  min-width: 0;
+}
+
+.jokerRound .jokerLine {
+  font-size: 12px;
+}
+
+/* ---- S1 rows ---- */
+
+.deckList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 11px;
+}
+
+.deckRow {
+  border: 1px solid var(--seam);
+  background: var(--plate);
+  padding: 14px 16px;
+  text-align: left;
+}
+
+.deckRowOn {
+  border-color: var(--strike);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--strike) 20%, transparent),
+    color-mix(in srgb, var(--strike) 5%, transparent)
+  );
+}
+
+.deckRowTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.deckRowName {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.deckGlyph {
+  font-family: var(--jp);
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--rail);
+}
+
+.deckRowOn .deckGlyph,
+.deckRowOn .deckCount {
+  color: var(--strike);
+}
+
+.deckLabel {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.deckCount {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--rail);
+  white-space: nowrap;
+}
+
+.deckRow .bar {
+  margin-top: 10px;
+  height: 6px;
+}
+
+.bankStripOn {
+  border-color: var(--strike);
+}
+
+/* the CTA before anything is selected: present, inert, seam */
+.btnInert {
+  border: 1px solid var(--seam);
+  background: var(--plate);
+  color: var(--carbon);
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-align: center;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+}
+
+/* ---- deck screens (S2 / S2k / S3) ---- */
+
+.panel {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--seam);
+  background: var(--plate);
+  padding: 16px;
+  margin-top: 9px;
+  text-align: left;
+}
+
+/* cards notch top-right; actions notch bottom-left */
+.panelNotch {
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+}
+
+.panelName {
+  font-size: 19px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.panelCount {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--bone);
+  line-height: 1;
+}
+
+.barBone > i {
+  background: var(--bone);
+}
+
+.deckCharacters {
+  margin-top: 11px;
+}
+
+.deckCharactersTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.deckCharacters .bar {
+  margin-top: 13px;
+  height: 6px;
+}
+
+.deckDakuten {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.toggle {
+  display: flex;
+  border: 1px solid var(--seam);
+}
+
+.toggleOpt {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  padding: 5px 10px;
+  color: var(--carbon);
+}
+
+.toggleOn {
+  background: var(--bone);
+  color: var(--chassis);
+}
+
+.deckNote {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--carbon);
+  margin-top: 12px;
+}
+
+.setRow {
+  margin-top: 9px;
+}
+
+.setRowTop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.setGlyph {
+  font-family: var(--jp);
+  font-weight: 900;
+  font-size: 34px;
+  line-height: 1;
+  color: var(--strike);
+}
+
+.setRowName {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.setRowMeta {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--rail);
+  white-space: nowrap;
+}
+
+.setRowNumbers {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  text-align: right;
+}
+
+.setFoil {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--carbon);
+  white-space: nowrap;
+}
+
+.setFoilOn {
+  color: var(--strike);
+}
+
+.setRow .bar {
+  margin-top: 13px;
+  height: 6px;
+}
+
+/* ---- S6b ---- */
+
+.setHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.setHeadTitle {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.setGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.roundLength {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--seam);
+  background: var(--plate);
+  padding: 14px 17px;
+  gap: 12px;
+}
+
+.roundLengthValue {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--bone);
+  white-space: nowrap;
+}
+
+.roundLength + .actionBar {
+  margin-top: 10px;
+}
+
+/* ---- the card ---- */
+
+.card {
+  container-type: inline-size;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  background: var(--plate);
+  border: 1px solid var(--seam);
+  color: var(--bone);
+}
+
+/* the stock: a 45° weave, the same one the prompt and foil faces carry */
+.card-prompt::before,
+.card-foil::before,
+.card-worn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.card-prompt::before {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(242, 240, 235, 0.035) 0 7px,
+    transparent 7px 14px
+  );
+}
+
+.card-foil {
+  background: var(--strike);
+  border-color: var(--strike);
+  color: #000;
+  box-shadow: 0 0 34px -10px rgba(255, 46, 136, 0.55);
+}
+
+.card-foil::before {
+  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.14) 0 7px, transparent 7px 14px);
+}
+
+.card-worn {
+  background: #101011;
+  border-color: #1d1d21;
+  color: var(--rail);
+}
+
+.card-worn::before {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(242, 240, 235, 0.03) 0 1px,
+    transparent 1px 5px
+  );
+}
+
+.card-round {
+  width: 150px;
+  height: 210px;
+  flex: none;
+  padding: 12px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+}
+
+.card-earn {
+  width: 214px;
+  height: 300px;
+  flex: none;
+  padding: 16px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+}
+
+.card-fan {
+  width: 104px;
+  height: 146px;
+  flex: none;
+  padding: 8px;
+  justify-content: space-between;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+
+.card-grid {
+  aspect-ratio: 5 / 7;
+  width: 100%;
+  padding: 4px;
+  justify-content: space-between;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+}
+
+.cardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  position: relative;
+}
+
+.cardChip {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  padding: 3px 6px;
+  white-space: nowrap;
+  border: 1px solid var(--seam);
+  color: var(--rail);
+}
+
+.card-foil .cardChip {
+  background: var(--bone);
+  border-color: var(--bone);
+  color: #000;
+  font-weight: 600;
+}
+
+.card-worn .cardChip {
+  border-color: #1d1d21;
+  color: var(--carbon);
+}
+
+.cardChipPlain {
+  border: none;
+  padding: 0;
+  letter-spacing: 0.18em;
+  color: var(--carbon);
+}
+
+/* the compact faces carry the rarity as a bare word, no chip */
+.card-fan .cardChip,
+.card-grid .cardChip {
+  border: none;
+  padding: 0;
+  font-size: 7px;
+  letter-spacing: 0.14em;
+  color: var(--carbon);
+}
+
+.card-fan.card-foil .cardChip,
+.card-grid.card-foil .cardChip {
+  background: none;
+  color: #000;
+  font-weight: 600;
+}
+
+.card-grid .cardChip {
+  font-size: 5px;
+}
+
+.cardMark {
+  font-family: var(--jp);
+  font-weight: 900;
+  font-size: 14px;
+  line-height: 1;
+  color: currentColor;
+}
+
+.cardMarkStrike {
+  color: var(--strike);
+}
+
+.cardMid {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 0;
+}
+
+.cardWord {
+  font-family: var(--jp);
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.cardRomaji {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--rail);
+  white-space: nowrap;
+}
+
+.card-foil .cardRomaji,
+.card-foil .cardReading,
+.card-foil .cardKind {
+  color: rgba(0, 0, 0, 0.72);
+}
+
+.card-fan .cardRomaji,
+.card-grid .cardRomaji {
+  font-size: 7px;
+  letter-spacing: 0.1em;
+  overflow: hidden;
+}
+
+.card-grid .cardRomaji {
+  font-size: 4.5px;
+  letter-spacing: 0.04em;
+}
+
+.card-fan .cardMid,
+.card-grid .cardMid {
+  justify-content: center;
+}
+
+.cardReading {
+  font-family: var(--jp);
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--rail);
+  white-space: nowrap;
+}
+
+.cardReadingBig {
+  font-family: var(--jp);
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--bone);
+  line-height: 1;
+}
+
+.cardPromptRomaji {
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.cardFoot {
+  position: relative;
+}
+
+.cardRule {
+  display: block;
+  height: 1px;
+  background: var(--seam);
+  margin-bottom: 8px;
+}
+
+.card-foil .cardRule {
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.card-worn .cardRule {
+  background: #1d1d21;
+}
+
+.cardMeaning {
+  display: block;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.card-earn .cardMeaning {
+  font-size: 18px;
+}
+
+.cardKind {
+  display: block;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  color: var(--carbon);
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* the back: deck mark on strike stripe, and nothing else */
+.card-back {
+  aspect-ratio: 5 / 7;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border-color: var(--strike);
+  background: var(--chassis)
+    repeating-linear-gradient(45deg, rgba(255, 46, 136, 0.26) 0 6px, transparent 6px 12px);
+}
+
+.cardBackMark {
+  font-family: var(--jp);
+  font-weight: 900;
+  font-size: 16px;
+  color: var(--strike);
+}
+
+/* tapping an earned card shows its face, plain, over everything */
+.cardOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 11, 0.86);
+}
+
+/* ---- the round (S7 / S7b) ---- */
+
+.roundHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* the strike rail owns the right 13px; nothing in the head runs under it */
+  padding-right: 15px;
+}
+
+.roundChip {
+  background: var(--strike);
+  color: #000;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  padding: 4px 7px;
+  white-space: nowrap;
+}
+
+.roundChipBone {
+  background: var(--bone);
+  color: var(--chassis);
+}
+
+.roundDeck {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--rail);
+  white-space: nowrap;
+  flex: 1;
+}
+
+.roundTop {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.roundCard {
+  flex: none;
+}
+
+.round .canvasWrap {
+  margin-top: 18px;
+}
+
+.canvasFoot {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: rgba(10, 10, 11, 0.45);
+  white-space: nowrap;
+  z-index: 3;
+}
+
+.btnGrade {
+  flex: 1;
+  border: 1px solid currentColor;
+  text-align: center;
+  padding: 18px;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+/* ---- the whole-word reveal ---- */
+
+.wordReveal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  z-index: 2;
+  pointer-events: none;
+  /* the model is the strike; the ink underneath is the user's own */
+  --stroke: rgba(255, 46, 136, 0.9);
+  --shadow: rgba(255, 46, 136, 0.14);
+}
+
+.wordRevealCell {
+  position: relative;
+  aspect-ratio: 1;
+  flex: none;
+}
+
+.wordRevealGlyph {
+  width: 100%;
+  height: 100%;
+}
+
+.wordRevealGlyph svg {
+  display: block;
+}
+
+/* small kana sit smaller, and on the floor of their cell */
+.wordRevealSmall {
+  transform-origin: left bottom;
+}
+
+/* ---- S7c: the earn beat ---- */
+
+.roundEarned {
+  cursor: pointer;
+}
+
+.earnStack {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.earnStack .joker {
+  align-self: stretch;
+}
+
+.earnLabel {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--strike);
+  white-space: nowrap;
+}
+
+.earnCard {
+  box-shadow:
+    0 22px 44px -12px rgba(0, 0, 0, 0.8),
+    0 0 40px -8px rgba(255, 46, 136, 0.5);
+}
+
+.card-earn.card-base.earnCard,
+.card-earn.card-worn.earnCard {
+  box-shadow: 0 22px 44px -12px rgba(0, 0, 0, 0.8);
+}
+
+.earnNote {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--carbon);
+  text-align: center;
+  line-height: 1.7;
+}
+
+.handStrip {
+  border-top: 1px solid var(--seam);
+  margin: 0 calc(var(--gutter) * -1);
+  padding: 14px var(--gutter) 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.handStrip .legend {
+  padding-bottom: 26px;
+  white-space: nowrap;
+}
+
+.handCards {
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+/* the hand overlaps like a hand; the newest card is on top */
+.handCard {
+  width: 54px;
+  height: 74px;
+  white-space: nowrap;
+  flex: none;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border: 1px solid var(--seam);
+  background: var(--plate);
+  font-family: var(--jp);
+  font-weight: 900;
+  font-size: 15px;
+  color: var(--bone);
+  overflow: hidden;
+  line-height: 1;
+  /* the slide: ~260ms, one ease, and it is one of only two animations */
+  animation: handDeal 260ms ease-out both;
+}
+
+/* each card is dealt over the last one; the seam keeps two foils apart and
+   the inset keeps the word out from under the card on top of it */
+.handCard + .handCard {
+  margin-left: -16px;
+  padding-left: 20px;
+  border-left: 1px solid var(--chassis);
+}
+
+.handCard-worn {
+  background: #101011;
+  border-color: #1d1d21;
+  color: var(--rail);
+}
+
+.handCard-foil {
+  background: var(--strike);
+  border-color: var(--strike);
+  color: #000;
+  box-shadow: 0 0 22px -4px rgba(255, 46, 136, 0.6);
+}
+
+@keyframes handDeal {
+  from {
+    transform: translate(0, -120px) scale(1.4);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* ---- S8 ---- */
+
+.ghostResult {
+  right: -52px;
+  bottom: 200px;
+  font-size: 250px;
+}
+
+.resultCount {
+  font-size: 64px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  margin-top: 28px;
+}
+
+.resultCountWord {
+  font-size: 26px;
+  letter-spacing: -0.01em;
+  margin-left: 0.14em;
+}
+
+.resultTally {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.resultFoil {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  background: var(--strike);
+  color: #000;
+  padding: 5px 8px;
+  white-space: nowrap;
+}
+
+.resultRest {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--rail);
+  white-space: nowrap;
+}
+
+/* a fan up to five cards; the cards may bleed, their content never does */
+.resultFan {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 calc(var(--gutter) * -1);
+  min-height: 190px;
+}
+
+.fanCard {
+  transform-origin: bottom center;
+}
+
+/* the fan overlaps by a third of a card; the covered edge is padding, so the
+   cards bleed but their content never does */
+.fanCard + .fanCard {
+  margin-left: -34px;
+  padding-left: 36px;
+}
+
+.fanCard0 {
+  transform: rotate(-14deg) translateY(20px);
+  z-index: 5;
+}
+.fanCard1 {
+  transform: rotate(-7deg) translateY(6px);
+  z-index: 4;
+}
+.fanCard2 {
+  transform: rotate(0deg) translateY(-4px);
+  z-index: 3;
+}
+.fanCard3 {
+  transform: rotate(7deg) translateY(6px);
+  z-index: 2;
+}
+.fanCard4 {
+  transform: rotate(14deg) translateY(20px);
+  z-index: 1;
+}
+
+/* from six, the fan stops fanning: seven columns, 21 cards at the ceiling */
+.resultGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  align-content: center;
+  flex: 1;
+  margin-top: 16px;
+}
+
+.resultNote {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--carbon);
+  line-height: 1.7;
+}
+
+.btnBone {
+  background: var(--bone);
+  color: var(--chassis);
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-align: center;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+}
+
+.resultNote + .btnBone {
+  margin-top: 16px;
+}
+
+/* ---- S9 ---- */
+
+.creditList {
+  list-style: none;
+  margin-top: 11px;
+}
+
+.creditRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  border-top: 1px solid var(--seam);
+  padding: 13px 0;
+}
+
+.creditName {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+a.creditName {
+  border-bottom: 1px solid var(--strike);
+}
+
+.creditLicense {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--rail);
+}
+
+.creditNote {
+  flex: 1;
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--carbon);
+  white-space: nowrap;
+}
+
+/* the motion budget is two animations; this cuts both to their end state */
+@media (prefers-reduced-motion: reduce) {
+  .handCard {
+    animation: none;
+  }
+  .bar > i {
+    transition: none;
+  }
+}
+
+/* the drill is the v3 screen; he takes the slot above the prompt and nothing
+   else moves */
+.jokerDrill {
+  margin-top: 16px;
+}
+
+/* his panel is ~104px of chrome the v3 drill did not have; the canvas takes
+   what is left over, so the number it subtracts has to know about him */
+.session {
+  --chrome: calc(524px + env(safe-area-inset-top) + env(safe-area-inset-bottom));
+}
+
+/* the round carries the card row instead, which is taller again */
+.round {
+  --chrome: calc(560px + env(safe-area-inset-top) + env(safe-area-inset-bottom));
+}
+
+.jokerDrill .jokerLine {
+  font-size: 12px;
+}

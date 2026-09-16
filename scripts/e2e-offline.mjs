@@ -6,6 +6,8 @@
 //   2. Offline cold reload: home renders from cache
 //   3. Offline: a session starts and the stroke SVG animates (fetched, not
 //      bundled — the precache is what makes it arrive)
+//   3b. Offline: a word set deals, reveals the whole word, and earns a card —
+//      the set JSON and every character's stroke file came from the precache
 //   4. Offline: a capture saves, the count ticks, and it survives a reload
 //   5. Only one cache exists, and it is the current content hash
 //   6. A URL the host does not serve costs that URL, not the whole install
@@ -51,7 +53,7 @@ page.setDefaultTimeout(60000);
 
 // --- 1. install and take control ---
 await page.goto(URL);
-await page.waitForSelector("button:has-text('Start session'):not([disabled])");
+await page.waitForSelector(".deckRow:has-text('HIRAGANA')");
 // `ready` resolves once the SW is activated, which is after cache.addAll has
 // pulled the entire export down
 await page.evaluate(() => navigator.serviceWorker.ready);
@@ -63,16 +65,19 @@ console.log(`1. service worker installed and controlling: ${cached} URLs in ${ca
 // --- 2. offline cold reload ---
 await context.setOffline(true);
 await page.reload();
-await page.waitForSelector("button:has-text('Start session'):not([disabled])");
+await page.waitForSelector(".deckRow:has-text('HIRAGANA')");
 assert.equal(
-  await page.locator(".track:has-text('Hiragana') .trackCount").innerText(),
+  await page.locator(".deckRow:has-text('HIRAGANA') .deckCount").innerText(),
   "0/71",
   "home renders offline, from cache",
 );
 console.log("2. offline: the shell boots and home renders");
 
 // --- 3. offline: the writing loop, including the stroke data ---
+// S1 selects, the CTA commits, the deck's characters card opens the drill
+await page.click(".deckRow:has-text('HIRAGANA')");
 await page.click("button:has-text('Start session')");
+await page.click(".deckCharacters");
 const box = await page.locator("canvas.ink").boundingBox();
 await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.3);
 await page.mouse.down();
@@ -89,11 +94,41 @@ const running = await page.evaluate(
 assert.ok(running > 0, "the stroke animation runs offline — its SVG came from the precache");
 console.log("3. offline: a session starts and the stroke SVG animates");
 
+// --- 3b. offline: a set round, dealt and earned with no network ---
+// The kana sets need their JSON and one stroke file per character; if any of
+// that were a runtime fetch rather than precache, this is where it would show.
+await page.goto(URL);
+await page.click(".deckRow:has-text('HIRAGANA')");
+await page.click("button:has-text('Start session')");
+await page.click(".setRow");
+await page.waitForSelector("button:has-text('DEAL')");
+const roundLeft = await page.locator(".roundLengthValue").innerText();
+assert.match(roundLeft, /^10 LEFT/, `the set deals its ten words offline, got '${roundLeft}'`);
+await page.click("button:has-text('DEAL')");
+const roundBox = await page.locator("canvas.ink").boundingBox();
+await page.mouse.move(roundBox.x + roundBox.width * 0.3, roundBox.y + roundBox.height * 0.3);
+await page.mouse.down();
+await page.mouse.move(roundBox.x + roundBox.width * 0.7, roundBox.y + roundBox.height * 0.6, { steps: 5 });
+await page.mouse.up();
+await page.click("button:has-text('FLIP')");
+await page.waitForSelector(".wordReveal svg path");
+const cells = await page.locator(".wordRevealCell").count();
+assert.ok(cells >= 2, `the whole word reveals one cell per character, got ${cells}`);
+await page.click("button:has-text('GOT IT')");
+await page.waitForSelector(".earnCard");
+assert.equal(
+  await page.locator(".earnCard .cardChip").innerText(),
+  "FOIL · 1st TRY",
+  "first try offline still mints a foil",
+);
+console.log(`3b. offline: a set round deals, reveals ${cells} cells and earns a card`);
+
 // --- 4. offline: capture, the whole point of the trip ---
 // a second offline reload gets back to home, and re-proves the shell boots
 await page.reload();
 await page.waitForSelector(".bankStrip");
 await page.click(".bankStrip");
+await page.click("button:has-text('Open bank')");
 await page.setInputFiles(".bankInput", fixture);
 await page.waitForSelector(".thumb");
 assert.equal(await page.locator(".bankHeadCount").innerText(), "1", "the count ticks offline");
@@ -133,7 +168,7 @@ try {
   assert.ok(survived > 500, `the rest of the export still installed, got ${survived}`);
   await hostile.setOffline(true);
   await page2.reload();
-  await page2.waitForSelector("button:has-text('Start session'):not([disabled])");
+  await page2.waitForSelector(".deckRow:has-text('HIRAGANA')");
   await hostile.setOffline(false);
   await hostile.close();
   console.log(`6. one unserved URL costs one URL: ${survived} cached, the app still boots offline`);
