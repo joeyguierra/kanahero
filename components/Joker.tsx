@@ -1,11 +1,25 @@
 "use client";
 
 // The dealer, on every screen. Flat panel, 1px seam, square tail, mono tag,
-// one line. He never animates and he never says two things at once.
+// one line, and he never says two things at once.
+//
+// The line types itself out, RPG-style (creator call, v5 — it overrides
+// SPEC-v5 §6 "never animates"). The tail of the line is laid out but hidden
+// rather than absent, so the panel is its full height from the first frame and
+// nothing below it — the board especially — moves while he talks. Tapping the
+// panel finishes the line, and `prefers-reduced-motion` skips the typing
+// altogether.
 //
 // The art is `public/joker-mascot.png` — the official mascot, one square PNG
 // with an alpha channel, precached like everything else in public/. Swapping
 // it later means replacing that file and nothing else.
+
+import { useEffect, useRef, useState } from "react";
+
+/** ms per character — one steady rate, start to finish, no breath anywhere */
+const TICK = 22;
+/** a beat before he starts, so the line reads as an answer to the screen */
+const LEAD_IN = 120;
 
 /** the source of truth for the mascot art; nothing else references the file */
 export const JOKER_ART = "/joker-mascot.png";
@@ -31,13 +45,62 @@ export default function Joker({
   tail?: "left" | "top";
   className?: string;
 }) {
+  const [typed, setTyped] = useState({ line, n: 0 });
+  // a new line starts over from nothing: adjusting state during render rather
+  // than in an effect keeps it to one pass, with no frame of the old line
+  if (typed.line !== line) setTyped({ line, n: 0 });
+  const shown = [...line];
+  const done = typed.n >= shown.length;
+
+  // the pending work, so finishing the line early can stop the rest of it
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ticker = useRef<ReturnType<typeof setInterval> | null>(null);
+  const stop = () => {
+    if (timer.current) clearTimeout(timer.current);
+    if (ticker.current) clearInterval(ticker.current);
+    timer.current = null;
+    ticker.current = null;
+  };
+
+  useEffect(() => {
+    const chars = [...line];
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    let i = 0;
+    const start = () => {
+      ticker.current = setInterval(() => {
+        i++;
+        setTyped({ line, n: i });
+        if (i >= chars.length) stop();
+      }, TICK);
+    };
+    timer.current = reduced
+      ? setTimeout(() => setTyped({ line, n: chars.length }), 0)
+      : setTimeout(start, LEAD_IN);
+    return stop;
+  }, [line]);
+
   return (
     <div className={`joker joker-${tail} ${className}`.trim()}>
       <JokerMark size={size} />
-      <div className="jokerPanel">
+      <div
+        className="jokerPanel"
+        onClick={(e) => {
+          if (done) return;
+          // the RPG contract: a tap on the box finishes the line, and does not
+          // reach whatever the screen does with a tap
+          e.stopPropagation();
+          stop();
+          setTyped({ line, n: shown.length });
+        }}
+      >
         <span className="jokerTail" aria-hidden />
         <div className="jokerTag">JOKER</div>
-        <p className="jokerLine">{line}</p>
+        <p className="jokerLine">
+          <span className={done ? "jokerSaid" : "jokerSaid jokerSaying"}>
+            {shown.slice(0, typed.n).join("")}
+          </span>
+          <span className="jokerRest">{shown.slice(typed.n).join("")}</span>
+        </p>
       </div>
     </div>
   );

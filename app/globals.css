@@ -1331,6 +1331,23 @@ button:not(:disabled):active {
   color: var(--bone);
 }
 
+/* The tail of the line is laid out but not painted: the panel is its finished
+   height from the first frame, so nothing under it moves while he talks. */
+.jokerRest {
+  visibility: hidden;
+}
+
+/* the pen he is writing with — no blink, it just moves with the text */
+.jokerSaying::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 0.95em;
+  margin-left: 1px;
+  vertical-align: -0.14em;
+  background: var(--strike);
+}
+
 .jokerHome {
   margin-top: 20px;
 }
