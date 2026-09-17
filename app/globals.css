@@ -2319,129 +2319,6 @@ button:not(:disabled):active {
   transform-origin: left bottom;
 }
 
-/* ---- S7c: the earn beat ---- */
-
-.roundEarned {
-  cursor: pointer;
-}
-
-.earnStack {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-}
-
-.earnStack .joker {
-  align-self: stretch;
-}
-
-.earnLabel {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.24em;
-  color: var(--strike);
-  white-space: nowrap;
-}
-
-.earnCard {
-  box-shadow:
-    0 22px 44px -12px rgba(0, 0, 0, 0.8),
-    0 0 40px -8px rgba(255, 46, 136, 0.5);
-}
-
-.card-earn.card-base.earnCard,
-.card-earn.card-worn.earnCard {
-  box-shadow: 0 22px 44px -12px rgba(0, 0, 0, 0.8);
-}
-
-.earnNote {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.16em;
-  color: var(--carbon);
-  text-align: center;
-  line-height: 1.7;
-}
-
-.handStrip {
-  border-top: 1px solid var(--seam);
-  margin: 0 calc(var(--gutter) * -1);
-  padding: 14px var(--gutter) 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.handStrip .legend {
-  padding-bottom: 26px;
-  white-space: nowrap;
-}
-
-.handCards {
-  display: flex;
-  align-items: flex-end;
-  overflow: hidden;
-}
-
-/* the hand overlaps like a hand; the newest card is on top */
-.handCard {
-  width: 54px;
-  height: 74px;
-  white-space: nowrap;
-  flex: none;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  border: 1px solid var(--seam);
-  background: var(--plate);
-  font-family: var(--jp);
-  font-weight: 900;
-  font-size: 15px;
-  color: var(--bone);
-  overflow: hidden;
-  line-height: 1;
-  /* the slide: ~260ms, one ease, and it is one of only two animations */
-  animation: handDeal 260ms ease-out both;
-}
-
-/* each card is dealt over the last one; the seam keeps two shinies apart and
-   the inset keeps the word out from under the card on top of it */
-.handCard + .handCard {
-  margin-left: -16px;
-  padding-left: 20px;
-  border-left: 1px solid var(--chassis);
-}
-
-.handCard-worn {
-  background: #101011;
-  border-color: #1d1d21;
-  color: var(--rail);
-}
-
-.handCard-shiny {
-  background: var(--strike);
-  border-color: var(--strike);
-  color: #000;
-  box-shadow: 0 0 22px -4px rgba(255, 46, 136, 0.6);
-}
-
-@keyframes handDeal {
-  from {
-    transform: translate(0, -120px) scale(1.4);
-    opacity: 0;
-  }
-  to {
-    transform: none;
-    opacity: 1;
-  }
-}
-
 /* ---- S8 ---- */
 
 .ghostResult {
@@ -2608,11 +2485,7 @@ a.creditName {
   white-space: nowrap;
 }
 
-/* the motion budget is two animations; this cuts both to their end state */
 @media (prefers-reduced-motion: reduce) {
-  .handCard {
-    animation: none;
-  }
   .bar > i {
     transition: none;
   }

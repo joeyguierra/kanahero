@@ -1,8 +1,11 @@
 "use client";
 
-// S7 / S7b / S7c — the round.
+// S7 / S7b — the round.
 //
-// Prompt → write → FLIP → the model word over your ink → GOT IT / MISSED.
+// Prompt → write → FLIP → the model word over your ink → GOT IT / MISSED →
+// the next prompt, with no tap in between. The reward for a word is one small
+// acknowledgement here; the reward for the RUN is S8, where every card is
+// turned over one at a time (SPEC-v5a §9).
 // A miss goes back in the deck and comes round again; a win earns a card into
 // the hand — provisionally. A run is all-or-nothing (SPEC-v5a §1): the hand
 // reaches storage in one write when the queue empties, and ✕ (through the
@@ -39,11 +42,10 @@ export default function Round({
   onFinish: (hand: RoundCard[]) => void;
 }) {
   const [queue, setQueue] = useState<SetWord[]>(dealt);
-  const [phase, setPhase] = useState<"write" | "reveal" | "earned">("write");
+  const [phase, setPhase] = useState<"write" | "reveal">("write");
   const [hand, setHand] = useState<RoundCard[]>([]);
   const [hasInk, setHasInk] = useState(false);
   const [justMissed, setJustMissed] = useState(false);
-  const [earned, setEarned] = useState<RoundCard | null>(null);
   const [leaving, setLeaving] = useState(false);
   const canvasRef = useRef<WritingCanvasHandle>(null);
   const quitRef = useRef<HTMLButtonElement>(null);
@@ -77,14 +79,9 @@ export default function Round({
         ? "round.kanji"
         : "round.kana";
   const line = useJokerLine(
-    phase === "earned" ? null : screen,
+    screen,
     { set, word: current, chars: chars.length, triesThisWord: tries, allowOnce: !reveal && !justMissed },
     `${presented}.${phase}`,
-  );
-  const earnedLine = useJokerLine(
-    phase === "earned" && earned ? (`earned.${earned.card.rarity}` as JokerScreen) : null,
-    { set, word: earned?.word },
-    earned?.word.word,
   );
 
   useEffect(() => {
@@ -116,73 +113,23 @@ export default function Round({
     setPhase("reveal");
   }
 
+  // No tap, no interstitial: the card joins the hand and the next prompt is
+  // already on its way. Rarity is not shown here — S8 turns it over.
   function gotIt() {
     const n = tried[current.word] || 1;
     const won: RoundCard = { word: current, card: { rarity: rarityFor(n), tries: n } };
-    setHand((h) => [...h, won]);
-    setEarned(won);
-    setPhase("earned");
+    const held = [...hand, won];
+    setHand(held);
+    nextPrompt(queue.slice(1), held);
   }
 
   function missed() {
     setJustMissed(true);
-    setEarned(null);
     setPhase("write");
     canvasRef.current?.clear();
     setHasInk(false);
     setQueue((q) => miss(q));
     setPresented((n) => n + 1);
-  }
-
-  // ---- S7c: the earn beat, in place, then the hand ----
-  if (phase === "earned" && earned) {
-    const rarity = earned.card.rarity;
-    return (
-      <main
-        className="frame roundEarned"
-        onClick={() => {
-          const rest = queue.slice(1);
-          setEarned(null);
-          nextPrompt(rest, hand);
-        }}
-      >
-        <div className="rail" aria-hidden />
-        <div className="roundHead">
-          <span className="roundChip roundChipBone">
-            {set.glyph} {set.name}
-          </span>
-          <span className="roundDeck">
-            DECK {queue.length - 1} · HAND {hand.length}
-          </span>
-        </div>
-
-        <div className="earnStack">
-          <Joker line={earnedLine.text} lineId={earnedLine.id} size={84} />
-          <div className="earnLabel">
-            {rarity.toUpperCase()} ·{" "}
-            {earned.card.tries === 1 ? "FIRST TRY" : `${earned.card.tries} TRIES`}
-          </div>
-          <Card word={earned.word} set={set} size="earn" card={earned.card} className="earnCard" />
-          <div className="earnNote">KEPT WHEN THE RUN FINISHES</div>
-        </div>
-
-        <div className="handStrip">
-          <span className="legend">HAND · {hand.length}</span>
-          <div className="handCards">
-            {hand.map(({ word, card }, i) => (
-              <span
-                key={word.word}
-                className={`handCard handCard-${card.rarity}`}
-                // a fixed 54px card, less the inset where the next card covers it
-                style={{ fontSize: `${Math.min(19, (i === 0 ? 42 : 30) / word.word.length)}px` }}
-              >
-                {word.word}
-              </span>
-            ))}
-          </div>
-        </div>
-      </main>
-    );
   }
 
   // ---- S7 / S7b: write, then grade ----
