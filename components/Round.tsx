@@ -35,12 +35,19 @@ export interface RoundCard {
 
 type Once = { id: JokerOnce; text: string } | null;
 
-/** the one-off line this prompt earns, if he has not used it before */
+/** the one-off line this prompt earns, if he has not used it before.
+    `kuchi` is about the station set's seven 口 words and is scoped to it: it
+    used to fire on any kanji word containing 口, which spent it on TEST's lone
+    口 where the line is nonsense (SPEC-v5b §1). */
 function pickOnce(set: WordSet, word: SetWord): Once {
   const id: JokerOnce | null =
-    set.script === "kanji" ? (word.word.includes("口") ? "kuchi" : null) : "wholeWord";
+    set.script === "kanji"
+      ? set.id === "station-kanji" && word.word.includes("口")
+        ? "kuchi"
+        : null
+      : "wholeWord";
   if (!id) return null;
-  const text = peekOnce(id);
+  const text = peekOnce(id, set);
   return text ? { id, text } : null;
 }
 

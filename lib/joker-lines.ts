@@ -6,7 +6,14 @@
 // dry. Never two lines at once. Never explains a mechanic twice — the two
 // first-time lines are keyed by a `seen` set in localStorage.
 
+import type { WordSet } from "./sets";
+
 const SEEN_KEY = "kanahero:v1.joker.seen";
+
+/** Spent-once ids retired by a truth fix (SPEC-v5b §1): the line a user was
+    shown was false, so the id is dropped from storage and everyone meets the
+    true line once. Dropped on the first read, then written back. */
+const RETIRED_SEEN = ["kuchi"];
 
 export type JokerScreen =
   | "home"
@@ -46,8 +53,10 @@ const LINES: Record<JokerScreen, string> = {
   "home.kanji": "Kanji. Meaning, not sound. One character, many readings.",
   "home.bank": "The bank. Characters you snapped but couldn't read yet.",
   "deck.hiragana": "Characters first, or straight to words. Your call.",
-  "deck.katakana": "Same rules, sharper strokes. Countries today.",
-  "deck.kanji": "No alphabet here. Only words, only places you've been.",
+  // neither line may name a set: COUNTRIES and STATION are one set each on a
+  // screen that is about the whole script (SPEC-v5b §1)
+  "deck.katakana": "Same sounds as hiragana, sharper strokes. Characters or words.",
+  "deck.kanji": "No alphabet here. Every character means something. Pick a set.",
   drill: "That's the stroke. Yours next to mine — honest?",
   // the canvas draws S4 revealing only; the prompt state needs its own line or
   // his panel would empty out and move the canvas
@@ -55,7 +64,8 @@ const LINES: Record<JokerScreen, string> = {
   bank: "What you couldn't read. Kept until you can.",
   collection: "Every copy you've made, word by word.",
   "collection.empty": "Nothing here yet. Finish a run.",
-  abandon: "Leave now and this run's cards leave with you.",
+  // the cards are discarded, not carried off (SPEC-v5b §1)
+  abandon: "Leave now and the cards stay with me.",
   // the set and result lines carry the state's own numbers — see setLine and
   // resultLine; nothing on S6b or S8 is a fixed string any more
   "round.kana": "Whole word, one box. Make it fit.",
@@ -73,8 +83,9 @@ const LINES: Record<JokerScreen, string> = {
 const ONCE: Record<JokerOnce, string> = {
   // the first time a word reveal ever happens
   wholeWord: "Whole word, one box. Make it fit.",
-  // the first station word that carries 口
-  kuchi: "Five of these share 口. You'll know it by the third.",
+  // the first station word that carries 口 — the number is counted off the set
+  // in peekOnce, never typed (bible §7.1: no typed numbers about data)
+  kuchi: "",
 };
 
 export function jokerLine(screen: JokerScreen): string {
@@ -118,7 +129,18 @@ function seen(): Set<string> {
   try {
     const raw = window.localStorage.getItem(SEEN_KEY);
     const list = raw ? (JSON.parse(raw) as unknown) : [];
-    return new Set(Array.isArray(list) ? list.filter((s) => typeof s === "string") : []);
+    const ids = new Set(Array.isArray(list) ? list.filter((s) => typeof s === "string") : []);
+    // self-healing read, like every other reader here: a retired id is dropped
+    // and written back once, so the true line is owed exactly one showing
+    if (RETIRED_SEEN.some((id) => ids.has(id))) {
+      for (const id of RETIRED_SEEN) ids.delete(id);
+      try {
+        window.localStorage.setItem(SEEN_KEY, JSON.stringify([...ids]));
+      } catch {
+        // no storage — the retired line simply shows again next launch
+      }
+    }
+    return ids;
   } catch {
     return new Set();
   }
@@ -128,9 +150,20 @@ function seen(): Set<string> {
  * A line the Joker is allowed to say exactly once, ever — read without
  * spending it. Null once it has been seen, so the caller falls back to the
  * screen's own line and he never explains the same mechanic twice.
+ *
+ * `kuchi` counts its own number off the set it is about. It shipped saying
+ * "Five" against a set of seven, which is the bug that made no-typed-numbers a
+ * law: a set edit must move the line, not falsify it.
  */
-export function peekOnce(id: JokerOnce): string | null {
-  return seen().has(id) ? null : ONCE[id];
+export function peekOnce(id: JokerOnce, set?: WordSet): string | null {
+  if (seen().has(id)) return null;
+  if (id === "kuchi") {
+    const n = set ? set.words.filter((w) => w.word.includes("口")).length : 0;
+    // one word sharing 口 with itself is not a pattern worth naming
+    if (n < 2) return null;
+    return `${count(n)} of these share 口. You'll know it by the third.`;
+  }
+  return ONCE[id];
 }
 
 /** spend it: called when the line has actually been shown */
