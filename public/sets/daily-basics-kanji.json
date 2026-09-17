@@ -1,0 +1,12 @@
+{"id":"daily-basics-kanji","name":"DAILY BASICS","glyph":"日","label":"KANJI","blurb":"NATURE, PEOPLE","script":"kanji","origin":"platform","words":[
+{"word":"日","reading":"ひ","romaji":"hi","meaning":"sun, day","kind":"nature"},
+{"word":"月","reading":"つき","romaji":"tsuki","meaning":"moon","kind":"nature"},
+{"word":"火","reading":"ひ","romaji":"hi","meaning":"fire","kind":"nature"},
+{"word":"水","reading":"みず","romaji":"mizu","meaning":"water","kind":"nature"},
+{"word":"木","reading":"き","romaji":"ki","meaning":"tree","kind":"nature"},
+{"word":"金","reading":"かね","romaji":"kane","meaning":"money, gold","kind":"money"},
+{"word":"土","reading":"つち","romaji":"tsuchi","meaning":"soil, earth","kind":"nature"},
+{"word":"人","reading":"ひと","romaji":"hito","meaning":"person","kind":"person"},
+{"word":"大","reading":"だい","romaji":"dai","meaning":"large","kind":"size"},
+{"word":"小","reading":"しょう","romaji":"shou","meaning":"small","kind":"size"}
+]}

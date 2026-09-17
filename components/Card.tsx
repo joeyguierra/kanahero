@@ -59,6 +59,7 @@ export default function Card({
 }) {
   const kanji = set.script === "kanji";
   const mark = kanji ? (set.place ?? set.glyph) : set.glyph;
+  const kindWord = kanji ? (set.label ?? "PLACE") : "WORD";
   const compact = size === "fan" || size === "grid";
   const classes = [
     "card",
@@ -104,7 +105,7 @@ export default function Card({
           <span className="cardRule" />
           <span className="cardMeaning">{word.meaning.toUpperCase()}</span>
           <span className="cardKind">
-            {kanji ? "PLACE" : "WORD"} · {mark} {set.name}
+            {kindWord} · {mark} {set.name}
           </span>
         </div>
       </>
@@ -145,9 +146,7 @@ export default function Card({
         <span className="cardKind">
           {attempt !== undefined
             ? `ATTEMPT ${attempt}`
-            : kanji
-              ? "PLACE · NO KANJI YET"
-              : "WORD · NO KANA YET"}
+            : `${kindWord} · NO ${kanji ? "KANJI" : "KANA"} YET`}
         </span>
       </div>
     </>

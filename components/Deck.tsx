@@ -151,6 +151,7 @@ export default function Deck({
 
 /** the row's second line: what the set is, in the canvas's own words */
 function setDescription(set: WordSet): string {
+  if (set.blurb) return set.blurb;
   if (set.script === "kanji") return "EXITS, SIGNS";
   const longest = Math.max(...set.words.map((w) => w.word.length));
   return `≤${longest} KANA`;

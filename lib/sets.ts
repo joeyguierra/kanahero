@@ -22,6 +22,10 @@ export interface WordSet {
   glyph: string;
   /** kanji sets only: the place glyph on the card */
   place?: string;
+  /** kanji sets only: the card's kind word — defaults to PLACE (the station set) */
+  label?: string;
+  /** the deck row's one-line description — defaults per script */
+  blurb?: string;
   script: SetScript;
   origin: "platform";
   words: SetWord[];
@@ -31,6 +35,7 @@ export interface WordSet {
 export const PLATFORM_SET_IDS = [
   "everyday-hiragana",
   "countries-katakana",
+  "daily-basics-kanji",
   "station-kanji",
 ] as const;
 

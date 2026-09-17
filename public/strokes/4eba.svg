@@ -1,0 +1,13 @@
+<svg data-strokesvg="人" data-source="kanjivg" data-stroke-width="58" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- KanjiVG (CC BY-SA 3.0), U+04EBA; normalized 109→1024, stroke weight 58 to match strokesvg. -->
+  <g transform="scale(9.394495)">
+    <g data-strokesvg="shadows" style="fill:none;stroke:var(--shadow,#ccc);stroke-width:6.1738;stroke-linecap:round;stroke-linejoin:round">
+      <path d="M54.5,20c0.37,2.12,0.23,4.03-0.22,6.27C51.68,39.48,38.25,72.25,16.5,87.25"/>
+      <path d="M46,54.25c6.12,6,25.51,22.24,35.52,29.72c3.66,2.73,6.94,4.64,11.48,5.53"/>
+    </g>
+    <g data-strokesvg="strokes" style="fill:none;stroke:var(--stroke,#000);stroke-width:6.1738;stroke-linecap:round;stroke-linejoin:round">
+      <path style="--i:0" d="M54.5,20c0.37,2.12,0.23,4.03-0.22,6.27C51.68,39.48,38.25,72.25,16.5,87.25"/>
+      <path style="--i:1" d="M46,54.25c6.12,6,25.51,22.24,35.52,29.72c3.66,2.73,6.94,4.64,11.48,5.53"/>
+    </g>
+  </g>
+</svg>

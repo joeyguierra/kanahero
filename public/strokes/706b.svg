@@ -1,0 +1,17 @@
+<svg data-strokesvg="火" data-source="kanjivg" data-stroke-width="58" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- KanjiVG (CC BY-SA 3.0), U+0706B; normalized 109→1024, stroke weight 58 to match strokesvg. -->
+  <g transform="scale(9.394495)">
+    <g data-strokesvg="shadows" style="fill:none;stroke:var(--shadow,#ccc);stroke-width:6.1738;stroke-linecap:round;stroke-linejoin:round">
+      <path d="M24.25,34c3.27,3.33,8.5,13,9.5,17.75"/>
+      <path d="M83,27.25c0.5,1.38,0.22,2.74-0.5,4.25c-2.38,5-7.5,12.12-12.75,17.25"/>
+      <path d="M52.5,14.25c1,1.25,1.5,3.12,1.5,5C54,69,39.62,80,21,91.5"/>
+      <path d="M52.75,50c12.49,14.06,25.01,28.42,33.62,36.13c2.7,2.42,4.9,4.02,8.38,4.87"/>
+    </g>
+    <g data-strokesvg="strokes" style="fill:none;stroke:var(--stroke,#000);stroke-width:6.1738;stroke-linecap:round;stroke-linejoin:round">
+      <path style="--i:0" d="M24.25,34c3.27,3.33,8.5,13,9.5,17.75"/>
+      <path style="--i:1" d="M83,27.25c0.5,1.38,0.22,2.74-0.5,4.25c-2.38,5-7.5,12.12-12.75,17.25"/>
+      <path style="--i:2" d="M52.5,14.25c1,1.25,1.5,3.12,1.5,5C54,69,39.62,80,21,91.5"/>
+      <path style="--i:3" d="M52.75,50c12.49,14.06,25.01,28.42,33.62,36.13c2.7,2.42,4.9,4.02,8.38,4.87"/>
+    </g>
+  </g>
+</svg>
