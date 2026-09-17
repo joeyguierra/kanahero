@@ -81,3 +81,49 @@ Supabase or any server · accounts · user-created sets / S6c · bank → card c
 | distinct kanji vendored | build log | 14 | ✅ vendored from KanjiVG at weight 58 |
 | build minutes | build log → title | — | ⚠️ owed |
 | first-run baseline (pen test on the 9) | video ring | — | ⚠️ owed, filmed |
+
+---
+
+# Post-build audit — what shipped that this spec did not ask for
+*Appended 2026-09-16, against `ef4124b`. Read this before writing v5a.*
+
+The five commits since `8c05a49 implement v5` (`c9ce57c` stroke animator, `d04948a` canvas, `14d8448` dialogue, `ef4124b` daily basics) carry work that no line above authorizes. Nothing here is a bug report — most of it is deliberate and good. It is listed so v5a can either adopt it into the spec or take it back out, rather than leaving the spec and the tree disagreeing in silence.
+
+## 12. Off-spec additions
+
+**12.1 A fourth platform set — `daily-basics-kanji`.** §Scope says "exactly three things … three platform sets — two kana, one kanji"; §10 excludes "more than one set per script". `lib/sets.ts:PLATFORM_SET_IDS` ships four: `everyday-hiragana`, `countries-katakana`, `daily-basics-kanji` (10 words: 日月火水木金土人大小), `station-kanji`. Ten more KanjiVG files vendored, so the §11 count of 14 distinct kanji is now 24. Knock-on: §0.6's cold-start S1 reads `1 SET · 0/9`; the built S1 kanji row reads `2 SETS · 0/19`.
+
+**12.2 The Joker types his line.** `components/Joker.tsx` streams the line RPG-style — 22 ms per character, 120 ms lead-in, tap the panel to finish, `prefers-reduced-motion` skips it. §6 says "Never animates"; §7's motion budget is two items (the flip, the slide). The component documents itself as a creator override. The spec still says the opposite.
+
+**12.3 The mascot is a raster.** `public/joker-mascot.png`, 92 KB, placed by hand-measured alpha bounds (`ART = {box:1080, x:61, y:158, w:958, h:764}`) and negative margins. BUILD-MAP §6 asked for SVG, single colour + strike, ≤ 8 KB. Consequences: no `currentColor`, no strike tint, 11× the asset budget, and it is the one element on screen that cannot follow a theme.
+
+**12.4 The Joker's lines are generated, not tabled.** §6 says one table keyed `screen × state`, lines copied verbatim from the canvas sheet. `lib/joker-lines.ts` adds `setLine()`, `revealLine()` and `resultLine()` — templates plus a number-word array (`No, One, Two … Twenty-one`) — so most lines the user meets on S6b, S7b and S8 are assembled at runtime. `drill.prompt` is an invented line (S4's prompt state had none, and an empty panel moved the canvas).
+
+**12.5 Schema fields beyond §2.** `WordSet` gained `label` (the kanji card's kind word, defaults `PLACE`) and `blurb` (the deck row's description, defaults per script). `daily-basics-kanji.json` uses both — `"label":"KANJI"`, `"blurb":"NATURE, PEOPLE"`. §2 fixes the schema at `{id, name, glyph, place?, script, origin, words}`.
+
+**12.6 `tries` lives in memory, not in the blob.** `lib/joker.ts` counts attempts in a module-level `Map`, reasoning that §3 wants tries counted across rounds while §2 wants nothing of a round persisted. The gap: a reload clears the map, so a word missed twice and then written correctly after a refresh mints as **foil**. Rarity is the one thing the app promises never changes, and it currently depends on whether the tab was reloaded.
+
+**12.7 Unspecced canvas and screen work.**
+- `lib/strokes.ts:scopeSvgIds` — strokesvg keys clipPath ids off the codepoint, so ちょっと / こんにちは inlined two elements with the same id and strokes vanished. Real fix, but new canvas code beyond §4's "only new canvas code".
+- S6b tap-a-card detail overlay. §0.6 specced tap-detail on **S8** only.
+- Screen copy in no sheet: the `REVEALING` LED chip, `RARITY IS WRITTEN ON THE CARD / AND NEVER CHANGES`, `TAP A CARD TO SEE ITS FACE …`, the `· FULL` title suffix, `NOTHING LEFT TO DEAL`.
+- Earned kanji faces print `word.reading` under the word. Consistent with the CARD rule (earned, never shown), but the placement is undesigned.
+
+**12.8 Dev artifacts tracked in git.** `.wide2.mjs` (a Playwright screenshot scratch script, from `d04948a`) and `set-title-overlap.png` (58 KB debug shot) sit at the repo root and are committed. `banner.png` too.
+
+**12.9 Dead exports.** `hasSeen()` (`joker-lines.ts`), `isEarned()` and `resetAttempts()` (`joker.ts`, commented "only for tests" — no test calls it).
+
+## 13. Specced but still owed
+
+- **§11 truth table** — `build minutes` and `first-run baseline` remain ⚠️ owed. `distinct kanji vendored: 14` is stale at 24 (see 12.1).
+- **Supabase.** BUILD-MAP §1 says "initialised in v5, creator decision 2026-09-17". §10 here forbids any server. Nothing is initialised — this file won, correctly — but the two documents still contradict each other in the repo. v5a should delete one of the two claims.
+- **BUILD-MAP §3** says station-kanji is "12 distinct characters". It is 14 (出口入新幹線禁煙東中央西南北). §5 above is right; the build map is wrong.
+- **§9 e2e** is done — `e2e-loop.mjs` §10/§10b cover deal → foil → abandon → miss → base → S8, and `e2e-offline.mjs` §3b runs a round with no network. `sets.json` in the export ZIP (BUILD-MAP §1) is absent and should stay absent while user sets are out of scope.
+
+## 14. Candidates for v5a, ranked
+
+1. **Persist pending attempts.** The only item above that can mint a wrong card. Key them into the `kanahero:v1` blob beside `joker`; clear the entry at the earn. Small change, and it makes the rarity promise true.
+2. **Reconcile spec to tree.** Amend §6 (he types), §Scope and §10 (four sets), §2 (`label`, `blurb`), §11 (24 kanji), and drop BUILD-MAP §1's Supabase line. The spec is the artifact the build is filmed against; it should not describe a different app.
+3. **Vector the mascot.** Biggest asset win, unblocks tinting, and deletes the alpha-bounds arithmetic in `Joker.tsx`.
+4. **Decide the generated lines.** Either bless `setLine`/`revealLine`/`resultLine` in §6 as the design (they read well) or move their output back into the table as authored variants.
+5. **Untrack `.wide2.mjs` and `set-title-overlap.png`;** decide whether `banner.png` belongs at the root or in `public/`.
