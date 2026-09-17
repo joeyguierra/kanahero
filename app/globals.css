@@ -2319,6 +2319,22 @@ button:not(:disabled):active {
   transform-origin: left bottom;
 }
 
+/* the card on its way to the hand (SPEC-v5a §9.2): a clone over the round,
+   under the abandon dialog, and deaf to every pointer */
+.handGhost {
+  position: fixed;
+  z-index: 25;
+  pointer-events: none;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+
+/* the count the card is flying to; it pops as the card lands */
+.roundHand {
+  display: inline-block;
+}
+
 /* ---- S8 ---- */
 
 .ghostResult {

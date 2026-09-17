@@ -15,11 +15,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { earnRun, miss, rarityFor, type EarnedCard } from "@/lib/joker";
+import type { Rarity } from "@/lib/progress";
 import { useJokerLine, type JokerScreen } from "@/lib/joker-lines";
 import type { SetWord, WordSet } from "@/lib/sets";
 import AbandonDialog from "./AbandonDialog";
 import Card from "./Card";
 import Joker from "./Joker";
+import { flyToHand, popCount } from "./HandTick";
 import { MeltFilter, meltIn } from "./PromptMelt";
 import WordReveal from "./WordReveal";
 import WritingCanvas, { type WritingCanvasHandle } from "./WritingCanvas";
@@ -51,6 +53,15 @@ export default function Round({
   const quitRef = useRef<HTMLButtonElement>(null);
   const promptRef = useRef<HTMLDivElement>(null);
   const jokerRef = useRef<HTMLImageElement>(null);
+  const handRef = useRef<HTMLSpanElement>(null);
+  /** the flight in the air, if any — cancelling lands it (§9.2) */
+  const flight = useRef<(() => void) | null>(null);
+  // The header counts lag the run by one flight: the card is still on its way
+  // to the hand, so the hand has not got it yet. Everything else — the queue,
+  // the next prompt — has already moved on.
+  const [shown, setShown] = useState({ deck: dealt.length, hand: 0 });
+  /** the rarity of the word just graded: his line on the NEXT prompt (§9.2.4) */
+  const [justEarned, setJustEarned] = useState<Rarity | null>(null);
   // every prompt he puts up gets its own melt (S7 anim sheet) — including the
   // one a miss brings back round. The flip is not a new prompt: the card is
   // the same card, so this counts presentations rather than renders.
@@ -60,6 +71,8 @@ export default function Round({
   // count never crosses a run (SPEC-v5a §1.3).
   const [tried, setTried] = useState<Record<string, number>>({});
   const kanji = set.script === "kanji";
+  /** the deck mark the card back carries, the same one S6b's grid shows */
+  const mark = kanji ? (set.place ?? set.glyph) : set.glyph;
   const current = queue[0];
   const chars = [...current.word];
   const tries = tried[current.word] ?? 0;
@@ -75,9 +88,11 @@ export default function Round({
       : "reveal.kana"
     : justMissed
       ? "round.missed"
-      : kanji
-        ? "round.kanji"
-        : "round.kana";
+      : justEarned
+        ? (`earned.${justEarned}` as JokerScreen)
+        : kanji
+          ? "round.kanji"
+          : "round.kana";
   const line = useJokerLine(
     screen,
     { set, word: current, chars: chars.length, triesThisWord: tries, allowOnce: !reveal && !justMissed },
@@ -89,6 +104,8 @@ export default function Round({
     if (!card) return;
     return meltIn(card, jokerRef.current);
   }, [presented]);
+
+  useEffect(() => () => flight.current?.(), []);
 
   function nextPrompt(next: SetWord[], won: RoundCard[]) {
     canvasRef.current?.clear();
@@ -119,12 +136,30 @@ export default function Round({
     const n = tried[current.word] || 1;
     const won: RoundCard = { word: current, card: { rarity: rarityFor(n), tries: n } };
     const held = [...hand, won];
+    const rest = queue.slice(1);
+    const card = promptRef.current;
     setHand(held);
-    nextPrompt(queue.slice(1), held);
+    setJustEarned(won.card.rarity);
+
+    // the card leaves for the hand while its slot is already melting in the
+    // next prompt behind it — a clone, so the two never touch the same element
+    flight.current?.();
+    if (card && handRef.current) {
+      flight.current = flyToHand(card, handRef.current, mark, () => {
+        flight.current = null;
+        setShown({ deck: rest.length, hand: held.length });
+        popCount(handRef.current);
+      });
+    } else {
+      setShown({ deck: rest.length, hand: held.length });
+    }
+
+    nextPrompt(rest, held);
   }
 
   function missed() {
     setJustMissed(true);
+    setJustEarned(null);
     setPhase("write");
     canvasRef.current?.clear();
     setHasInk(false);
@@ -141,7 +176,10 @@ export default function Round({
           {set.glyph} {set.name}
         </span>
         <span className="roundDeck">
-          DECK {queue.length} · HAND {hand.length}
+          DECK {shown.deck} ·{" "}
+          <span ref={handRef} className="roundHand">
+            HAND {shown.hand}
+          </span>
         </span>
         {reveal ? (
           <span className="revealing">
