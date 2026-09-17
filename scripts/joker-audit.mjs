@@ -150,7 +150,9 @@ for (const set of sets) {
       fail.push(`${set.id}: joker key "${key}" is not a JokerScreen`);
     }
     for (const entry of entries) {
-      setLines.push({ ...entry, pool: key, set: set.id, fromSet: true });
+      // sitting in a `once` block is what makes a set line a once-line
+      const once = key === ONCE_POOL || entry.once === true;
+      setLines.push({ ...entry, once, pool: key, set: set.id, fromSet: true });
     }
   }
 }

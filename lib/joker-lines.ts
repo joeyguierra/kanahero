@@ -317,11 +317,12 @@ function poolFor(screen: JokerScreen, ctx: JokerContext): JokerLine[] {
   return [...(POOLS[screen] ?? []), ...set];
 }
 
-/** the once-lines that could be due here: the global pool plus the active
-    set's asides, which carry their own trigger */
+/** The once-lines that could be due here: the global pool plus the active
+    set's asides, which carry their own trigger. Sitting in a `once` block is
+    what makes a set line a once-line — it does not restate the tag. */
 function oncePool(ctx: JokerContext): JokerLine[] {
-  const set = ctx.set?.joker?.once ?? [];
-  return [...(POOLS[ONCE_POOL] ?? []), ...set];
+  const asides = (ctx.set?.joker?.once ?? []).map((line) => ({ ...line, once: true as const }));
+  return [...(POOLS[ONCE_POOL] ?? []), ...asides];
 }
 
 function triggered(line: JokerLine, ctx: JokerContext): boolean {
