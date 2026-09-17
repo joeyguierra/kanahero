@@ -86,6 +86,18 @@ function heldCards(raw: unknown): boolean {
   );
 }
 
+/** Has this browser ever written a blob? The Joker's first-launch line hangs
+    off it (SPEC-v5b §5, `firstEver`) — not off an empty blob, which is also
+    what a wiped one looks like. */
+export function hasStoredProgress(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(KEY) !== null;
+  } catch {
+    return false;
+  }
+}
+
 export function loadProgress(): Progress {
   const fallback: Progress = {
     earned: new Set(),

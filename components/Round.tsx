@@ -12,14 +12,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { earnRun, miss, rarityFor, type EarnedCard } from "@/lib/joker";
-import {
-  jokerLine,
-  markSeen,
-  peekOnce,
-  revealLine,
-  type JokerOnce,
-  type StaticScreen,
-} from "@/lib/joker-lines";
+import { useJokerLine, type JokerScreen } from "@/lib/joker-lines";
 import type { SetWord, WordSet } from "@/lib/sets";
 import AbandonDialog from "./AbandonDialog";
 import Card from "./Card";
@@ -31,24 +24,6 @@ import WritingCanvas, { type WritingCanvasHandle } from "./WritingCanvas";
 export interface RoundCard {
   word: SetWord;
   card: EarnedCard;
-}
-
-type Once = { id: JokerOnce; text: string } | null;
-
-/** the one-off line this prompt earns, if he has not used it before.
-    `kuchi` is about the station set's seven 口 words and is scoped to it: it
-    used to fire on any kanji word containing 口, which spent it on TEST's lone
-    口 where the line is nonsense (SPEC-v5b §1). */
-function pickOnce(set: WordSet, word: SetWord): Once {
-  const id: JokerOnce | null =
-    set.script === "kanji"
-      ? set.id === "station-kanji" && word.word.includes("口")
-        ? "kuchi"
-        : null
-      : "wholeWord";
-  if (!id) return null;
-  const text = peekOnce(id, set);
-  return text ? { id, text } : null;
 }
 
 export default function Round({
@@ -82,18 +57,35 @@ export default function Round({
   // It lives and dies with the component, which is the whole of the rule: the
   // count never crosses a run (SPEC-v5a §1.3).
   const [tried, setTried] = useState<Record<string, number>>({});
-  // the two lines he is allowed exactly once, ever (SPEC-v5 §6): picked when
-  // a prompt is dealt, spent only once it has actually been on screen
-  const [once, setOnce] = useState<Once>(() => pickOnce(set, dealt[0]));
-
   const kanji = set.script === "kanji";
   const current = queue[0];
   const chars = [...current.word];
   const tries = tried[current.word] ?? 0;
+  const reveal = phase === "reveal";
 
-  useEffect(() => {
-    if (once) markSeen(once.id);
-  }, [once]);
+  // What he says here, in one place. The screen decides the pool; the engine
+  // decides the line, and an unspent aside outranks the pool — which is the
+  // whole of the S7 order: missed → once → the prompt's own pool. An aside
+  // belongs to the prompt, so the reveal and a miss both wave it off.
+  const screen: JokerScreen = reveal
+    ? kanji
+      ? "reveal.kanji"
+      : "reveal.kana"
+    : justMissed
+      ? "round.missed"
+      : kanji
+        ? "round.kanji"
+        : "round.kana";
+  const line = useJokerLine(
+    phase === "earned" ? null : screen,
+    { set, word: current, chars: chars.length, triesThisWord: tries, allowOnce: !reveal && !justMissed },
+    `${presented}.${phase}`,
+  );
+  const earnedLine = useJokerLine(
+    phase === "earned" && earned ? (`earned.${earned.card.rarity}` as JokerScreen) : null,
+    { set, word: earned?.word },
+    earned?.word.word,
+  );
 
   useEffect(() => {
     const card = promptRef.current;
@@ -113,7 +105,6 @@ export default function Round({
       onFinish(won);
       return;
     }
-    setOnce(pickOnce(set, next[0]));
     setQueue(next);
     setPhase("write");
     setPresented((n) => n + 1);
@@ -135,7 +126,6 @@ export default function Round({
 
   function missed() {
     setJustMissed(true);
-    setOnce(null);
     setEarned(null);
     setPhase("write");
     canvasRef.current?.clear();
@@ -167,7 +157,7 @@ export default function Round({
         </div>
 
         <div className="earnStack">
-          <Joker line={jokerLine(`earned.${rarity}` as StaticScreen)} size={84} />
+          <Joker line={earnedLine.text} lineId={earnedLine.id} size={84} />
           <div className="earnLabel">
             {rarity.toUpperCase()} ·{" "}
             {earned.card.tries === 1 ? "FIRST TRY" : `${earned.card.tries} TRIES`}
@@ -196,13 +186,6 @@ export default function Round({
   }
 
   // ---- S7 / S7b: write, then grade ----
-  const reveal = phase === "reveal";
-  const line = reveal
-    ? revealLine(set.script, chars.length)
-    : justMissed
-      ? jokerLine("round.missed")
-      : (once?.text ?? jokerLine(kanji ? "round.kanji" : "round.kana"));
-
   return (
     <main className={`frame round${leaving ? " frameBehindDialog" : ""}`}>
       <div className="rail" aria-hidden />
@@ -228,7 +211,7 @@ export default function Round({
       <MeltFilter />
 
       <div className="roundTop">
-        <Joker line={line} tail="top" markRef={jokerRef} className="jokerRound" />
+        <Joker line={line.text} lineId={line.id} tail="top" markRef={jokerRef} className="jokerRound" />
         <Card
           word={current}
           set={set}

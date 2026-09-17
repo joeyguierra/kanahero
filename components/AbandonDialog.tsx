@@ -7,7 +7,7 @@
 // so cancelling costs nothing at all.
 
 import { useEffect, useRef } from "react";
-import { jokerLine } from "@/lib/joker-lines";
+import { useJokerLine } from "@/lib/joker-lines";
 import Joker from "./Joker";
 
 export default function AbandonDialog({
@@ -19,6 +19,7 @@ export default function AbandonDialog({
 }) {
   const panel = useRef<HTMLDivElement>(null);
   const keep = useRef<HTMLButtonElement>(null);
+  const line = useJokerLine("abandon");
 
   useEffect(() => {
     keep.current?.focus();
@@ -57,7 +58,7 @@ export default function AbandonDialog({
         aria-label="Leave this run?"
         onClick={(e) => e.stopPropagation()}
       >
-        <Joker line={jokerLine("abandon")} tail="top" />
+        <Joker line={line.text} lineId={line.id} tail="top" />
         <div className="dialogActions">
           <button ref={keep} type="button" className="btnBone dialogBtn" onClick={onCancel}>
             KEEP WRITING

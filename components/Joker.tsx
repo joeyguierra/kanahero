@@ -40,12 +40,16 @@ export default function Joker({
   tail = "left",
   /** S6b measures his hand off the art and flicks it once per card */
   markRef,
+  /** the corpus id of the line, published for the e2e — a pool makes the text
+      a coin flip, so nothing outside the corpus asserts on his wording */
+  lineId,
   className = "",
 }: {
   line: string;
   size?: number;
   tail?: "left" | "top";
   markRef?: Ref<HTMLImageElement>;
+  lineId?: string;
   className?: string;
 }) {
   const [typed, setTyped] = useState({ line, n: 0 });
@@ -87,6 +91,7 @@ export default function Joker({
       <JokerMark size={size} ref={markRef} />
       <div
         className="jokerPanel"
+        data-line={lineId || undefined}
         onClick={(e) => {
           if (done) return;
           // the RPG contract: a tap on the box finishes the line, and does not

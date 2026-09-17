@@ -7,7 +7,7 @@
 // are satisfied by the texts in public/licenses, and are named here because
 // naming them costs one line each.
 
-import { jokerLine } from "@/lib/joker-lines";
+import { useJokerLine } from "@/lib/joker-lines";
 import Joker from "./Joker";
 
 const CREDITS = [
@@ -32,6 +32,7 @@ const CREDITS = [
 ];
 
 export default function Credits({ onBack }: { onBack: () => void }) {
+  const line = useJokerLine("credits");
   return (
     <main className="frame">
       <div className="screenHead">
@@ -41,7 +42,7 @@ export default function Credits({ onBack }: { onBack: () => void }) {
         <span className="screenTitle">CREDITS</span>
       </div>
 
-      <Joker line={jokerLine("credits")} className="jokerDeck" />
+      <Joker line={line.text} lineId={line.id} className="jokerDeck" />
 
       <div className="legend legendSpaced">SHIPPED WITH THIS APP</div>
       <ul className="creditList">

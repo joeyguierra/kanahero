@@ -11,14 +11,15 @@ import { useEffect, useState, useSyncExternalStore, type CSSProperties } from "r
 import { BY_SCRIPT, kanaSet, type Kana, type Script } from "@/lib/kana";
 import {
   getProgress,
+  hasStoredProgress,
   getServerProgress,
   subscribeProgress,
   updateProgress,
 } from "@/lib/progress";
 import { getBank, getServerBank, subscribeBank } from "@/lib/bank";
 import { shuffle } from "@/lib/session";
-import { deal, newSeed } from "@/lib/joker";
-import { jokerLine, type StaticScreen } from "@/lib/joker-lines";
+import { allTotals, deal, newSeed, runsFinished } from "@/lib/joker";
+import { useJokerLine, type JokerScreen } from "@/lib/joker-lines";
 import { loadPlatformSets, type SetWord, type WordSet } from "@/lib/sets";
 import Session, { type SessionSummary } from "@/components/Session";
 import Bank from "@/components/Bank";
@@ -89,6 +90,34 @@ export default function App() {
   const progress = useSyncExternalStore(subscribeProgress, getProgress, getServerProgress);
   const bank = useSyncExternalStore(subscribeBank, getBank, getServerBank);
   const loaded = progress !== getServerProgress();
+
+  // S1's line. The hook sits above every phase's early return, so the screen
+  // he is not on passes null and spends nothing (SPEC-v5b §5).
+  // Nothing is drawn until storage has landed: with an empty context the
+  // conditional lines are all ineligible, so an early draw would spend a line
+  // he was never going to say. The panel holds its height meanwhile.
+  const homeScreen: JokerScreen | null =
+    phase !== "home" || !loaded
+      ? null
+      : selection === null
+        ? progress.wiped
+          ? "home.wiped"
+          : "home"
+        : (`home.${selection}` as JokerScreen);
+  const homeLine = useJokerLine(
+    homeScreen,
+    {
+      // first ever means this browser has never written a blob — not an empty
+      // one, which is also what a wipe leaves behind
+      firstEver: !hasStoredProgress(),
+      wiped: progress.wiped,
+      runsFinished: runsFinished(),
+      ...allTotals(),
+      bank: bank.ready ? bank.captures.length : undefined,
+    },
+    // a new line when the deck under his nose changes
+    selection,
+  );
 
   // the platform sets are static JSON, precached by the service worker; the
   // decks show "—" for the fraction until they land, which is one frame
@@ -354,14 +383,6 @@ export default function App() {
 
   // ---- S1 ----
 
-  const line = jokerLine(
-    selection === null
-      ? progress.wiped
-        ? "home.wiped"
-        : "home"
-      : (`home.${selection}` as StaticScreen),
-  );
-
   return (
     <main className="frame">
       <div className="livery" aria-hidden>
@@ -370,7 +391,7 @@ export default function App() {
       <div className="brand">KANA HERO</div>
 
       {/* the canvas draws him 110 wide on S1 — 89 tall, his art being 1.25:1 */}
-      <Joker line={line} size={89} className="jokerHome" />
+      <Joker line={homeLine.text} lineId={homeLine.id} size={89} className="jokerHome" />
 
       <div className="legend legendSpaced">DECKS</div>
       <div className="deckList">

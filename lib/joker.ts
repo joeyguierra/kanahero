@@ -48,6 +48,33 @@ export function setTotals(set: WordSet): RarityCounts {
   return out;
 }
 
+/** every copy in the app, by stock — what {shiny} counts on the home screen */
+export function allTotals(): RarityCounts {
+  const out = { shiny: 0, base: 0, worn: 0 };
+  for (const words of Object.values(getProgress().joker)) {
+    for (const row of Object.values(words)) {
+      out.shiny += row.shiny;
+      out.base += row.base;
+      out.worn += row.worn;
+    }
+  }
+  return out;
+}
+
+/** How many runs have ever been finished. Every finished run adds exactly one
+    copy of every word of its set, so the largest row total in any set is the
+    number of times that set was run — and the largest of those is the answer.
+    Exact, not an estimate (SPEC-v5b §5). */
+export function runsFinished(): number {
+  let most = 0;
+  for (const words of Object.values(getProgress().joker)) {
+    for (const row of Object.values(words)) {
+      most = Math.max(most, row.shiny + row.base + row.worn);
+    }
+  }
+  return most;
+}
+
 /** how many words of the set have at least one copy — the collection's own count */
 export function collectedCount(set: WordSet): number {
   const cards = cardsFor(set.id);
@@ -56,8 +83,9 @@ export function collectedCount(set: WordSet): number {
 
 // ---- the shuffle ----
 
-/** mulberry32 — small, seeded, and the same queue every time for a given seed */
-function random(seed: number): () => number {
+/** mulberry32 — small, seeded, and the same queue every time for a given seed.
+    The Joker's shuffle bag draws on it too; there is one of these in the app. */
+export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
     a = (a + 0x6d2b79f5) >>> 0;
@@ -78,7 +106,7 @@ export function newSeed(): number {
  */
 export function deal(set: WordSet, seed: number): SetWord[] {
   const queue = [...set.words];
-  const rand = random(seed);
+  const rand = mulberry32(seed);
   for (let i = queue.length - 1; i > 0; i--) {
     const j = Math.floor(rand() * (i + 1));
     [queue[i], queue[j]] = [queue[j], queue[i]];

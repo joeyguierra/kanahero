@@ -18,7 +18,7 @@ import {
   subscribeBank,
   type Capture,
 } from "@/lib/bank";
-import { jokerLine } from "@/lib/joker-lines";
+import { useJokerLine } from "@/lib/joker-lines";
 import Joker from "./Joker";
 
 /** the count flash is one frame of inverse, no motion — anything springier is
@@ -58,6 +58,9 @@ export default function Bank({
 
   const count = bank.captures.length;
   const previous = useRef(count);
+  // the count is undefined until the read lands, so a line that counts the
+  // bank is simply not eligible yet rather than saying "No characters"
+  const line = useJokerLine("bank", { bank: bank.ready ? count : undefined });
 
   useEffect(() => {
     if (count > previous.current) {
@@ -99,7 +102,7 @@ export default function Bank({
         </span>
       </header>
 
-      <Joker line={jokerLine("bank")} className="jokerDeck" />
+      <Joker line={line.text} lineId={line.id} className="jokerDeck" />
 
       {count === 0 ? (
         <div className="bankEmpty">

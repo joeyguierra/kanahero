@@ -9,7 +9,7 @@
 // storage — nothing keeps a copy's try count past the run (SPEC-v5a §2).
 
 import { useState } from "react";
-import { resultLine } from "@/lib/joker-lines";
+import { useJokerLine } from "@/lib/joker-lines";
 import type { Rarity } from "@/lib/progress";
 import type { WordSet } from "@/lib/sets";
 import type { RoundCard } from "./Round";
@@ -32,6 +32,14 @@ export default function Result({
   const tally = (r: Rarity) => hand.filter((c) => c.card.rarity === r).length;
   const shiny = tally("shiny");
   const fan = hand.length <= FAN_MAX;
+  // {earned} counts the cards this run earned, never the drill's characters
+  const line = useJokerLine("result", {
+    set,
+    earned: hand.length,
+    shiny,
+    base: tally("base"),
+    worn: tally("worn"),
+  });
 
   return (
     <main className="frame">
@@ -57,7 +65,7 @@ export default function Result({
         </span>
       </div>
 
-      <Joker line={resultLine(hand.length, shiny)} className="jokerDeck" />
+      <Joker line={line.text} lineId={line.id} className="jokerDeck" />
 
       <div className={fan ? "resultFan" : "resultGrid"}>
         {hand.map(({ word, card }, i) => (

@@ -1332,6 +1332,11 @@ button:not(:disabled):active {
   font-size: 13px;
   line-height: 1.45;
   color: var(--bone);
+  /* Two lines, always. The line is drawn from a pool held in storage, so it
+     cannot be chosen until the app is on the device — the panel is its full
+     height before he has said anything, and stays that height whichever line
+     he draws. Under twelve words never wraps past two. */
+  min-height: 2.9em;
 }
 
 /* The tail of the line is laid out but not painted: the panel is its finished

@@ -12,7 +12,7 @@
 // appearance is still the card you earned (SPEC-v5a §3).
 
 import { cardsFor } from "@/lib/joker";
-import { jokerLine } from "@/lib/joker-lines";
+import { useJokerLine } from "@/lib/joker-lines";
 import { NO_COPIES } from "@/lib/progress";
 import type { WordSet } from "@/lib/sets";
 import Card from "./Card";
@@ -23,6 +23,7 @@ const STOCKS = ["shiny", "base", "worn"] as const;
 export default function Collection({ set, onBack }: { set: WordSet; onBack: () => void }) {
   const cards = cardsFor(set.id);
   const empty = set.words.every((w) => !cards[w.word]);
+  const line = useJokerLine(empty ? "collection.empty" : "collection", { set });
 
   return (
     <main className="frame">
@@ -33,7 +34,7 @@ export default function Collection({ set, onBack }: { set: WordSet; onBack: () =
         <span className="screenTitle">COLLECTION</span>
       </div>
 
-      <Joker line={jokerLine(empty ? "collection.empty" : "collection")} className="jokerDeck" />
+      <Joker line={line.text} lineId={line.id} className="jokerDeck" />
 
       <div className="collectionList">
         {set.words.map((word) => {

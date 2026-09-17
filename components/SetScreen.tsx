@@ -8,7 +8,7 @@
 import { useEffect, useRef } from "react";
 
 import { setTotals } from "@/lib/joker";
-import { setLine } from "@/lib/joker-lines";
+import { useJokerLine } from "@/lib/joker-lines";
 import type { WordSet } from "@/lib/sets";
 import { CardBack } from "./Card";
 import Joker from "./Joker";
@@ -79,6 +79,7 @@ export default function SetScreen({
   onCollection: () => void;
 }) {
   const totals = setTotals(set);
+  const line = useJokerLine("set", { set, ...totals });
   const jokerRef = useRef<HTMLImageElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -179,7 +180,7 @@ export default function SetScreen({
         </span>
       </div>
 
-      <Joker line={setLine(set.words.length)} markRef={jokerRef} className="jokerDeck" />
+      <Joker line={line.text} lineId={line.id} markRef={jokerRef} className="jokerDeck" />
 
       <div className="setHead">
         <span className="setHeadTitle">THE SET</span>

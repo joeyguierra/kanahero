@@ -225,9 +225,10 @@ function holds(cond, ctx) {
   const [, not, key, op, rhs] = m;
   const value = ctx[key];
   if (!op) return not ? !value : Boolean(value);
+  // a comparison against something the screen cannot know is never true
+  if (value === undefined) return false;
   if (op === "=") return String(value) === rhs;
   if (op === "!=") return String(value) !== rhs;
-  if (value === undefined) return false;
   return op === ">" ? Number(value) > Number(rhs) : Number(value) >= Number(rhs);
 }
 

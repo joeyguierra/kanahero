@@ -11,7 +11,7 @@
 // (SPEC-v5a §3). The characters card keeps its fraction: it counts characters.
 
 import type { Script } from "@/lib/kana";
-import { jokerLine, type StaticScreen } from "@/lib/joker-lines";
+import { useJokerLine, type JokerScreen } from "@/lib/joker-lines";
 import type { WordSet } from "@/lib/sets";
 import Joker from "./Joker";
 
@@ -45,6 +45,7 @@ export default function Deck({
   onCharacters: () => void;
   onOpenSet: (set: WordSet) => void;
 }) {
+  const line = useJokerLine(`deck.${script}` as JokerScreen);
   return (
     <main className="frame">
       <div className="livery" aria-hidden>
@@ -60,7 +61,7 @@ export default function Deck({
         </span>
       </div>
 
-      <Joker line={jokerLine(`deck.${script}` as StaticScreen)} className="jokerDeck" />
+      <Joker line={line.text} lineId={line.id} className="jokerDeck" />
 
       {characters && (
         <>

@@ -16,6 +16,8 @@ export interface SetWord {
   kind?: string;
 }
 
+import type { SetJoker } from "./joker-lines";
+
 export interface WordSet {
   id: string;
   name: string;
@@ -29,6 +31,9 @@ export interface WordSet {
   script: SetScript;
   origin: "platform";
   words: SetWord[];
+  /** lines only this set can say (SPEC-v5b §4). They arrive and leave with the
+      file, so a deleted set can never leave an orphaned line behind. */
+  joker?: SetJoker;
 }
 
 /** every platform set, in the order the decks show them */
