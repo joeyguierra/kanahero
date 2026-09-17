@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<title>KanaHero S7 — the prompt melts in</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&amp;family=JetBrains+Mono:wght@400;600;800&amp;family=Noto+Sans+JP:wght@400;700;900&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#151517;color:#F2F0EB;font-family:Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#FF2E88;text-decoration:none}a:hover{color:#F2F0EB}
+</style>
+</helmet>
+
+<section style="padding:44px 48px 40px">
+  <div style="display:flex;align-items:baseline;gap:11px;margin-bottom:8px">
+    <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#FF2E88;color:#000">S7</span>
+    <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#2E9DFF;color:#000;white-space:nowrap">M5 · THE PROMPT</span>
+    <b style="font:700 14px Archivo,sans-serif">Round — the Joker conjures the prompt card</b>
+  </div>
+  <div style="font:400 12px/1.6 'JetBrains Mono',monospace;color:#8C8C93;max-width:940px;letter-spacing:.02em;margin-bottom:32px">
+    THE CARD IS NOT DEALT HERE — IT IS MADE. IT ARRIVES AS PINK SMOKE AND LIQUID EDGES, THEN THE DISTORTION DRAINS OUT AND THE STOCK HARDENS INTO A CARD. THE CANVAS NEVER MOVES. TAP THE CARD OR THE JOKER TO REPLAY.
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:38px;align-items:flex-start">
+    <div style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S7</span>Round — prompt conjured · kanji
+      </div>
+
+      <div data-screen-label="S7 Round prompt melt" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;font-family:Archivo,sans-serif;position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;padding:54px 28px 36px;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+        <svg width="0" height="0" style="position:absolute;width:0;height:0" aria-hidden="true">
+          <filter id="s7melt" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+            <feTurbulence ref="{{ turbRef }}" type="fractalNoise" baseFrequency="0.03 0.07" numOctaves="2" seed="7" result="noise"></feTurbulence>
+            <feDisplacementMap ref="{{ dispRef }}" in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" result="warp"></feDisplacementMap>
+            <feGaussianBlur ref="{{ blurRef }}" in="warp" stdDeviation="0"></feGaussianBlur>
+          </filter>
+        </svg>
+        <div style="position:absolute;top:0;bottom:0;right:0;width:13px;background:repeating-linear-gradient(45deg,#FF2E88 0 7px,transparent 7px 14px);opacity:.18;border-left:1px solid #2A2A2E;pointer-events:none"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="background:#FF2E88;color:#000;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;letter-spacing:.16em;padding:4px 7px;white-space:nowrap">駅 STATION</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8C8C93;white-space:nowrap">DECK 9 · HAND 3</span>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:#8C8C93;padding:12px;margin:-12px;white-space:nowrap">✕</div>
+        </div>
+
+        <div style="display:flex;align-items:stretch;gap:12px;margin-top:20px">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;gap:10px">
+            <img ref="{{ jokerRef }}" onClick="{{ conjure }}" src="assets/joker.png" alt="The Joker" style="width:96px;height:78px;object-fit:contain;margin-left:-8px;cursor:pointer;filter:drop-shadow(0 12px 22px rgba(255,46,136,.28));transform-origin:60% 70%">
+            <div style="position:relative;border:1px solid #2A2A2E;background:#141416;padding:10px 12px 11px">
+              <div style="position:absolute;left:24px;top:-6px;width:10px;height:10px;background:#141416;border-left:1px solid #2A2A2E;border-top:1px solid #2A2A2E;transform:rotate(45deg)"></div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.2em;color:#FF2E88;margin-bottom:4px">JOKER</div>
+              <div style="font-size:12px;line-height:1.45;color:#F2F0EB">Ticket gate. The kana's on the card — I want the kanji.</div>
+            </div>
+          </div>
+
+          <div onClick="{{ conjure }}" style="width:150px;height:210px;flex:none;position:relative;cursor:pointer">
+            <div ref="{{ glowRef }}" style="position:absolute;inset:-30px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,46,136,.55),rgba(255,46,136,0));opacity:0;pointer-events:none;will-change:opacity,transform"></div>
+            <div ref="{{ cardRef }}" style="position:absolute;inset:0;opacity:0;will-change:transform,opacity,filter">
+              <div style="width:150px;height:210px;background:#141416;border:1px solid #2A2A2E;clip-path:polygon(0 0,100% 0,100% 100%,14px 100%,0 calc(100% - 14px));padding:12px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+                <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(242,240,235,.035) 0 7px,transparent 7px 14px);pointer-events:none"></div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between">
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.18em;color:#5A5A5F;white-space:nowrap">PROMPT</span>
+                  <span style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:13px;line-height:1;color:#FF2E88">駅</span>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+                  <div style="font-family:'Noto Sans JP',sans-serif;font-weight:700;font-size:34px;line-height:1;color:#F2F0EB;white-space:nowrap">かいさつ</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;color:#8C8C93;white-space:nowrap">KAISATSU</div>
+                </div>
+                <div>
+                  <div style="height:1px;background:#2A2A2E;margin-bottom:8px"></div>
+                  <div style="font-size:14px;font-weight:900;letter-spacing:-.01em;line-height:1;white-space:nowrap">TICKET GATE</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.14em;color:#5A5A5F;margin-top:4px;white-space:nowrap">PLACE · NO KANJI YET</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="width:334px;height:334px;background:#F2F0EB;margin-top:18px;position:relative;box-shadow:inset 0 0 0 1px #2A2A2E">
+          <div style="position:absolute;left:50%;top:6%;bottom:6%;width:0;border-left:1px dashed rgba(10,10,11,.16)"></div>
+          <div style="position:absolute;top:50%;left:6%;right:6%;height:0;border-top:1px dashed rgba(10,10,11,.16)"></div>
+          <div style="position:absolute;left:10px;top:8px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(10,10,11,.4)">DRAW</div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="display:flex;gap:10px;margin-top:16px">
+          <div style="flex:1;border:1px solid #2A2A2E;background:#141416;color:#8C8C93;text-align:center;padding:16px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em">CLEAR</div>
+          <div style="flex:1;border:1px solid #2A2A2E;background:#141416;color:#8C8C93;text-align:center;padding:16px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em">UNDO</div>
+        </div>
+        <div style="background:#FF2E88;color:#000;text-align:center;padding:19px;font-size:20px;font-weight:900;margin-top:10px;clip-path:polygon(0 0,100% 0,100% 100%,16px 100%,0 calc(100% - 16px))">FLIP</div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-width:300px;max-width:440px;border:1px solid #2A2A2E;background:#141416;padding:20px 22px;font:400 12.5px/1.65 Archivo,sans-serif;color:#B9B6B1">
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">THE MELT</h4>
+      <p style="margin:0 0 14px">One SVG filter on the card: fractal noise → displacement → blur. The whole card is present from the first frame but pushed around by the noise — edges run, the kana smears — and over the duration the displacement drains to zero and the blur sharpens. Opacity reaches full by 40%; scale settles from 0.92 to 1 with a small drop from 8px above. Ease-out cubic.</p>
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">THE SMOKE</h4>
+      <p style="margin:0 0 14px">Off by default. Optional strike-pink radial behind the card that flares to peak at 30% and is gone by the end. The Joker tips −6° toward the card as it starts and recovers as it hardens. Nothing else on the screen moves; the canvas is pinned.</p>
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">HOOK</h4>
+      <p style="margin:0">Fires when the prompt card mounts in S7 — after the deal, and again on each next hand. Budget ≈ 900ms; the player can start drawing at any point, the melt does not block input. Reduced motion: 160ms fade, no filter.</p>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;meltMs&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:900,&quot;min&quot;:400,&quot;max&quot;:2400,&quot;step&quot;:50,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Melt&quot;},&quot;meltStrength&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:70,&quot;min&quot;:10,&quot;max&quot;:160,&quot;step&quot;:5,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Melt&quot;},&quot;smoke&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Melt&quot;}}">
+class Component extends DCLogic {
+  cardRef = React.createRef(); glowRef = React.createRef(); jokerRef = React.createRef();
+  turbRef = React.createRef(); dispRef = React.createRef(); blurRef = React.createRef();
+  raf = 0; anims = [];
+  componentDidMount() { this.t = setTimeout(() => this.conjure(), 600); }
+  componentDidUpdate(prev) {
+    if (prev.meltMs !== this.props.meltMs || prev.meltStrength !== this.props.meltStrength) this.conjure();
+    else if (prev.smoke !== this.props.smoke && !this.props.smoke && this.glowRef.current) this.glowRef.current.style.opacity = "0";
+  }
+  componentWillUnmount() { clearTimeout(this.t); cancelAnimationFrame(this.raf); this.anims.forEach(a => a.cancel()); }
+  conjure = () => {
+    const card = this.cardRef.current, glow = this.glowRef.current, joker = this.jokerRef.current;
+    const disp = this.dispRef.current, blur = this.blurRef.current, turb = this.turbRef.current;
+    if (!card || !disp) return;
+    cancelAnimationFrame(this.raf); this.anims.forEach(a => a.cancel()); this.anims = [];
+    const dur = this.props.meltMs ?? 900;
+    const strength = this.props.meltStrength ?? 70;
+    const smoke = this.props.smoke ?? false;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      card.style.filter = "none"; card.style.transform = "none";
+      this.anims.push(card.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, fill: "forwards" }));
+      return;
+    }
+    turb.setAttribute("seed", String(Math.floor(Math.random() * 100)));
+    card.style.filter = "url(#s7melt)";
+    if (joker) this.anims.push(joker.animate([
+      { transform: "rotate(0deg)" }, { transform: "rotate(-6deg) translateX(4px)", offset: .25 }, { transform: "rotate(0deg)" }
+    ], { duration: dur, easing: "ease-in-out" }));
+    const t0 = performance.now();
+    const step = now => {
+      const p = Math.min(1, (now - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      const wobble = 1 + Math.sin(p * 18) * .18 * (1 - e);
+      disp.setAttribute("scale", (strength * (1 - e) * wobble).toFixed(2));
+      blur.setAttribute("stdDeviation", (9 * (1 - e)).toFixed(2));
+      turb.setAttribute("baseFrequency", `${(0.012 + 0.03 * (1 - e)).toFixed(4)} ${(0.03 + 0.05 * (1 - e)).toFixed(4)}`);
+      card.style.opacity = Math.min(1, p / .4).toFixed(3);
+      card.style.transform = `translateY(${(-8 * (1 - e)).toFixed(2)}px) scale(${(.92 + .08 * e).toFixed(4)})`;
+      if (glow) {
+        const g = smoke ? Math.sin(Math.min(1, p / .9) * Math.PI) : 0;
+        glow.style.opacity = (g * .9).toFixed(3);
+        glow.style.transform = `scale(${(.7 + .6 * e).toFixed(3)})`;
+      }
+      if (p < 1) this.raf = requestAnimationFrame(step);
+      else { card.style.filter = "none"; card.style.transform = "none"; card.style.opacity = "1"; if (glow) glow.style.opacity = "0"; }
+    };
+    this.raf = requestAnimationFrame(step);
+  };
+  renderVals() {
+    return { cardRef: this.cardRef, glowRef: this.glowRef, jokerRef: this.jokerRef, turbRef: this.turbRef, dispRef: this.dispRef, blurRef: this.blurRef, conjure: this.conjure };
+  }
+}
+</script>
+</body>
+</html>

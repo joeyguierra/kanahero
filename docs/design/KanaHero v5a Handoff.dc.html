@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<title>KanaHero v5a — runs, copies, collection</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&amp;family=JetBrains+Mono:wght@400;600;800&amp;family=Klee+One:wght@400;600&amp;family=Noto+Sans+JP:wght@400;700;900&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  --strike:#FF2E88; --chassis:#0A0A0B; --bone:#F2F0EB; --live:#00E58A; --caution:#FFB300;
+  --blueprint:#2E9DFF; --rail:#8C8C93; --print:#B9B6B1; --carbon:#5A5A5F; --seam:#2A2A2E; --plate:#141416;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --display:Archivo,system-ui,sans-serif;
+  --jp:'Noto Sans JP',system-ui,sans-serif;
+  --kana:'Klee One',serif;
+  --gutter:28px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#151517;font-family:var(--display);color:var(--bone);-webkit-font-smoothing:antialiased}
+a{color:var(--strike);text-decoration:none}a:hover{color:var(--bone)}
+
+/* ---------- canvas chrome ---------- */
+.sheet{padding:44px 48px 40px;border-bottom:1px solid rgba(255,255,255,.08)}
+.tag{font:800 10px var(--mono);letter-spacing:.16em;padding:4px 8px;background:var(--strike);color:#000}
+.tagGhost{background:rgba(255,255,255,.11);color:var(--bone)}
+.tagLive{background:var(--live);color:#000}
+.tagBlue{background:var(--blueprint);color:#000}
+.sheetTitle{display:flex;align-items:baseline;gap:11px;margin-bottom:8px}
+.sheetTitle b{font:700 14px var(--display)}
+.sheetNote{font:400 12px/1.6 var(--mono);color:var(--rail);max-width:940px;letter-spacing:.02em;margin-bottom:32px}
+.boards{display:flex;flex-wrap:wrap;gap:38px;align-items:flex-start}
+.board{flex:none;display:flex;flex-direction:column;gap:11px}
+.boardLabel{display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 var(--display);color:var(--rail)}
+.boardLabel span.k{font:600 10.5px var(--mono);padding:3px 7px;background:rgba(255,255,255,.11);color:var(--bone)}
+.boardLabel span.new{background:var(--strike);color:#000}
+
+/* ---------- the phone ---------- */
+.ab{width:390px;height:844px;background:var(--chassis);color:var(--bone);font-family:var(--display);
+    position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;
+    padding:44px 28px 36px;border:1px solid var(--seam);box-shadow:0 18px 44px rgba(0,0,0,.5)}
+.grow{flex:1;min-height:12px}
+.livery{position:absolute;inset:0;overflow:hidden;z-index:-1;pointer-events:none}
+.ghost{position:absolute;font-family:var(--jp);font-weight:900;line-height:1;color:transparent;-webkit-text-stroke:1px #1D1D21;user-select:none}
+.ghostHome{right:-64px;top:-58px;font-size:290px}
+.ghostResult{right:-52px;bottom:200px;font-size:250px}
+.rail{position:absolute;top:0;bottom:0;right:0;width:13px;opacity:.18;border-left:1px solid var(--seam);
+      background:repeating-linear-gradient(45deg,var(--strike) 0 7px,transparent 7px 14px)}
+.brand{font-size:30px;font-weight:900;letter-spacing:-.03em;white-space:nowrap}
+.legend{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--rail)}
+.legendSpaced{margin-top:28px}
+.legendFaint{color:var(--carbon);font-size:9px;letter-spacing:.18em;margin-top:12px}
+
+/* joker */
+.joker{display:flex;gap:12px;align-items:center;min-width:0}
+.joker-top{flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:10px}
+.jokerHome{margin-top:20px}
+.jokerDeck{margin-top:22px}
+.jokerMark{flex:none;object-fit:contain;filter:drop-shadow(0 12px 22px rgba(255,46,136,.28))}
+.m78{width:110.3px;height:110.3px;margin:-16.1px -6.2px -16.1px -14.2px}
+.m84{width:118.7px;height:118.7px;margin:-17.4px -6.7px -17.4px -14.7px}
+.m89{width:125.8px;height:125.8px;margin:-18.4px -7.1px -18.4px -15.1px}
+.jokerPanel{position:relative;flex:1;min-width:0;border:1px solid var(--seam);background:var(--plate);padding:10px 13px 11px}
+.joker-top .jokerPanel{width:100%;flex:none}
+.jokerTail{position:absolute;width:10px;height:10px;background:var(--plate);transform:rotate(45deg)}
+.joker-left .jokerTail{left:-6px;top:50%;margin-top:-5px;border-left:1px solid var(--seam);border-bottom:1px solid var(--seam)}
+.joker-top .jokerTail{left:24px;top:-6px;border-left:1px solid var(--seam);border-top:1px solid var(--seam)}
+.jokerTag{font-family:var(--mono);font-size:8px;letter-spacing:.2em;color:var(--strike);margin-bottom:4px}
+.jokerLine{font-family:Archivo,var(--jp);font-size:13px;line-height:1.45;color:var(--bone)}
+.jokerRound .jokerLine{font-size:12px}
+.jokerRound{flex:1;min-width:0}
+.caret::after{content:"";display:inline-block;width:2px;height:.95em;margin-left:1px;vertical-align:-.14em;background:var(--strike)}
+.unsaid{visibility:hidden}
+
+/* home */
+.deckList{display:flex;flex-direction:column;gap:8px;margin-top:11px}
+.deckRow{border:1px solid var(--seam);background:var(--plate);padding:14px 16px;text-align:left}
+.deckRowOn{border-color:var(--strike);background:linear-gradient(180deg,rgba(255,46,136,.2),rgba(255,46,136,.05))}
+.deckRowTop{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.deckRowName{display:flex;align-items:baseline;gap:10px}
+.deckGlyph{font-family:var(--jp);font-weight:900;font-size:22px;color:var(--rail)}
+.deckRowOn .deckGlyph,.deckRowOn .deckCount{color:var(--strike)}
+.deckLabel{font-size:18px;font-weight:900}
+.deckCount{font-family:var(--mono);font-size:11px;color:var(--rail);white-space:nowrap}
+.bankStrip{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--seam);
+           background:var(--plate);padding:12px 18px;margin-top:10px;color:var(--rail)}
+.bankStripCount{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--strike)}
+.bankStripArrow{font-family:var(--mono);font-size:9px;color:var(--carbon)}
+.attribution{font-family:var(--mono);text-transform:uppercase;color:var(--carbon);font-size:8px;letter-spacing:.1em;text-align:center;line-height:1.7;margin-top:14px}
+
+/* buttons */
+.btnStrike{background:var(--strike);color:#000;font-size:21px;font-weight:900;letter-spacing:.02em;text-transform:uppercase;
+           display:flex;align-items:center;justify-content:center;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px))}
+.btnBone{background:var(--bone);color:var(--chassis);font-size:21px;font-weight:900;display:flex;align-items:center;justify-content:center;
+         clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px))}
+.btnInert{border:1px solid var(--seam);background:var(--plate);color:var(--carbon);font-size:21px;font-weight:900;
+          display:flex;align-items:center;justify-content:center;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px))}
+.btnSeam{border:1px solid var(--seam);background:var(--plate);color:var(--rail);font-family:var(--mono);font-size:11px;
+         letter-spacing:.14em;display:flex;align-items:center;justify-content:center}
+.btnGrade{flex:1;border:1px solid currentColor;text-align:center;padding:18px;font-size:16px;font-weight:900;
+          display:flex;align-items:center;justify-content:center}
+.btnLive{border-color:var(--live);color:var(--live);background:linear-gradient(180deg,rgba(0,229,138,.22),rgba(0,229,138,.06))}
+.btnCaution{border-color:var(--caution);color:var(--caution);background:linear-gradient(180deg,rgba(255,179,0,.2),rgba(255,179,0,.05))}
+.actionBar{height:62px;flex:none}
+.homeStart{padding:22px}
+.actionRow{display:flex;gap:10px;height:56px;flex:none}
+.actionRow>*{flex:1}
+
+/* deck / set rows */
+.screenHead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.backLink,.screenTitle{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--rail);white-space:nowrap}
+.backLink{font-size:11px;letter-spacing:.16em}
+.panel{display:block;width:100%;border:1px solid var(--seam);background:var(--plate);padding:16px;margin-top:9px;text-align:left}
+.panelNotch{clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%)}
+.panelName{font-size:19px;font-weight:900;letter-spacing:-.01em;line-height:1;white-space:nowrap}
+.panelCount{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--bone);line-height:1}
+.deckCharacters{margin-top:11px}
+.deckCharactersTop{display:flex;align-items:baseline;justify-content:space-between}
+.bar{display:block;height:6px;background:var(--chassis);border:1px solid var(--seam);margin-top:13px}
+.bar>i{display:block;height:100%;width:var(--fill,0%);background:var(--rail)}
+.deckDakuten{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+.toggle{display:flex;border:1px solid var(--seam)}
+.toggleOpt{font-family:var(--mono);font-size:9px;letter-spacing:.14em;padding:5px 10px;color:var(--carbon)}
+.toggleOn{background:var(--bone);color:var(--chassis)}
+.deckNote{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--carbon);margin-top:12px}
+.setRow{margin-top:9px}
+.setRowTop{display:flex;align-items:center;gap:14px}
+.setGlyph{font-family:var(--jp);font-weight:900;font-size:34px;line-height:1;color:var(--strike)}
+.setRowName{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.setRowMeta{font-family:var(--mono);font-size:9px;letter-spacing:.16em;color:var(--rail);white-space:nowrap}
+.setRowWords{font-size:12px;white-space:nowrap}
+
+/* S6b */
+.setHead{display:flex;align-items:baseline;justify-content:space-between;margin-top:24px;margin-bottom:12px}
+.setHeadTitle{font-size:28px;font-weight:900;letter-spacing:-.03em}
+.setGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:18px}
+.setTotals{border:1px solid var(--seam);background:var(--plate);padding:14px 17px}
+.setTotalsRow{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.setTotal{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--bone);white-space:nowrap}
+.setTotal-shiny{color:var(--strike)}
+.setTotal-worn{color:var(--rail)}
+.setTotalZero{color:var(--carbon)}
+.collectionLink{display:block;width:100%;margin-top:13px;padding-top:12px;border-top:1px solid var(--seam);
+                font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--print);text-align:left}
+.setTotals+.actionBar{margin-top:10px}
+
+/* S6d */
+.screenHeadStick{background:var(--chassis);padding:10px 0;margin-top:-10px}
+.collectionList{display:flex;flex-direction:column;gap:22px;margin-top:20px}
+.collectionRow{padding-bottom:20px;border-bottom:1px solid var(--seam)}
+.collectionHead{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.collectionWord{font-family:var(--jp);font-weight:900;font-size:20px;line-height:1;color:var(--bone);white-space:nowrap}
+.collectionMark{font-style:normal;color:var(--strike);opacity:.55}
+.collectionMeaning{flex:1;min-width:0;font-family:var(--mono);font-size:9px;letter-spacing:.16em;color:var(--carbon);
+                   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.collectionTotal{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--print);white-space:nowrap}
+.collectionRowEmpty .collectionTotal{color:var(--carbon)}
+.collectionCards{display:flex;align-items:flex-start;gap:9px}
+.collectionSlot{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px}
+.shelfSlot{width:100%;aspect-ratio:5/7;display:flex;align-items:center;justify-content:center;border:1px dashed var(--seam);
+           clip-path:polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))}
+.shelfSlotStock{font-family:var(--mono);font-size:8px;letter-spacing:.14em;color:var(--carbon)}
+.collectionTimes{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--bone)}
+.collectionSlot-shiny .collectionTimes{color:var(--strike)}
+.collectionSlot-worn .collectionTimes{color:var(--rail)}
+.collectionTimesZero{color:var(--carbon)}
+.collectionSlot .card-shiny{box-shadow:0 0 22px -8px rgba(255,46,136,.55)}
+
+/* cards */
+.card{position:relative;overflow:hidden;display:flex;flex-direction:column;text-align:left;background:var(--plate);
+      border:1px solid var(--seam);color:var(--bone)}
+.card-prompt::before,.card-shiny::before,.card-worn::before{content:"";position:absolute;inset:0;pointer-events:none}
+.card-prompt::before{background:repeating-linear-gradient(45deg,rgba(242,240,235,.035) 0 7px,transparent 7px 14px)}
+.card-shiny{background:var(--strike);border-color:var(--strike);color:#000;box-shadow:0 0 34px -10px rgba(255,46,136,.55)}
+.card-shiny::before{background:repeating-linear-gradient(45deg,rgba(0,0,0,.14) 0 7px,transparent 7px 14px)}
+.card-worn{background:#101011;border-color:#1D1D21;color:var(--rail)}
+.card-worn::before{background:repeating-linear-gradient(-45deg,rgba(242,240,235,.03) 0 1px,transparent 1px 5px)}
+.card-round{width:150px;height:210px;flex:none;padding:12px;clip-path:polygon(0 0,100% 0,100% 100%,14px 100%,0 calc(100% - 14px))}
+.card-earn{width:214px;height:300px;flex:none;padding:16px;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px))}
+.card-fan{width:104px;height:146px;flex:none;padding:8px;justify-content:space-between;clip-path:polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))}
+.card-shelf{width:100%;flex:none;aspect-ratio:5/7;padding:8px;justify-content:space-between;clip-path:polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))}
+.card-grid{aspect-ratio:5/7;width:100%;padding:4px;justify-content:space-between;clip-path:polygon(0 0,100% 0,100% 100%,6px 100%,0 calc(100% - 6px))}
+.card-back{aspect-ratio:5/7;width:100%;align-items:center;justify-content:center;border-color:var(--strike);
+           background:var(--chassis) repeating-linear-gradient(45deg,rgba(255,46,136,.26) 0 6px,transparent 6px 12px)}
+.cardBackMark{font-family:var(--jp);font-weight:900;font-size:16px;color:var(--strike)}
+.cardHead{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;position:relative}
+.cardChip{font-family:var(--mono);font-size:8px;letter-spacing:.16em;padding:3px 6px;white-space:nowrap;border:1px solid var(--seam);color:var(--rail)}
+.card-shiny .cardChip{background:var(--bone);border-color:var(--bone);color:#000;font-weight:600}
+.card-worn .cardChip{border-color:#1D1D21;color:var(--carbon)}
+.cardChipPlain{border:none;padding:0;letter-spacing:.18em;color:var(--carbon)}
+.card-fan .cardChip,.card-shelf .cardChip,.card-grid .cardChip{border:none;padding:0;font-size:7px;letter-spacing:.14em;color:var(--carbon)}
+.card-fan.card-shiny .cardChip,.card-shelf.card-shiny .cardChip,.card-grid.card-shiny .cardChip{background:none;color:#000;font-weight:600}
+.card-grid .cardChip{font-size:5px}
+.cardMark{font-family:var(--jp);font-weight:900;font-size:14px;line-height:1;color:currentColor}
+.cardMarkStrike{color:var(--strike)}
+.cardMid{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:0}
+.cardWord{font-family:var(--jp);font-weight:900;line-height:1;white-space:nowrap}
+.cardRomaji{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.18em;color:var(--rail);white-space:nowrap}
+.card-shiny .cardRomaji,.card-shiny .cardReading,.card-shiny .cardKind{color:rgba(0,0,0,.72)}
+.card-fan .cardRomaji,.card-shelf .cardRomaji,.card-grid .cardRomaji{font-size:7px;letter-spacing:.1em;overflow:hidden}
+.card-grid .cardRomaji{font-size:4.5px;letter-spacing:.04em}
+.cardReading{font-family:var(--jp);font-weight:400;font-size:11px;letter-spacing:.14em;color:var(--rail);white-space:nowrap}
+.cardFoot{position:relative}
+.cardRule{display:block;height:1px;background:var(--seam);margin-bottom:8px}
+.card-shiny .cardRule{background:rgba(0,0,0,.42)}
+.card-worn .cardRule{background:#1D1D21}
+.cardMeaning{display:block;font-size:14px;font-weight:900;letter-spacing:-.01em;line-height:1;white-space:nowrap;overflow:hidden}
+.card-earn .cardMeaning{font-size:18px}
+.cardKind{display:block;font-family:var(--mono);font-size:8px;letter-spacing:.14em;color:var(--carbon);margin-top:4px;white-space:nowrap;overflow:hidden}
+
+/* round + dialog */
+.roundHead{display:flex;align-items:center;gap:8px;padding-right:15px}
+.roundChip{background:var(--strike);color:#000;font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.16em;padding:4px 7px;white-space:nowrap}
+.roundChipBone{background:var(--bone);color:var(--chassis)}
+.roundDeck{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--rail);white-space:nowrap;flex:1}
+.quit{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--rail)}
+.roundTop{display:flex;align-items:stretch;gap:12px;margin-top:20px}
+.canvasWrap{display:flex;justify-content:center;margin-top:24px;flex:none}
+.canvasBox{position:relative;width:100%;height:230px;background:var(--bone);box-shadow:inset 0 0 0 1px var(--seam)}
+.canvasTag{position:absolute;left:10px;top:8px;font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:rgba(10,10,11,.4)}
+.inkDemo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--kana);font-size:96px;color:#0A0A0B;opacity:.82}
+.sessionActions{display:flex;flex-direction:column;gap:10px;justify-content:flex-end;padding-top:20px}
+.dialogScrim{position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:var(--gutter);
+             background:rgba(10,10,11,.72);backdrop-filter:blur(6px)}
+.dialogPanel{width:100%;max-width:374px;border:1px solid var(--seam);background:var(--plate);padding:20px;
+             clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%)}
+.dialogActions{display:flex;flex-direction:column;gap:9px;margin-top:20px}
+.dialogBtn{height:54px;flex:none;font-size:16px;padding:0}
+
+/* S7c */
+.earnStack{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.earnStack .joker{align-self:stretch}
+.earnLabel{font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--strike);white-space:nowrap}
+.earnCard{box-shadow:0 22px 44px -12px rgba(0,0,0,.8),0 0 40px -8px rgba(255,46,136,.5)}
+.earnNote{font-family:var(--mono);font-size:9px;letter-spacing:.16em;color:var(--carbon);text-align:center;line-height:1.7}
+.handStrip{border-top:1px solid var(--seam);margin:0 -28px;padding:14px 28px 0;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.handStrip .legend{padding-bottom:26px;white-space:nowrap}
+.handCards{display:flex;align-items:flex-end;overflow:hidden}
+.handCard{width:54px;height:74px;flex:none;display:flex;align-items:center;justify-content:center;padding:4px;
+          border:1px solid var(--seam);background:var(--plate);font-family:var(--jp);font-weight:900;font-size:15px;color:var(--bone);overflow:hidden;line-height:1}
+.handCard+.handCard{margin-left:-16px;padding-left:20px;border-left:1px solid var(--chassis)}
+.handCard-worn{background:#101011;border-color:#1D1D21;color:var(--rail)}
+.handCard-shiny{background:var(--strike);border-color:var(--strike);color:#000;box-shadow:0 0 22px -4px rgba(255,46,136,.6)}
+
+/* S8 */
+.resultCount{font-size:64px;font-weight:900;letter-spacing:-.04em;line-height:.92;margin-top:28px}
+.resultCountWord{font-size:26px;letter-spacing:-.01em;margin-left:.14em}
+.resultTally{display:flex;align-items:center;gap:9px;margin-top:14px}
+.resultShiny{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.14em;background:var(--strike);color:#000;padding:5px 8px}
+.resultRest{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--rail)}
+.resultFan{flex:1;display:flex;align-items:center;justify-content:center;margin:0 -28px;min-height:190px}
+.fanCard{transform-origin:bottom center}
+.fanCard+.fanCard{margin-left:-34px;padding-left:36px}
+.fanCard0{transform:rotate(-14deg) translateY(20px);z-index:5}
+.fanCard1{transform:rotate(-7deg) translateY(6px);z-index:4}
+.fanCard2{transform:rotate(0deg) translateY(-4px);z-index:3}
+.fanCard3{transform:rotate(7deg) translateY(6px);z-index:2}
+.fanCard4{transform:rotate(14deg) translateY(20px);z-index:1}
+.resultGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-content:center;flex:1;margin-top:16px}
+.resultNote{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--carbon);line-height:1.7}
+.resultNote+.btnBone{margin-top:16px}
+
+/* ---------- spec panels ---------- */
+.cols{display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start}
+.panelDoc{flex:1;min-width:300px;max-width:440px;border:1px solid var(--seam);background:var(--plate);padding:20px 22px;
+          font:400 12.5px/1.65 var(--display);color:var(--print)}
+.panelDoc h4{font:800 10px var(--mono);letter-spacing:.14em;color:var(--bone);margin-bottom:8px}
+.panelDoc p{margin:0 0 14px}
+.panelDoc p:last-child{margin-bottom:0}
+.mono{font-family:var(--mono);font-size:12px;color:var(--blueprint)}
+.strikeText{color:var(--strike)}
+.dead{color:var(--carbon);text-decoration:line-through}
+table{border-collapse:collapse;width:100%;font:400 12px/1.5 var(--display)}
+th{font:800 9px var(--mono);letter-spacing:.14em;color:var(--rail);text-align:left;padding:7px 10px 7px 0;border-bottom:1px solid var(--seam);white-space:nowrap}
+td{padding:8px 10px 8px 0;border-bottom:1px solid rgba(255,255,255,.05);color:var(--print);vertical-align:top}
+td.key{font-family:var(--mono);font-size:11px;color:var(--blueprint);white-space:nowrap}
+td.was{color:var(--carbon)}
+
+/* ---------- motion lab ---------- */
+.slot{width:270px;border:1px solid var(--seam);background:var(--plate);padding:16px}
+.slotHead{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+.slotId{font:800 9px var(--mono);letter-spacing:.14em;background:var(--blueprint);color:#000;padding:3px 6px}
+.slotName{font:900 14px var(--display);color:var(--bone)}
+.slotBody{font:400 12px/1.6 var(--display);color:var(--print)}
+.slotMeta{margin-top:12px;padding-top:10px;border-top:1px solid var(--seam);font:400 10px/1.7 var(--mono);color:var(--carbon);letter-spacing:.06em}
+.slotMeta b{color:var(--rail);font-weight:600}
+.storyboard{display:flex;gap:8px;margin:12px 0}
+.frame3{flex:1;height:64px;border:1px dashed var(--seam);display:flex;align-items:center;justify-content:center;
+        font:600 9px var(--mono);letter-spacing:.1em;color:var(--carbon);text-align:center;padding:4px}
+.ovl{width:270px;border:1px solid var(--seam);background:var(--chassis);padding:0;overflow:hidden}
+.ovlTop{padding:14px 16px;border-bottom:1px solid var(--seam);display:flex;align-items:baseline;gap:8px}
+.ovlBody{padding:16px;font:400 12px/1.6 var(--display);color:var(--print)}
+.ovlStage{height:150px;background:var(--plate);border-bottom:1px solid var(--seam);position:relative;display:flex;align-items:center;justify-content:center}
+.budget{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.budgetPill{border:1px solid var(--seam);background:var(--plate);padding:9px 13px;font:400 11px var(--mono);letter-spacing:.08em;color:var(--print)}
+.budgetPill b{color:var(--live);font-weight:600}
+.budgetPill i{color:var(--caution);font-style:normal}
+</style>
+</helmet>
+
+<!-- ============================================================ HEADER -->
+<section class="sheet">
+  <div class="sheetTitle">
+    <span class="tag">V5A</span>
+    <b>kanahero v5a — runs, copies, collection · drawn from the shipped tree</b>
+  </div>
+  <div class="sheetNote">
+    EVERY SCREEN v5a CHANGED, AS BUILT AT <span style="color:#F2F0EB">c64672a</span> + <span style="color:#F2F0EB">fbe1645</span>. A RUN IS ALL-OR-NOTHING · EVERY RUN DEALS THE WHOLE SET · ONE COPY PER WORD PER FINISHED RUN · FOIL IS NOW SHINY · S6D COLLECTION IS NEW · ABANDON IS A JOKER MODAL. UNCHANGED SCREENS (S4 DRILL, S5 BANK, S7/S7B WRITE + GRADE, CREDITS) LIVE IN <a href="KanaHero v5 Handoff.dc.html">V5</a>. SPEC-V5A WINS ON BEHAVIOR, THE TREE WINS ON TRUTH, THIS WINS ON PIXELS.
+    <br><br>
+    THIS SHEET EXISTS TO BE WORKSHOPPED: THE LAST TWO SECTIONS ARE THE <span style="color:#FF2E88">MOTION LAB</span> AND THE <span style="color:#2E9DFF">OVERLAY LAB</span> — EMPTY SLOTS WITH THE HOOKS, TRIGGERS AND BUDGETS ALREADY NAMED.
+  </div>
+</section>
+
+<!-- ============================================================ S1 -->
+<section class="sheet">
+  <div class="sheetTitle"><span class="tag tagGhost">S1</span><b>Home — no fractions, no bars, a set count and a greeting</b></div>
+  <div class="sheetNote">THE ROW SAYS WHAT THE DECK HOLDS, NOT HOW FAR THROUGH IT YOU ARE: A SET IS NEVER FINISHED (SPEC-V5A §3). KANJI NOW CARRIES THREE PLATFORM SETS — STATION, DAILY BASICS, TEST. THE JOKER'S HOME LINE OPENS IN HIRAGANA.</div>
+  <div class="boards">
+
+    <div class="board">
+      <div class="boardLabel"><span class="k new">S1</span>Home — base, nothing selected · <span style="color:#FF2E88">new greeting</span></div>
+      <div class="ab" data-screen-label="S1 Home base">
+        <div class="livery"><span class="ghost ghostHome">親</span></div>
+        <div class="brand">KANA HERO</div>
+        <div class="joker joker-left jokerHome">
+          <img class="jokerMark m89" src="assets/joker.png" alt="">
+          <div class="jokerPanel"><span class="jokerTail"></span><div class="jokerTag">JOKER</div>
+            <p class="jokerLine">こんにちは. Pick a deck, I'll deal, you write.</p></div>
+        </div>
+        <div class="legend legendSpaced">DECKS</div>
+        <div class="deckList">
+          <div class="deckRow"><span class="deckRowTop"><span class="deckRowName"><span class="deckGlyph">あ</span><span class="deckLabel">HIRAGANA</span></span><span class="deckCount">1 SET</span></span></div>
+          <div class="deckRow"><span class="deckRowTop"><span class="deckRowName"><span class="deckGlyph">ア</span><span class="deckLabel">KATAKANA</span></span><span class="deckCount">1 SET</span></span></div>
+          <div class="deckRow"><span class="deckRowTop"><span class="deckRowName"><span class="deckGlyph">漢</span><span class="deckLabel">KANJI</span></span><span class="deckCount">3 SETS</span></span></div>
+          <div class="bankStrip"><span class="legend">BANK</span><span class="grow"></span><span class="bankStripCount">4</span><span class="bankStripArrow">→</span></div>
+        </div>
+        <div class="grow"></div>
+        <div class="btnInert homeStart">START SESSION</div>
+        <div class="attribution">CREDITS</div>
+      </div>
+    </div>
+
+    <div class="board">
+      <div class="boardLabel"><span class="k">S1</span>Home — kanji selected, CTA live</div>
+      <div class="ab" data-screen-label="S1 Home kanji">
+        <div class="livery"><span class="ghost ghostHome">漢</span></div>
+        <div class="brand">KANA HERO</div>
+        <div class="joker joker-left jokerHome">
+          <img class="jokerMark m89" src="assets/joker.png" alt="">
+          <div class="jokerPanel"><span class="jokerTail"></span><div class="jokerTag">JOKER</div>
+            <p class="jokerLine">Kanji. Meaning, not sound. One character, many readings.</p></div>
+        </div>
+        <div class="legend legendSpaced">DECKS</div>
+        <div class="deckList">
+          <div class="deckRow"><span class="deckRowTop"><span class="deckRowName"><span class="deckGlyph">あ</span><span class="deckLabel">HIRAGANA</span></span><span class="deckCount">1 SET</span></span></div>
+          <div class="deckRow"><span class="deckRowTop"><span class="deckRowName"><span class="deckGlyph">ア</span><span class="deckLabel">KATAKANA</span></span><span class="deckCount">1 SET</span></span></div>
+          <div class="deckRow deckRowOn"><span class="deckRowTop"><span class="deckRowName"><span class="deckGlyph">漢</span><span class="deckLabel">KANJI</span></span><span class="deckCount">3 SETS</span></span></div>
+          <div class="bankStrip"><span class="legend">BANK</span><span class="grow"></span><span class="bankStripCount">4</span><span class="bankStripArrow">→</span></div>
+        </div>
+        <div class="grow"></div>
+        <div class="btnStrike homeStart">START SESSION</div>
+        <div class="attribution">CREDITS</div>
+      </div>
+    </div>
+
+    <div class="board">
+      <div class="boardLabel"><span class="k new">S1</span>Home — the wipe line, once ever</div>
+      <div class="ab" data-screen-label="S1 Home wiped">
+        <div class="livery"><span class="ghost ghostHome">親</span></div>
+        <div class="brand">KANA HERO</div>
+        <div class="joker joker-left jokerHome">
+          <img class="jokerMark m89" src="assets/joker.png" alt="">
+          <div class="jokerPanel"><span class="jokerTail"></span><div class="jokerTag">JOKER</div>
+            <p class="jokerLine">New rules, so I reshuffled. Your old cards are gone.</p></div>
+        </div>
+        <div class="legend legendSpaced">DECKS</div>
+        <div class="deckList">
+          <div class="deckRow"><span class="deckRowTop"><span class="deckRowName"><span class="deckGlyph">あ</span><span class="deckLabel">HIRAGANA</span></span><span class="deckCount">1 SET</span></span></div>
+          <div class="deckRow"><span class="deckRowTop"><span class="deckRowName"><span class="deckGlyph">ア</span><span class="deckLabel">KATAKANA</span></span><span class="deckCount">1 SET</span></span></div>
+          <div class="deckRow"><span class="deckRowTop"><span class="deckRowName"><span class="deckGlyph">漢</span><span class="deckLabel">KANJI</span></span><span class="deckCount">3 SETS</span></span></div>
+          <div class="bankStrip"><span class="legend">BANK</span><span class="grow"></span><span class="bankStripCount">4</span><span class="bankStripArrow">→</span></div>
+        </div>
+        <div class="grow"></div>
+        <div class="btnInert homeStart">START SESSION</div>
+        <div class="attribution">CREDITS</div>
+      </div>
+    </div>
+
+    <div class="panelDoc">
+      <h4>WHAT CHANGED ON S1</h4>
+      <p>The row was <span class="dead">あ HIRAGANA · 6/10 · ▓▓▓▒▒</span>. It is now the deck's set count and nothing else — no fraction, no bar, no stock number. The CTA, the ghost, the bank strip and the selection model are untouched.</p>
+      <h4>THE WIPE LINE</h4>
+      <p>v2 → v3 storage migration drops every card. If the old blob held at least one, <span class="mono">progress.wiped</span> is set and the Joker says the wipe line instead of the home line. <b style="color:#F2F0EB">The first tap on any row spends it</b> — choosing is the acknowledgement — and it never returns.</p>
+      <h4>HIS GREETING</h4>
+      <p>The home line now opens in hiragana: <span style="font-family:var(--jp);color:#F2F0EB">こんにちは</span>. It types out with everything else, so the kana land one character at a time — see <span class="mono">M1</span> in the motion lab.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ DECKS -->
+<section class="sheet">
+  <div class="sheetTitle"><span class="tag tagGhost">S2 / S3</span><b>Deck — a set row says how many words it holds</b></div>
+  <div class="sheetNote">THE FRACTION SLOT IS NOW THE WORD COUNT. THE DESCRIPTION LINE DROPS ITS COUNT. THE BAR AND THE STOCK NUMBER ARE GONE. THE CHARACTERS CARD IS UNCHANGED — IT COUNTS CHARACTERS, AND CHARACTERS DO FINISH.</div>
+  <div class="boards">
+
+    <div class="board">
+      <div class="boardLabel"><span class="k">S2</span>Deck — Hiragana</div>
+      <div class="ab" data-screen-label="S2 Deck Hiragana">
+        <div class="livery"><span class="ghost ghostHome">あ</span></div>
+        <div class="screenHead"><span class="backLink">← HOME</span><span class="screenTitle">あ HIRAGANA</span></div>
+        <div class="joker joker-left jokerDeck">
+          <img class="jokerMark m78" src="assets/joker.png" alt="">
+          <div class="jokerPanel"><span class="jokerTail"></span><div class="jokerTag">JOKER</div>
+            <p class="jokerLine">Characters first, or straight to words. Your call.</p></div>
+        </div>
+        <div class="legend legendSpaced">CHARACTERS</div>
+        <div class="panel panelNotch deckCharacters">
+          <div class="deckCharactersTop"><span class="panelName">ALL 71</span><span class="panelCount">18/71</span></div>
+          <span class="bar" style="--fill:25%"><i></i></span>
+          <div class="deckDakuten"><span class="legend">DAKUTEN</span>
+            <span class="toggle"><span class="toggleOpt toggleOn">ON</span><span class="toggleOpt">OFF</span></span></div>
+          <div class="deckNote">MISSED CARDS REPLAY UNTIL ZERO.</div>
+        </div>
+        <div class="legend legendSpaced">SETS</div>
+        <div class="legend legendFaint">PLATFORM</div>
+        <div class="panel panelNotch setRow">
+          <div class="setRowTop"><span class="setGlyph">あ</span>
+            <span class="setRowName"><span class="panelName">DAILY BASICS</span><span class="setRowMeta">≤5 KANA</span></span>
+            <span class="panelCount setRowWords">10 WORDS</span></div>
+        </div>
+        <div class="grow"></div>
+      </div>
+    </div>
+
+    <div class="board">
+      <div class="boardLabel"><span class="k">S3</span>Deck — Kanji, three sets</div>
+      <div class="ab" data-screen-label="S3 Deck Kanji">
+        <div class="livery"><span class="ghost ghostHome">漢</span></div>
+        <div class="screenHead"><span class="backLink">← HOME</span><span class="screenTitle">漢 KANJI</span></div>
+        <div class="joker joker-left jokerDeck">
+          <img class="jokerMark m78" src="assets/joker.png" alt="">
+          <div class="jokerPanel"><span class="jokerTail"></span><div class="jokerTag">JOKER</div>
+            <p class="jokerLine">No alphabet here. Only words, only places you've been.</p></div>
+        </div>
+        <div class="legend legendSpaced">SETS</div>
+        <div class="legend legendFaint">PLATFORM</div>
+        <div class="panel panelNotch setRow">
+          <div class="setRowTop"><span class="setGlyph">駅</span>
+            <span class="setRowName"><span class="panelName">STATION</span><span class="setRowMeta">EXITS, SIGNS</span></span>
+            <span class="panelCount setRowWords">9 WORDS</span></div>
+        </div>
+        <div class="panel panelNotch setRow">
+          <div class="setRowTop"><span class="setGlyph">日</span>
+            <span class="setRowName"><span class="panelName">DAILY BASICS</span><span class="setRowMeta">NATURE, PEOPLE</span></span>
+            <span class="panelCount setRowWords">10 WORDS</span></div>
+        </div>
+        <div class="panel panelNotch setRow">
+          <div class="setRowTop"><span class="setGlyph">試</span>
+            <span class="setRowName"><span class="panelName">TEST</span><span class="setRowMeta">THREE CHARACTERS</span></span>
+            <span class="panelCount setRowWords">3 WORDS</span></div>
+        </div>
+        <div class="grow"></div>
+      </div>
+    </div>
+
+    <div class="panelDoc">
+      <h4>SET ROW — BEFORE / AFTER</h4>
+      <table>
+        <tr><th>SLOT</th><th>V5</th><th>V5A</th></tr>
+        <tr><td class="key">right</td><td class="was">3/9 · 1 FOIL</td><td>9 WORDS</td></tr>
+        <tr><td class="key">under name</td><td class="was">EXITS, SIGNS · 9 WORDS</td><td>EXITS, SIGNS</td></tr>
+        <tr><td class="key">bar</td><td class="was">▓▓▒▒▒▒</td><td>—</td></tr>
+      </table>
+      <p style="margin-top:14px">The second line comes from the set file's <span class="mono">blurb</span> when it has one, else <span class="mono">EXITS, SIGNS</span> for kanji or <span class="mono">≤N KANA</span> measured off the longest word.</p>
+      <h4>NOT TOUCHED</h4>
+      <p>The CHARACTERS card keeps its fraction, its bar and the DAKUTEN toggle. YOUR SETS and NEW SET are still out of scope.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ S6b -->
+<section class="sheet">
+  <div class="sheetTitle"><span class="tag tagGhost">S6b</span><b>Set — always face down, and the shelf underneath</b></div>
+  <div class="sheetNote">EVERY RUN DEALS THE WHOLE SET, SO THERE IS NO EARNED HALF OF THIS GRID AND NOTHING TO REVEAL HERE. THE BOTTOM PANEL IS THE SHELF: THREE STOCKS, ALWAYS ALL THREE, ZEROS UNLIT — AND THE DOOR INTO S6D.</div>
+  <div class="boards">
+
+    <div class="board">
+      <div class="boardLabel"><span class="k">S6b</span>Station — cold, nothing minted</div>
+      <div class="ab" data-screen-label="S6b Set Station cold">
+        <div class="screenHead"><span class="backLink">← KANJI</span><span class="screenTitle">駅 STATION</span></div>
+        <div class="joker joker-left jokerDeck">
+          <img class="jokerMark m78" src="assets/joker.png" alt="">
+          <div class="jokerPanel"><span class="jokerTail"></span><div class="jokerTag">JOKER</div>
+            <p class="jokerLine">Nine words, face down. Deal when you're ready.</p></div>
+        </div>
+        <div class="setHead"><span class="setHeadTitle">THE SET</span><span class="panelCount">9 WORDS</span></div>
+        <div class="setGrid">
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+        </div>
+        <div class="grow"></div>
+        <div class="setTotals">
+          <div class="setTotalsRow">
+            <span class="setTotal setTotal-shiny setTotalZero">0 SHINY</span>
+            <span class="setTotal setTotalZero">0 BASE</span>
+            <span class="setTotal setTotal-worn setTotalZero">0 WORN</span>
+          </div>
+          <div class="collectionLink">VIEW COLLECTION →</div>
+        </div>
+        <div class="btnStrike actionBar">DEAL</div>
+      </div>
+    </div>
+
+    <div class="board">
+      <div class="boardLabel"><span class="k">S6b</span>Station — after eight finished runs</div>
+      <div class="ab" data-screen-label="S6b Set Station stocked">
+        <div class="screenHead"><span class="backLink">← KANJI</span><span class="screenTitle">駅 STATION</span></div>
+        <div class="joker joker-left jokerDeck">
+          <img class="jokerMark m78" src="assets/joker.png" alt="">
+          <div class="jokerPanel"><span class="jokerTail"></span><div class="jokerTag">JOKER</div>
+            <p class="jokerLine">Nine words, face down. Deal when you're ready.</p></div>
+        </div>
+        <div class="setHead"><span class="setHeadTitle">THE SET</span><span class="panelCount">9 WORDS</span></div>
+        <div class="setGrid">
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+          <div class="card card-back"><span class="cardBackMark">駅</span></div>
+        </div>
+        <div class="grow"></div>
+        <div class="setTotals">
+          <div class="setTotalsRow">
+            <span class="setTotal setTotal-shiny">21 SHINY</span>
+            <span class="setTotal">33 BASE</span>
+            <span class="setTotal setTotal-worn">18 WORN</span>
+          </div>
+          <div class="collectionLink">VIEW COLLECTION →</div>
+        </div>
+        <div class="btnStrike actionBar">DEAL</div>
+      </div>
+    </div>
+
+    <div class="panelDoc">
+      <h4>REMOVED FROM S6b</h4>
+      <p><span class="dead">3/9 · FULL</span> in the title · <span class="dead">ROUND LENGTH · n LEFT · NO TIMER</span> · <span class="dead">NOTHING LEFT TO DEAL</span> · earned faces in the grid · rarity chips · the tap-a-card overlay. DEAL is always live, because a set is always dealable.</p>
+      <h4>THE SHELF PANEL</h4>
+      <p>Three numbers, three colors: shiny is <span class="strikeText">strike</span>, base is bone, worn is rail, and a zero of any of them drops to carbon. They are totals over the whole set, so eight finished runs on a nine-word set sum to 72.</p>
+      <h4>THE DOOR</h4>
+      <p><span class="mono">VIEW COLLECTION →</span> sits inside the same panel, above the CTA, under a 1px seam. It is the only route to S6d.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ S6d -->
+<section class="sheet">
+  <div class="sheetTitle"><span class="tag">S6d</span><b>Collection — NEW · the only screen where a card stands face up</b></div>
+  <div class="sheetNote">ONE ROW PER WORD, IN SET-FILE ORDER AND NEVER THE RUN'S: THE SHELF STANDS STILL WHILE THE RUNS SHUFFLE. A ROW IS THREE SLOTS — SHINY, BASE, WORN. A STOCK YOU HAVE NEVER MINTED IS AN EMPTY DASHED SLOT WITH THE STOCK'S NAME IN IT, SO THE ROW READS AS A SET TO FILL RATHER THAN A LIST OF ZEROES. CARDS ARE NOT TAPPABLE. ROWS SCROLL UNDER A STICKY HEAD.</div>
+  <div class="boards">
+
+    <div class="board">
+      <div class="boardLabel"><span class="k new">S6d</span>Collection — before any finished run</div>
+      <div class="ab" data-screen-label="S6d Collection empty">
+        <div class="screenHead screenHeadStick"><span class="backLink">← STATION</span><span class="screenTitle">COLLECTION</span></div>
+        <div class="joker joker-left jokerDeck">
+          <img class="jokerMark m78" src="assets/joker.png" alt="">
+          <div class="jokerPanel"><span class="jokerTail"></span><div class="jokerTag">JOKER</div>
+            <p class="jokerLine">Nothing here yet. Finish a run.</p></div>
+        </div>
+        <div class="collectionList">
+          <div class="collectionRow collectionRowEmpty">
+            <div class="collectionHead"><span class="collectionWord"><i class="collectionMark">駅</i></span>
+              <span class="collectionMeaning">EXIT</span><span class="collectionTotal">NOT YET</span></div>
+            <div class="collectionCards">
+              <div class="collectionSlot collectionSlot-shiny"><div class="shelfSlot"><span class="shelfSlotStock">SHINY</span></div><span class="collectionTimes collectionTimesZero">×0</span></div>
+              <div class="collectionSlot"><div class="shelfSlot"><span class="shelfSlotStock">BASE</span></div><span class="collectionTimes collectionTimesZero">×0</span></div>
+              <div class="collectionSlot collectionSlot-worn"><div class="shelfSlot"><span class="shelfSlotStock">WORN</span></div><span class="collectionTimes collectionTimesZero">×0</span></div>
+            </div>
+          </div>
+          <div class="collectionRow collectionRowEmpty">
+            <div class="collectionHead"><span class="collectionWord"><i class="collectionMark">駅</i></span>
+              <span class="collectionMeaning">ENTRANCE</span><span class="collectionTotal">NOT YET</span></div>
+            <div class="collectionCards">
+              <div class="collectionSlot collectionSlot-shiny"><div class="shelfSlot"><span class="shelfSlotStock">SHINY</span></div><span class="collectionTimes collectionTimesZero">×0</span></div>
+              <div class="collectionSlot"><div class="shelfSlot"><span class="shelfSlotStock">BASE</span></div><span class="collectionTimes collectionTimesZero">×0</span></div>
+              <div class="collectionSlot collectionSlot-worn"><div class="shelfSlot"><span class="shelfSlotStock">WORN</span></div><span class="collectionTimes collectionTimesZero">×0</span></div>
+            </div>
+          </div>
+          <div class="collectionRow collectionRowEmpty">
+            <div class="collectionHead"><span class="collectionWord"><i class="collectionMark">駅</i></span>
+              <span class="collectionMeaning">SHINKANSEN</span><span class="collectionTotal">NOT YET</span></div>
+            <div class="collectionCards">
+              <div class="collectionSlot collectionSlot-shiny"><div class="shelfSlot"><span class="shelfSlotStock">SHINY</span></div><span class="collectionTimes collectionTimesZero">×0</span></div>
+              <div class="collectionSlot"><div class="shelfSlot"><span class="shelfSlotStock">BASE</span></div><span class="collectionTimes collectionTimesZero">×0</span></div>
+              <div class="collectionSlot collectionSlot-worn"><div class="shelfSlot"><span class="shelfSlotStock">WORN</span></div><span class="collectionTimes collectionTimesZero">×0</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="grow"></div>
+      </div>
+    </div>
+
+    <div class="board">
+      <div class="boardLabel"><span class="k new">S6d</span>Collection — station, eight finished runs</div>
+      <div class="ab" data-screen-label="S6d Collection stocked">
+        <div class="screenHead screenHeadStick"><span class="backLink">← STATION</span><span class="screenTitle">COLLECTION</span></div>
+        <div class="joker joker-left jokerDeck">
+          <img class="jokerMark m78" src="assets/joker.png" alt="">
+          <div class="jokerPanel"><span class="jokerTail"></span><div class="jokerTag">JOKER</div>
+            <p class="jokerLine">Every copy you've made, word by word.</p></div>
+        </div>
+        <div class="collectionList">
+          <div class="collectionRow">
+            <div class="collectionHead"><span class="collectionWord">出口</span>
+              <span class="collectionMeaning">EXIT</span><span class="collectionTotal">×8</span></div>
+            <div class="collectionCards">
+              <div class="collectionSlot collectionSlot-shiny">
+                <div class="card card-shelf card-shiny"><div class="cardChip">SHINY</div>
+                  <div class="cardMid"><span class="cardWord" style="font-size:20.5px">出口</span></div>
+                  <div class="cardRomaji">DEGUCHI</div></div>
+                <span class="collectionTimes">×6</span></div>
+              <div class="collectionSlot">
+                <div class="card card-shelf card-base"><div class="cardChip">BASE</div>
+                  <div class="cardMid"><span class="cardWord" style="font-size:20.5px">出口</span></div>
+                  <div class="cardRomaji">DEGUCHI</div></div>
+                <span class="collectionTimes">×2</span></div>
+              <div class="collectionSlot collectionSlot-worn"><div class="shelfSlot"><span class="shelfSlotStock">WORN</span></div><span class="collectionTimes collectionTimesZero">×0</span></div>
+            </div>
+          </div>
+          <div class="collectionRow">
+            <div class="collectionHead"><span class="collectionWord">新幹線</span>
+              <span class="collectionMeaning">SHINKANSEN</span><span class="collectionTotal">×8</span></div>
+            <div class="collectionCards">
+              <div class="collectionSlot collectionSlot-shiny">
+                <div class="card card-shelf card-shiny"><div class="cardChip">SHINY</div>
+                  <div class="cardMid"><span class="cardWord" style="font-size:16.4px">新幹線</span></div>
+                  <div class="cardRomaji">SHINKANSEN</div></div>
+                <span class="collectionTimes">×2</span></div>
+              <div class="collectionSlot">
+                <div class="card card-shelf card-base"><div class="cardChip">BASE</div>
+                  <div class="cardMid"><span class="cardWord" style="font-size:16.4px">新幹線</span></div>
+                  <div class="cardRomaji">SHINKANSEN</div></div>
+                <span class="collectionTimes">×3</span></div>
+              <div class="collectionSlot collectionSlot-worn">
+                <div class="card card-shelf card-worn"><div class="cardChip">WORN</div>
+                  <div class="cardMid"><span class="cardWord" style="font-size:16.4px">新幹線</span></div>
+                  <div class="cardRomaji">SHINKANSEN</div></div>
+                <span class="collectionTimes">×3</span></div>
+            </div>
+          </div>
+          <div class="collectionRow collectionRowEmpty">
+            <div class="collectionHead"><span class="collectionWord"><i class="collectionMark">駅</i></span>
+              <span class="collectionMeaning">NO SMOKING</span><span class="collectionTotal">NOT YET</span></div>
+            <div class="collectionCards">
+              <div class="collectionSlot collectionSlot-shiny"><div class="shelfSlot"><span class="shelfSlotStock">SHINY</span></div><span class="collectionTimes collectionTimesZero">×0</span></div>
+              <div class="collectionSlot"><div class="shelfSlot"><span class="shelfSlotStock">BASE</span></div><span class="collectionTimes collectionTimesZero">×0</span></div>
+              <div class="collectionSlot collectionSlot-worn"><div class="shelfSlot"><span class="shelfSlotStock">WORN</span></div><span class="collectionTimes collectionTimesZero">×0</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="grow"></div>
+      </div>
+    </div>
+
+    <div class="panelDoc">
+      <h4>THE ROW</h4>
+      <p>Head: the word (or the set mark, at 55% strike, when you have never minted it) · the meaning, ellipsised · the row total <span class="mono">×n</span>, or <span class="mono">NOT YET</span>. Under it, three equal columns at <span class="mono">5/7</span>, gap 9, each with its <span class="mono">×n</span> under it.</p>
+      <h4>THE FACE HERE CARRIES NO STAMP</h4>
+      <p>A shelf card is the fan card's twin sized by its column. Its chip is the stock name alone — no tries, no <span class="mono">· n</span>. Tries are not stored past a run, and rarity already lives in the column.</p>
+      <h4>INVARIANT</h4>
+      <p>Every row sums to the number of finished runs on that set. If two rows disagree, something wrote outside <span class="mono">mintRun()</span>.</p>
+      <h4>CEILING</h4>
+      <p>21 rows, ~240px each. The head is sticky; the list scrolls under it. Word text never wraps.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ S7 modal + S7c -->
+<section class="sheet">
+  <div class="sheetTitle"><span class="tag">S7 / S7c</span><b>Leaving costs the run — and nothing is kept until it ends</b></div>
+  <div class="sheetNote">A RUN IS ALL-OR-NOTHING, SO LEAVING IS A REAL LOSS AND THE JOKER SAYS SO HIMSELF RATHER THAN A SYSTEM ALERT DOING IT. THE ROUND STAYS MOUNTED BEHIND THE DIALOG — INK, QUEUE AND HAND UNTOUCHED — SO CANCELLING COSTS NOTHING.</div>
+  <div class="boards">
+
+    <div class="board">
+      <div class="boardLabel"><span class="k new">S7</span>Abandon — the Joker modal</div>
+      <div class="ab" data-screen-label="S7 Abandon modal">
+        <div class="rail"></div>
+        <div class="roundHead"><span class="roundChip">駅 STATION</span><span class="roundDeck">DECK 6 · HAND 3</span><span class="quit">✕</span></div>
+        <div class="roundTop">
+          <div class="joker joker-top jokerRound">
+            <img class="jokerMark m78" src="assets/joker.png" alt="">
+            <div class="jokerPanel"><span class="jokerTail"></span><div class="jokerTag">JOKER</div>
+              <p class="jokerLine">The kana's on the card — I want the kanji.</p></div>
+          </div>
+          <div class="card card-round card-prompt">
+            <div class="cardHead"><span class="cardChip cardChipPlain">PROMPT</span><span class="cardMark cardMarkStrike">駅</span></div>
+            <div class="cardMid"><span class="cardReading" style="font-size:20px">でぐち</span><span class="cardRomaji">DEGUCHI</span></div>
+            <div class="cardFoot"><span class="cardRule"></span><span class="cardMeaning">EXIT</span><span class="cardKind">PLACE · NO KANJI YET</span></div>
+          </div>
+        </div>
+        <div class="canvasWrap"><div class="canvasBox"><span class="canvasTag">DRAW</span><span class="inkDemo" style="font-size:72px">出口</span></div></div>
+        <div class="grow"></div>
+        <div class="sessionActions">
+          <div class="actionRow"><div class="btnSeam">CLEAR</div><div class="btnSeam">UNDO</div></div>
+          <div class="btnStrike actionBar">FLIP</div>
+        </div>
+        <div class="dialogScrim">
+          <div class="dialogPanel">
+            <div class="joker joker-top">
+              <img class="jokerMark m78" src="assets/joker.png" alt="">
+              <div class="jokerPanel"><span class="jokerTail"></span><div class="jokerTag">JOKER</div>
+                <p class="jokerLine">Leave now and this run's cards leave with you.</p></div>
+            </div>
+            <div class="dialogActions">
+              <div class="btnBone dialogBtn">KEEP WRITING</div>
+              <div class="btnGrade btnCaution dialogBtn">LEAVE RUN</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="board">
+      <div class="boardLabel"><span class="k">S7c</span>Earned — shiny, provisional</div>
+      <div class="ab" data-screen-label="S7c Round earned">
+        <div class="rail"></div>
+        <div class="roundHead"><span class="roundChip roundChipBone">駅 STATION</span><span class="roundDeck">DECK 5 · HAND 4</span></div>
+        <div class="earnStack">
+          <div class="joker joker-left" style="align-self:stretch">
+            <img class="jokerMark m84" src="assets/joker.png" alt="">
+            <div class="jokerPanel"><span class="jokerTail"></span><div class="jokerTag">JOKER</div>
+              <p class="jokerLine">First try. Shiny — if you finish the run.</p></div>
+          </div>
+          <div class="earnLabel">SHINY · FIRST TRY</div>
+          <div class="card card-earn card-shiny earnCard">
+            <div class="cardHead"><span class="cardChip">SHINY · 1st TRY</span><span class="cardMark">駅</span></div>
+            <div class="cardMid"><span class="cardRomaji">DEGUCHI</span>
+              <span class="cardWord" style="font-size:74px">出口</span><span class="cardReading">でぐち</span></div>
+            <div class="cardFoot"><span class="cardRule"></span><span class="cardMeaning">EXIT</span><span class="cardKind">PLACE · 駅 STATION</span></div>
+          </div>
+          <div class="earnNote">KEPT WHEN THE RUN FINISHES</div>
+        </div>
+        <div class="handStrip">
+          <span class="legend">HAND · 4</span>
+          <div class="handCards">
+            <span class="handCard handCard-shiny" style="font-size:19px">入口</span>
+            <span class="handCard" style="font-size:10px">新幹線</span>
+            <span class="handCard handCard-worn" style="font-size:15px">禁煙</span>
+            <span class="handCard handCard-shiny" style="font-size:15px">出口</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panelDoc">
+      <h4>THE TRUTH RULE (§1.6)</h4>
+      <p>During a run the hand is provisional. No line and no label may say a card is earned, kept or yours before the queue empties.</p>
+      <table>
+        <tr><th>SLOT</th><th>V5</th><th>V5A</th></tr>
+        <tr><td class="key">earnLabel</td><td class="was">EARNED ON THE FIRST TRY</td><td>SHINY · FIRST TRY</td></tr>
+        <tr><td class="key">earnNote</td><td class="was">RARITY IS WRITTEN ON THE CARD / AND NEVER CHANGES</td><td>KEPT WHEN THE RUN FINISHES</td></tr>
+        <tr><td class="key">earned.shiny</td><td class="was">First try. That one's foil.</td><td>First try. Shiny — if you finish the run.</td></tr>
+      </table>
+      <h4>THE MODAL</h4>
+      <p>Scrim <span class="mono">rgba(10,10,11,.72)</span> + <span class="mono">blur(6px)</span>, panel 374 max, notched top-right 16px, the Joker at 78 with his tail up. <span class="mono">KEEP WRITING</span> is bone and takes focus; <span class="mono">LEAVE RUN</span> is caution — the same species as the bank's delete. Backdrop tap and <span class="mono">Esc</span> cancel; focus returns to <span class="mono">✕</span>. Tab cycles inside the panel or nowhere.</p>
+      <p><b style="color:#F2F0EB">Reduced motion:</b> the blur appears without a transition.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ S8 -->
+<section class="sheet">
+  <div class="sheetTitle"><span class="tag tagGhost">S8</span><b>Result — a run is the whole set, so the count never varies</b></div>
+  <div class="sheetNote">THE ONLY THING THAT VARIES IS THE STOCK IT CAME UP IN. A FAN UP TO FIVE CARDS, A SEVEN-COLUMN GRID FROM SIX. THE TRIES PRINTED ON THESE FACES COME FROM THE RUN THAT JUST ENDED, NOT FROM STORAGE.</div>
+  <div class="boards">
+
+    <div class="board">
+      <div class="boardLabel"><span class="k">S8</span>Result — station, nine minted, grid</div>
+      <div class="ab" data-screen-label="S8 Result Station">
+        <div class="livery"><span class="ghost ghostResult">駅</span></div>
+        <div class="screenHead"><span class="screenTitle">SET DEALT OUT</span><span class="screenTitle">駅 STATION</span></div>
+        <div class="resultCount">9<span class="resultCountWord">MINTED</span></div>
+        <div class="resultTally"><span class="resultShiny">3 SHINY</span><span class="resultRest">4 BASE · 2 WORN</span></div>
+        <div class="joker joker-left jokerDeck">
+          <img class="jokerMark m78" src="assets/joker.png" alt="">
+          <div class="jokerPanel"><span class="jokerTail"></span><div class="jokerTag">JOKER</div>
+            <p class="jokerLine">Nine cards minted, three shiny. Deal again whenever.</p></div>
+        </div>
+        <div class="resultGrid">
+          <div class="card card-grid card-shiny"><div class="cardChip">SHINY</div><div class="cardMid"><span class="cardWord" style="font-size:7.2px">出口</span></div><div class="cardRomaji">DEGUCHI</div></div>
+          <div class="card card-grid card-base"><div class="cardChip">BASE</div><div class="cardMid"><span class="cardWord" style="font-size:7.2px">入口</span></div><div class="cardRomaji">IRIGUCHI</div></div>
+          <div class="card card-grid card-worn"><div class="cardChip">WORN</div><div class="cardMid"><span class="cardWord" style="font-size:5.7px">新幹線</span></div><div class="cardRomaji">SHINKANSEN</div></div>
+          <div class="card card-grid card-base"><div class="cardChip">BASE</div><div class="cardMid"><span class="cardWord" style="font-size:7.2px">禁煙</span></div><div class="cardRomaji">KIN'EN</div></div>
+          <div class="card card-grid card-shiny"><div class="cardChip">SHINY</div><div class="cardMid"><span class="cardWord" style="font-size:7.2px">東口</span></div><div class="cardRomaji">HIGASHIGUCHI</div></div>
+          <div class="card card-grid card-worn"><div class="cardChip">WORN</div><div class="cardMid"><span class="cardWord" style="font-size:5.7px">中央口</span></div><div class="cardRomaji">CHUUOUGUCHI</div></div>
+          <div class="card card-grid card-base"><div class="cardChip">BASE</div><div class="cardMid"><span class="cardWord" style="font-size:7.2px">西口</span></div><div class="cardRomaji">NISHIGUCHI</div></div>
+          <div class="card card-grid card-base"><div class="cardChip">BASE</div><div class="cardMid"><span class="cardWord" style="font-size:7.2px">南口</span></div><div class="cardRomaji">MINAMIGUCHI</div></div>
+          <div class="card card-grid card-shiny"><div class="cardChip">SHINY</div><div class="cardMid"><span class="cardWord" style="font-size:7.2px">北口</span></div><div class="cardRomaji">KITAGUCHI</div></div>
+        </div>
+        <div class="resultNote">TAP A CARD TO SEE ITS FACE.</div>
+        <div class="btnBone actionBar">BACK TO DECK</div>
+      </div>
+    </div>
+
+    <div class="board">
+      <div class="boardLabel"><span class="k">S8</span>Result — three minted, the fan</div>
+      <div class="ab" data-screen-label="S8 Result fan">
+        <div class="livery"><span class="ghost ghostResult">試</span></div>
+        <div class="screenHead"><span class="screenTitle">SET DEALT OUT</span><span class="screenTitle">試 TEST</span></div>
+        <div class="resultCount">3<span class="resultCountWord">MINTED</span></div>
+        <div class="resultTally"><span class="resultShiny">1 SHINY</span><span class="resultRest">1 BASE · 1 WORN</span></div>
+        <div class="joker joker-left jokerDeck">
+          <img class="jokerMark m78" src="assets/joker.png" alt="">
+          <div class="jokerPanel"><span class="jokerTail"></span><div class="jokerTag">JOKER</div>
+            <p class="jokerLine">Three cards minted, one shiny. Deal again whenever.</p></div>
+        </div>
+        <div class="resultFan">
+          <div class="card card-fan card-shiny fanCard fanCard0"><div class="cardChip">SHINY · 1</div><div class="cardMid"><span class="cardWord" style="font-size:34.9px">日</span></div><div class="cardRomaji">HI</div></div>
+          <div class="card card-fan card-base fanCard fanCard1"><div class="cardChip">BASE · 2</div><div class="cardMid"><span class="cardWord" style="font-size:34.9px">人</span></div><div class="cardRomaji">HITO</div></div>
+          <div class="card card-fan card-worn fanCard fanCard2"><div class="cardChip">WORN · 4</div><div class="cardMid"><span class="cardWord" style="font-size:34.9px">口</span></div><div class="cardRomaji">KUCHI</div></div>
+        </div>
+        <div class="resultNote">TAP A CARD TO SEE ITS FACE.</div>
+        <div class="btnBone actionBar">BACK TO DECK</div>
+      </div>
+    </div>
+
+    <div class="panelDoc">
+      <h4>COPY DELTA</h4>
+      <table>
+        <tr><th>SLOT</th><th>V5</th><th>V5A</th></tr>
+        <tr><td class="key">count</td><td class="was">6 COLLECTED · FULL</td><td>9 MINTED</td></tr>
+        <tr><td class="key">chip</td><td class="was">2 FOIL</td><td>3 SHINY</td></tr>
+        <tr><td class="key">note</td><td class="was">TAP A CARD TO SEE ITS FACE. TRIES ARE PRINTED ON EVERY CARD, FOREVER.</td><td>TAP A CARD TO SEE ITS FACE.</td></tr>
+      </table>
+      <h4>STILL TRUE</h4>
+      <p>The tap-to-view overlay is unchanged: <span class="mono">.cardOverlay</span>, <span class="mono">rgba(10,10,11,.86)</span>, the earn face centred, tap anywhere to close. <span class="mono">BACK TO DECK</span> unchanged.</p>
+      <h4>THE FAN CHIP KEEPS ITS NUMBER</h4>
+      <p><span class="mono">SHINY · 1</span> — the fan face is the one place a try count still prints, because it comes from the run's own state on the way out.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ RULES -->
+<section class="sheet">
+  <div class="sheetTitle"><span class="tag tagGhost">RULES</span><b>What the app is now — the part the animations have to stay true to</b></div>
+  <div class="cols">
+    <div class="panelDoc">
+      <h4>THE RUN</h4>
+      <p><b style="color:#F2F0EB">All-or-nothing.</b> Nothing about a run reaches storage until the queue empties. Abandoning, reloading or closing mid-run discards every card in the hand. One write at the end, <span class="mono">mintRun()</span>, every word of it.</p>
+      <p><b style="color:#F2F0EB">The whole set, every time,</b> in a seeded random order (seed logged). A set is always replayable; "nothing left to deal" no longer exists. A miss goes back in the queue with a gap of 2.</p>
+      <p><b style="color:#F2F0EB">Tries live in the round</b> and die with it. 1 try → shiny · 2 → base · ≥3 → worn, fixed at mint.</p>
+      <h4>THE DATA</h4>
+      <p><span class="mono">kanahero:v1</span> → v3. <span class="mono">joker: { setId: { wordId: { shiny, base, worn } } }</span>. No <span class="mono">tries</span>, no <span class="mono">earnedAt</span>. v2 → v3 is a wipe of <span class="mono">joker</span> only; character progress and the Joker's <span class="mono">seen</span> key survive.</p>
+      <h4>THE WORD</h4>
+      <p><span class="dead">foil</span> is gone everywhere — copy, storage values, types, class names, lines, e2e. It is <span class="strikeText">shiny</span>.</p>
+    </div>
+
+    <div class="panelDoc">
+      <h4>JOKER — THE LINES AS SHIPPED</h4>
+      <table>
+        <tr><th>KEY</th><th>LINE</th></tr>
+        <tr><td class="key">home</td><td style="font-family:Archivo,'Noto Sans JP'">こんにちは. Pick a deck, I'll deal, you write.</td></tr>
+        <tr><td class="key">home.wiped</td><td>New rules, so I reshuffled. Your old cards are gone.</td></tr>
+        <tr><td class="key">set <span style="color:#5A5A5F">(fn)</span></td><td>{Nine} words, face down. Deal when you're ready.</td></tr>
+        <tr><td class="key">collection</td><td>Every copy you've made, word by word.</td></tr>
+        <tr><td class="key">collection.empty</td><td>Nothing here yet. Finish a run.</td></tr>
+        <tr><td class="key">abandon</td><td>Leave now and this run's cards leave with you.</td></tr>
+        <tr><td class="key">earned.shiny</td><td>First try. Shiny — if you finish the run.</td></tr>
+        <tr><td class="key">earned.base</td><td>Second try. Base stock. Finish to keep it.</td></tr>
+        <tr><td class="key">earned.worn</td><td>Took a few. Worn stock. Finish to keep it.</td></tr>
+        <tr><td class="key">result <span style="color:#5A5A5F">(fn)</span></td><td>{Nine} cards minted, {three} shiny. Deal again whenever.</td></tr>
+      </table>
+      <p style="margin-top:14px">One line, under twelve words, first person, dry. He counts in words, not digits. He never says two things at once, and never explains a mechanic twice — <span class="mono">wholeWord</span> and <span class="mono">kuchi</span> are spent once ever and kept in <span class="mono">kanahero:v1.joker.seen</span>.</p>
+    </div>
+
+    <div class="panelDoc">
+      <h4>PALETTE — UNCHANGED</h4>
+      <p>
+        <span style="color:#FF2E88">■ strike #FF2E88</span> · <span style="color:#F2F0EB">■ bone #F2F0EB</span> · <span style="color:#00E58A">■ live #00E58A</span> · <span style="color:#FFB300">■ caution #FFB300</span> · <span style="color:#2E9DFF">■ blueprint #2E9DFF</span><br>
+        <span style="color:#8C8C93">■ rail #8C8C93</span> · <span style="color:#B9B6B1">■ print #B9B6B1</span> · <span style="color:#5A5A5F">■ carbon #5A5A5F</span> · <span style="color:#2A2A2E">■ seam #2A2A2E</span> · <span style="color:#141416">■ plate #141416</span> · <span style="color:#5A5A5F">□ chassis #0A0A0B</span>
+      </p>
+      <h4>STOCKS</h4>
+      <p><b style="color:#FF2E88">SHINY</b> — strike ground, black ink, 45° black weave, the only glow in the app.<br>
+      <b style="color:#F2F0EB">BASE</b> — plate ground, seam border, bone ink, no texture.<br>
+      <b style="color:#8C8C93">WORN</b> — #101011 ground, #1D1D21 border, rail ink, −45° 1px hatch.</p>
+      <h4>GEOMETRY</h4>
+      <p>Cards are 5/7 with a cut bottom-left corner sized to the card: earn 18 · round 14 · fan/shelf 10 · grid 6. Panels notch top-right 14. The strike CTA cuts bottom-left 18.</p>
+      <h4>SCOPE GUARD — NOT BUILT, NOT DRAWN</h4>
+      <p>No tier names · no locks · no HP or opponents · no card effects · no sound · no timer · no streaks or scores beyond the count · nothing greyed, nothing "coming soon".</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ MOTION LAB -->
+<section class="sheet">
+  <div class="sheetTitle"><span class="tag">MOTION LAB</span><b>What moves today, and the slots open for workshopping</b></div>
+  <div class="sheetNote">V5 SET THE BUDGET AT TWO ANIMATIONS. V5 THEN SPENT A THIRD ON THE JOKER'S TYPING, ON THE CREATOR'S CALL. V5A ADDED NO MOTION AT ALL — THE MODAL'S BLUR IS A STATE, NOT A TRANSITION. EVERY SLOT BELOW IS A PROPOSAL SURFACE: THE TRIGGER, THE HOOK AND THE REDUCED-MOTION ANSWER ARE ALREADY NAMED, THE CURVE AND THE FEEL ARE NOT.</div>
+
+  <div class="budget">
+    <div class="budgetPill"><b>SHIPPED</b> · M1 joker type-on · 22ms/char, 120ms lead-in</div>
+    <div class="budgetPill"><b>SHIPPED</b> · M2 hand deal · 260ms ease-out, −120px + scale 1.4</div>
+    <div class="budgetPill"><b>SHIPPED</b> · M3 progress bar fill · width 250ms <span style="color:#5A5A5F">(drill only)</span></div>
+    <div class="budgetPill"><i>OPEN</i> · M4–M9 below</div>
+    <div class="budgetPill" style="border-color:#FFB300"><i>RULE</i> · every new animation ships with its <span style="color:#F2F0EB">prefers-reduced-motion</span> end state</div>
+  </div>
+
+  <div class="boards">
+
+    <div class="slot">
+      <div class="slotHead"><span class="slotId" style="background:#00E58A">M1</span><span class="slotName">Joker type-on</span></div>
+      <div class="storyboard">
+        <div class="frame3" style="font-family:Archivo">こ<span class="caret"></span></div>
+        <div class="frame3" style="font-family:Archivo">こんにち<span class="caret"></span></div>
+        <div class="frame3" style="font-family:Archivo">こんにちは.<br>Pick a deck…</div>
+      </div>
+      <div class="slotBody"><b style="color:#F2F0EB">Shipped.</b> One steady rate, no breath anywhere. The tail of the line is laid out but <span class="mono">visibility:hidden</span>, so the panel is full height from frame one and nothing below it moves while he talks.</div>
+      <div class="slotMeta"><b>HOOK</b> Joker.tsx · TICK 22 · LEAD_IN 120<br><b>TRIGGER</b> line changes<br><b>SKIP</b> tap the panel<br><b>REDUCED</b> full line, frame 0<br><b>OPEN QUESTION</b> does 日本語 want a slower tick than Latin?</div>
+    </div>
+
+    <div class="slot">
+      <div class="slotHead"><span class="slotId" style="background:#00E58A">M2</span><span class="slotName">Hand deal</span></div>
+      <div class="storyboard">
+        <div class="frame3">▯ above<br>opacity 0</div>
+        <div class="frame3">falling<br>scale 1.4</div>
+        <div class="frame3">seated<br>in strip</div>
+      </div>
+      <div class="slotBody"><b style="color:#F2F0EB">Shipped.</b> The new card drops into the hand strip from −120px at 1.4×. Each card overlaps the last by 16px with a chassis seam between them.</div>
+      <div class="slotMeta"><b>HOOK</b> @keyframes handDeal · 260ms ease-out both<br><b>TRIGGER</b> S7c mount<br><b>REDUCED</b> animation:none</div>
+    </div>
+
+    <div class="slot" style="border-color:#2E9DFF">
+      <div class="slotHead"><span class="slotId">M4</span><span class="slotName">The deal</span></div>
+      <div class="storyboard">
+        <div class="frame3">S6b grid<br>face down</div>
+        <div class="frame3">?</div>
+        <div class="frame3">S7 first<br>prompt</div>
+      </div>
+      <div class="slotBody">DEAL is the biggest unanimated moment in the app: the whole set is being shuffled and dealt, and the screen just swaps. The grid is already nine face-down cards — the material for a deal is on screen.</div>
+      <div class="slotMeta"><b>HOOK</b> page.tsx phase set→round<br><b>TRIGGER</b> DEAL tap<br><b>CONSTRAINT</b> the seed is already chosen; the order shown must not lie about it<br><b>BUDGET</b> ≤400ms — it sits between a tap and a prompt</div>
+    </div>
+
+    <div class="slot" style="border-color:#2E9DFF">
+      <div class="slotHead"><span class="slotId">M5</span><span class="slotName">The flip</span></div>
+      <div class="storyboard">
+        <div class="frame3">your ink<br>alone</div>
+        <div class="frame3">?</div>
+        <div class="frame3">model over<br>your ink</div>
+      </div>
+      <div class="slotBody">v5's spec named the flip as one of its two animations; the build ships it as a cut. The board must not move or resize across it — that is why <span class="mono">--chrome</span> is a fixed number.</div>
+      <div class="slotMeta"><b>HOOK</b> Round.tsx phase write→reveal · WordReveal<br><b>TRIGGER</b> FLIP<br><b>HARD RULE</b> canvas geometry is frozen; only paint may change<br><b>REDUCED</b> cut</div>
+    </div>
+
+    <div class="slot" style="border-color:#2E9DFF">
+      <div class="slotHead"><span class="slotId">M6</span><span class="slotName">Mint — the run lands</span></div>
+      <div class="storyboard">
+        <div class="frame3">last GOT IT</div>
+        <div class="frame3">?</div>
+        <div class="frame3">S8 count<br>+ fan/grid</div>
+      </div>
+      <div class="slotBody">The one moment the app writes to disk. Until now the hand has been provisional and the copy has said so; this is where it stops being provisional. It deserves the loudest beat in the app and currently has none.</div>
+      <div class="slotMeta"><b>HOOK</b> mintRun() → onFinish → Result mount<br><b>TRIGGER</b> queue empties<br><b>MATERIAL</b> the count 64px · the SHINY chip · the fan's five rotations<br><b>CAUTION</b> must not read as a score screen</div>
+    </div>
+
+    <div class="slot" style="border-color:#2E9DFF">
+      <div class="slotHead"><span class="slotId">M7</span><span class="slotName">Shelf restock</span></div>
+      <div class="storyboard">
+        <div class="frame3">×2 ×3 ×0</div>
+        <div class="frame3">?</div>
+        <div class="frame3">×3 ×3 ×0</div>
+      </div>
+      <div class="slotBody">Returning to S6b or S6d after a run, the numbers are simply higher. A tick, a slot filling for the first time, or the empty dashed slot becoming a card — the first copy of a stock is a real event and reads as nothing today.</div>
+      <div class="slotMeta"><b>HOOK</b> setTotals() / cardsFor() on mount<br><b>TRIGGER</b> back-navigation after a finished run<br><b>STATE NEEDED</b> what changed is not currently passed — a diff would have to be carried or derived</div>
+    </div>
+
+    <div class="slot" style="border-color:#2E9DFF">
+      <div class="slotHead"><span class="slotId">M8</span><span class="slotName">Modal in / out</span></div>
+      <div class="storyboard">
+        <div class="frame3">round, sharp</div>
+        <div class="frame3">?</div>
+        <div class="frame3">blur 6px<br>+ panel</div>
+      </div>
+      <div class="slotBody">Today the scrim and its blur appear in one frame. The reduced-motion block already anticipates a transition that does not exist yet — the hook is written and unused.</div>
+      <div class="slotMeta"><b>HOOK</b> .dialogScrim · backdrop-filter blur(6px)<br><b>TRIGGER</b> ✕ / cancel / Esc / backdrop<br><b>REDUCED</b> block already present: transition:none<br><b>BUDGET</b> ≤160ms in, faster out</div>
+    </div>
+
+    <div class="slot" style="border-color:#2E9DFF">
+      <div class="slotHead"><span class="slotId">M9</span><span class="slotName">Miss — back in the deck</span></div>
+      <div class="storyboard">
+        <div class="frame3">MISSED tap</div>
+        <div class="frame3">?</div>
+        <div class="frame3">DECK n<br>same card</div>
+      </div>
+      <div class="slotBody">A miss pushes the word back with a gap of 2 and the screen resets to a blank canvas. The <span class="mono">DECK n · HAND n</span> counter is the only evidence it happened.</div>
+      <div class="slotMeta"><b>HOOK</b> miss() · Round.missed()<br><b>TRIGGER</b> MISSED<br><b>CAUTION</b> a miss must not feel like a punishment — the Joker's line is already gentle</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================ OVERLAY LAB -->
+<section class="sheet">
+  <div class="sheetTitle"><span class="tag tagBlue">OVERLAY LAB</span><b>Every layer above the frame — shipped, and open</b></div>
+  <div class="sheetNote">THE APP HAS THREE Z-LAYERS TODAY: THE LIVERY GHOST AT −1, THE CARD OVERLAY AT 20, THE DIALOG SCRIM AT 30. EVERY OVERLAY IN THE APP IS OPAQUE-ISH, FULL-BLEED AND DISMISSED BY TAPPING ANYWHERE — THAT IS THE HOUSE STYLE AND NEW ONES SHOULD INHERIT IT.</div>
+  <div class="boards">
+
+    <div class="ovl" style="border-color:#00E58A">
+      <div class="ovlTop"><span class="slotId" style="background:#00E58A">OVL-1</span><span class="slotName">Card face</span></div>
+      <div class="ovlStage" style="background:rgba(10,10,11,.86)">
+        <div class="card card-shiny" style="width:112px;height:157px;padding:9px;clip-path:polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))">
+          <div class="cardHead"><span class="cardChip" style="font-size:6px;padding:2px 4px">SHINY · 1st TRY</span><span class="cardMark" style="font-size:9px">駅</span></div>
+          <div class="cardMid"><span class="cardRomaji" style="font-size:6px">DEGUCHI</span><span class="cardWord" style="font-size:38px">出口</span><span class="cardReading" style="font-size:7px">でぐち</span></div>
+          <div class="cardFoot"><span class="cardRule"></span><span class="cardMeaning" style="font-size:6px">EXIT</span><span class="cardKind" style="font-size:5.5px">PLACE · 駅 STATION</span></div>
+        </div>
+      </div>
+      <div class="ovlBody"><b style="color:#F2F0EB">Shipped.</b> S8 only. Scrim <span class="mono">rgba(10,10,11,.86)</span>, z 20, the earn face centred at full 214×300, tap anywhere to close. No animation, no chrome, no close button.</div>
+    </div>
+
+    <div class="ovl" style="border-color:#00E58A">
+      <div class="ovlTop"><span class="slotId" style="background:#00E58A">OVL-2</span><span class="slotName">Abandon dialog</span></div>
+      <div class="ovlStage" style="background:rgba(10,10,11,.72)">
+        <div style="width:190px;border:1px solid var(--seam);background:var(--plate);padding:11px;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)">
+          <div style="font:400 8px/1.4 Archivo;color:var(--bone);margin-bottom:9px">Leave now and this run's cards leave with you.</div>
+          <div style="height:22px;background:var(--bone);color:var(--chassis);font:900 9px Archivo;display:flex;align-items:center;justify-content:center;clip-path:polygon(0 0,100% 0,100% 100%,9px 100%,0 calc(100% - 9px))">KEEP WRITING</div>
+          <div style="height:22px;margin-top:5px;border:1px solid var(--caution);color:var(--caution);background:linear-gradient(180deg,rgba(255,179,0,.2),rgba(255,179,0,.05));font:900 9px Archivo;display:flex;align-items:center;justify-content:center">LEAVE RUN</div>
+        </div>
+      </div>
+      <div class="ovlBody"><b style="color:#F2F0EB">Shipped, v5a.</b> z 30. The first overlay in the app that is <i>not</i> dismissed by any tap — the backdrop cancels, but the panel swallows its own clicks and the two actions are real choices. Focus is trapped; <span class="mono">Esc</span> cancels.</div>
+    </div>
+
+    <div class="ovl">
+      <div class="ovlTop"><span class="slotId">OVL-3</span><span class="slotName">Shelf card detail</span></div>
+      <div class="ovlStage"><span style="font:600 10px var(--mono);letter-spacing:.14em;color:var(--carbon)">OPEN — NOT DRAWN</span></div>
+      <div class="ovlBody">S6d cards are deliberately not tappable in v5a. If they become tappable, the face they open is OVL-1's — but with a stock and a count instead of a try number, because no copy on that shelf remembers its own tries.<div class="slotMeta"><b>DECIDE</b> is the shelf for looking at, or for using?</div></div>
+    </div>
+
+    <div class="ovl">
+      <div class="ovlTop"><span class="slotId">OVL-4</span><span class="slotName">First shiny</span></div>
+      <div class="ovlStage"><span style="font:600 10px var(--mono);letter-spacing:.14em;color:var(--carbon)">OPEN — NOT DRAWN</span></div>
+      <div class="ovlBody">A word's first shiny copy is the rarest event the data can describe, and S7c treats it exactly like every other earn. The once-only machinery already exists — <span class="mono">peekOnce/markSeen</span> over <span class="mono">joker.seen</span> — and could gate a one-time overlay.<div class="slotMeta"><b>HOOK</b> lib/joker-lines.ts JokerOnce<br><b>CAUTION</b> the truth rule: it is not kept until the run finishes</div></div>
+    </div>
+
+    <div class="ovl">
+      <div class="ovlTop"><span class="slotId">OVL-5</span><span class="slotName">Run summary on leave</span></div>
+      <div class="ovlStage"><span style="font:600 10px var(--mono);letter-spacing:.14em;color:var(--carbon)">OPEN — NOT DRAWN</span></div>
+      <div class="ovlBody">LEAVE RUN currently returns to S6b in silence, having discarded a hand the player watched grow. Whether the loss gets a beat of its own — or whether silence <i>is</i> the beat — is a design call, not a build one.<div class="slotMeta"><b>HOOK</b> onAbandon → phase set<br><b>RISK</b> a summary of discarded cards re-states what the modal already said</div></div>
+    </div>
+
+    <div class="ovl">
+      <div class="ovlTop"><span class="slotId">OVL-6</span><span class="slotName">Reload guard</span></div>
+      <div class="ovlStage"><span style="font:600 10px var(--mono);letter-spacing:.14em;color:var(--carbon)">OPEN — NOT DRAWN</span></div>
+      <div class="ovlBody">Closing the tab mid-run costs the run and nothing warns you. A <span class="mono">beforeunload</span> prompt is the browser's overlay, not ours, and it cannot be styled or given to the Joker — so this may be a deliberate no.<div class="slotMeta"><b>DECIDE</b> is an unstylable system dialog worse than the loss?</div></div>
+    </div>
+
+  </div>
+
+  <div class="cols" style="margin-top:34px">
+    <div class="panelDoc" style="max-width:none">
+      <h4>HOW TO USE THIS SHEET</h4>
+      <p>Every artboard is the shipped tree, not a wish. Draw <b style="color:#F2F0EB">on top of</b> them: a motion slot wants three frames and a curve, an overlay slot wants one artboard at 390×844 with the layer over a real screen. Anything that changes a number, a line or a rule belongs in a spec first — <span class="mono">docs/spec/SPEC-v5a.md</span> §8 is where the creator's part 2 lands, and part 2 may replace any interim Joker line in the table above.</p>
+      <p style="margin:0"><b style="color:#F2F0EB">Three things that must survive any animation:</b> the canvas never moves or resizes between prompt and reveal · the Joker's panel never changes height while he talks · nothing says a card is kept before the run finishes.</p>
+    </div>
+  </div>
+</section>
+
+</x-dc>
+</body>
+</html>

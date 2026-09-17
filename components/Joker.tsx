@@ -14,7 +14,7 @@
 // with an alpha channel, precached like everything else in public/. Swapping
 // it later means replacing that file and nothing else.
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type Ref } from "react";
 
 /** ms per character — one steady rate, start to finish, no breath anywhere */
 const TICK = 22;
@@ -38,11 +38,14 @@ export default function Joker({
   size = 78,
   /** the round screens put him beside the card, so his tail points up */
   tail = "left",
+  /** S6b measures his hand off the art and flicks it once per card */
+  markRef,
   className = "",
 }: {
   line: string;
   size?: number;
   tail?: "left" | "top";
+  markRef?: Ref<HTMLImageElement>;
   className?: string;
 }) {
   const [typed, setTyped] = useState({ line, n: 0 });
@@ -81,7 +84,7 @@ export default function Joker({
 
   return (
     <div className={`joker joker-${tail} ${className}`.trim()}>
-      <JokerMark size={size} />
+      <JokerMark size={size} ref={markRef} />
       <div
         className="jokerPanel"
         onClick={(e) => {
@@ -106,7 +109,7 @@ export default function Joker({
   );
 }
 
-export function JokerMark({ size = 78 }: { size?: number }) {
+export function JokerMark({ size = 78, ref }: { size?: number; ref?: Ref<HTMLImageElement> }) {
   const scale = size / ART.h; // rendered px per art px
   const box = ART.box * scale;
   return (
@@ -116,6 +119,7 @@ export function JokerMark({ size = 78 }: { size?: number }) {
     // eslint-disable-next-line @next/next/no-img-element
     <img
       className="jokerMark"
+      ref={ref}
       src={JOKER_ART}
       alt=""
       width={Math.round(box)}

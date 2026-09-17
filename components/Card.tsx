@@ -10,6 +10,8 @@
 // Type steps down with word length and nothing wraps: the word is sized in
 // cqw against the card's own width, so one component covers 214px and 46px.
 
+import type { Ref } from "react";
+
 import type { MintedCard } from "@/lib/joker";
 import type { SetWord, WordSet } from "@/lib/sets";
 
@@ -179,14 +181,28 @@ export default function Card({
 }
 
 /** the face-down back: deck mark on stripe, no word anywhere */
-export function CardBack({ set, onClick }: { set: WordSet; onClick?: () => void }) {
+export function CardBack({
+  set,
+  onClick,
+  className = "",
+  /** the S6b deal animates each back from the Joker's hand into its slot */
+  ref,
+}: {
+  set: WordSet;
+  onClick?: () => void;
+  className?: string;
+  ref?: Ref<HTMLDivElement>;
+}) {
   const mark = set.script === "kanji" ? (set.place ?? set.glyph) : set.glyph;
   const body = <span className="cardBackMark">{mark}</span>;
+  const classes = `card card-back ${className}`.trim();
   return onClick ? (
-    <button type="button" className="card card-back" onClick={onClick}>
+    <button type="button" className={classes} onClick={onClick}>
       {body}
     </button>
   ) : (
-    <div className="card card-back">{body}</div>
+    <div className={classes} ref={ref}>
+      {body}
+    </div>
   );
 }

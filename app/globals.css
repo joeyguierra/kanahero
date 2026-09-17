@@ -1273,6 +1273,9 @@ button:not(:disabled):active {
   flex: none;
   object-fit: contain;
   filter: drop-shadow(0 12px 22px rgba(255, 46, 136, 0.28));
+  /* his throwing shoulder, measured off the art in the 1080² box — the S6b
+     flick pivots here, so the wrist is what moves and his head barely does */
+  transform-origin: 40% 62%;
 }
 
 .jokerPanel {
@@ -1591,6 +1594,39 @@ button:not(:disabled):active {
   grid-template-columns: repeat(4, 1fr);
   gap: 9px;
   margin-top: 18px;
+}
+
+/* the slot: what the grid is before the deal, and what a card sits in after.
+   The perspective is the card's own, so its float tilts in depth without the
+   grid itself becoming a 3D scene. */
+.setSlot {
+  position: relative;
+  aspect-ratio: 5 / 7;
+  width: 100%;
+  perspective: 520px;
+}
+
+.setSlotGhost {
+  position: absolute;
+  inset: 0;
+  border: 1px dashed var(--seam);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+
+/* SetScreen.tsx deals it in: opacity 0 until its flight, then a float loop
+   that never ends, so the card is transform-driven for the screen's life */
+.setSlotCard {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  /* the flight drives translate/rotate/scale, the float drives transform */
+  will-change: translate, rotate, scale, transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .setSlotCard {
+    will-change: auto;
+  }
 }
 
 /* ---- the card ---- */

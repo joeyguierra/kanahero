@@ -1,0 +1,53 @@
+{
+  "_": "DECLARED facts only. set.* script.* screen.* are DERIVED by the audit and never listed here. Set a fact to false (or delete it) and every line that needs it goes silent.",
+  "facts": {
+    "rule.allOrNothing": {
+      "holds": true,
+      "proof": "SPEC-v5a §1.1 · e2e-loop: leave run / reload → totals unchanged"
+    },
+    "rule.dealsWholeSet": {
+      "holds": true,
+      "proof": "SPEC-v5a §1.2 · lib/joker.ts deal()"
+    },
+    "rule.missRequeues": {
+      "holds": true,
+      "proof": "lib/joker.ts miss()"
+    },
+    "rule.rarityByTries": {
+      "holds": true,
+      "proof": "SPEC-v5a §1.4 · lib/joker.ts rarityFor()"
+    },
+    "rule.selfGrade": {
+      "holds": true,
+      "proof": "SPEC-v5 · GOT IT / MISSED on S7b; no recognition (README)"
+    },
+    "rule.noTimerNoScore": {
+      "holds": true,
+      "proof": "v4 brief §Not on any screen"
+    },
+    "rule.promptShowsReading": {
+      "holds": true,
+      "proof": "v4 brief §The round — prompt card shows reading, romaji, meaning"
+    },
+    "feature.offline": {
+      "holds": true,
+      "proof": "README §Offline · e2e-offline"
+    },
+    "feature.bank": {
+      "holds": true,
+      "proof": "README · e2e-bank"
+    },
+    "feature.strokeModel": {
+      "holds": true,
+      "proof": "lib/strokes.ts — every reveal is the bundled stroke SVG"
+    },
+    "feature.localProgress": {
+      "holds": true,
+      "proof": "lib/progress.ts — kanahero:v1 in localStorage"
+    },
+    "app.threeScripts": {
+      "holds": true,
+      "proof": "lib/sets.ts SetScript"
+    }
+  }
+}
