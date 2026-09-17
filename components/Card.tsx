@@ -10,15 +10,23 @@
 // Type steps down with word length and nothing wraps: the word is sized in
 // cqw against the card's own width, so one component covers 214px and 46px.
 
-import type { EarnedCard } from "@/lib/progress";
+import type { MintedCard } from "@/lib/joker";
 import type { SetWord, WordSet } from "@/lib/sets";
 
-export type CardSize = "round" | "earn" | "fan" | "grid";
+export type CardSize = "round" | "earn" | "fan" | "grid" | "shelf";
 
 /** width in cqw for a word of N characters, measured off the CARD sheet */
 const WORD_CQW = [43, 43, 34.6, 24.3, 18.7, 15.9, 13];
 /** the smaller sizes carry more chrome per pixel, so the word gives a little */
-const SIZE_SCALE: Record<CardSize, number> = { earn: 1, round: 0.95, fan: 0.78, grid: 0.82 };
+const SIZE_SCALE: Record<CardSize, number> = {
+  earn: 1,
+  round: 0.95,
+  fan: 0.78,
+  // the shelf card is the fan card's twin, sized by its column instead of
+  // fixed — half of the earn face, which is where the 0.78 comes from
+  shelf: 0.78,
+  grid: 0.82,
+};
 
 function wordSize(size: CardSize, chars: number): string {
   const cqw = WORD_CQW[Math.min(chars, WORD_CQW.length - 1)] * SIZE_SCALE[size];
@@ -36,13 +44,14 @@ function romajiSize(chars: number): string {
   return `${Math.min(14.7, 135 / chars).toFixed(1)}cqw`;
 }
 
-const RARITY_TRY: Record<string, string> = { foil: "1st TRY", base: "2nd TRY", worn: "TRIES" };
+const RARITY_TRY: Record<string, string> = { shiny: "1st TRY", base: "2nd TRY", worn: "TRIES" };
 
 export default function Card({
   word,
   set,
   size,
   card,
+  stamp = true,
   /** replaces the footer's kind line while a round is flipped: ATTEMPT n */
   attempt,
   onClick,
@@ -52,7 +61,9 @@ export default function Card({
   set: WordSet;
   size: CardSize;
   /** present = the earned face; absent = the prompt face */
-  card?: EarnedCard;
+  card?: MintedCard;
+  /** false: the face without its rarity stamp */
+  stamp?: boolean;
   attempt?: number;
   onClick?: () => void;
   className?: string;
@@ -60,11 +71,13 @@ export default function Card({
   const kanji = set.script === "kanji";
   const mark = kanji ? (set.place ?? set.glyph) : set.glyph;
   const kindWord = kanji ? (set.label ?? "PLACE") : "WORD";
-  const compact = size === "fan" || size === "grid";
+  const compact = size === "fan" || size === "grid" || size === "shelf";
   const classes = [
     "card",
     `card-${size}`,
-    card ? `card-${card.rarity}` : "card-prompt",
+    // an unstamped face carries no stock either — S6d says what a word's
+    // copies are in its columns, and a mixed row has no one rarity to wear
+    card ? `card-${stamp ? card.rarity : "plain"}` : "card-prompt",
     className,
   ]
     .filter(Boolean)
@@ -74,10 +87,12 @@ export default function Card({
     // ---- earned: the word's first appearance ----
     compact ? (
       <>
-        <div className="cardChip">
-          {card.rarity.toUpperCase()}
-          {size === "fan" ? ` · ${card.tries}` : ""}
-        </div>
+        {stamp && (
+          <div className="cardChip">
+            {card.rarity.toUpperCase()}
+            {size === "fan" ? ` · ${card.tries}` : ""}
+          </div>
+        )}
         <div className="cardMid">
           <span className="cardWord" style={{ fontSize: wordSize(size, word.word.length) }}>
             {word.word}
@@ -89,8 +104,9 @@ export default function Card({
       <>
         <div className="cardHead">
           <span className="cardChip">
-            {card.rarity.toUpperCase()} · {card.rarity === "worn" ? `${card.tries} ` : ""}
-            {RARITY_TRY[card.rarity]}
+            {stamp
+              ? `${card.rarity.toUpperCase()} · ${card.rarity === "worn" ? `${card.tries} ` : ""}${RARITY_TRY[card.rarity]}`
+              : "COLLECTED"}
           </span>
           <span className="cardMark">{mark}</span>
         </div>

@@ -10,6 +10,7 @@ const SEEN_KEY = "kanahero:v1.joker.seen";
 
 export type JokerScreen =
   | "home"
+  | "home.wiped"
   | "home.hiragana"
   | "home.katakana"
   | "home.kanji"
@@ -20,20 +21,17 @@ export type JokerScreen =
   | "drill"
   | "drill.prompt"
   | "bank"
-  | "set.kana"
-  | "set.kanji"
-  | "set.full"
+  | "collection"
+  | "collection.empty"
+  | "abandon"
   | "round.kana"
   | "round.kanji"
   | "round.missed"
   | "reveal.kana"
   | "reveal.kanji"
-  | "earned.foil"
+  | "earned.shiny"
   | "earned.base"
   | "earned.worn"
-  | "result.kana"
-  | "result.kanji"
-  | "result.full"
   | "credits";
 
 /** lines that may be shown once ever, then never again */
@@ -41,6 +39,8 @@ export type JokerOnce = "wholeWord" | "kuchi";
 
 const LINES: Record<JokerScreen, string> = {
   home: "Pick a deck. I'll deal, you write.",
+  // once, after the v2 → v3 wipe (SPEC-v5a §2) — then never again
+  "home.wiped": "New rules, so I reshuffled. Your old cards are gone.",
   "home.hiragana": "Native words, particles, endings. The first script.",
   "home.katakana": "Loanwords, names, signs. Same sounds, sharper strokes.",
   "home.kanji": "Kanji. Meaning, not sound. One character, many readings.",
@@ -53,21 +53,20 @@ const LINES: Record<JokerScreen, string> = {
   // his panel would empty out and move the canvas
   "drill.prompt": "From memory. I'll show you after.",
   bank: "What you couldn't read. Kept until you can.",
-  // set and result lines carry the state's own numbers — see setLine/resultLine
-  "set.kana": "Ten words, four yours. The rest wait.",
-  "set.kanji": "Three earned, nine face-down. Deal when you're ready.",
-  "set.full": "Every card in this set is yours. Nothing left to deal.",
+  collection: "Every copy you've made, word by word.",
+  "collection.empty": "Nothing here yet. Finish a run.",
+  abandon: "Leave now and this run's cards leave with you.",
+  // the set and result lines carry the state's own numbers — see setLine and
+  // resultLine; nothing on S6b or S8 is a fixed string any more
   "round.kana": "Whole word, one box. Make it fit.",
   "round.kanji": "The kana's on the card — I want the kanji.",
   "round.missed": "Back in the deck. It'll come round again.",
   "reveal.kana": "Five characters, one line. Did they all land?",
   "reveal.kanji": "There it is. Be honest. Did your ink match mine?",
-  "earned.foil": "First try. That's foil — and foil never fades. Take it.",
-  "earned.base": "Second time. Base stock, and it's yours.",
-  "earned.worn": "Took a few. Worn stock — still yours, still counts.",
-  "result.kana": "Words in hand. Come back for the rest.",
-  "result.kanji": "That's your hand. The deck keeps the rest.",
-  "result.full": "Every card. Nothing left for me to deal.",
+  // nothing is kept until the run finishes, and he never says otherwise (§1.6)
+  "earned.shiny": "First try. Shiny — if you finish the run.",
+  "earned.base": "Second try. Base stock. Finish to keep it.",
+  "earned.worn": "Took a few. Worn stock. Finish to keep it.",
   credits: "Other people's work, named. That's the deal.",
 };
 
@@ -92,16 +91,12 @@ const WORDS = [
 
 const count = (n: number) => WORDS[n] ?? String(n);
 
-/** S6b — the canvas phrasing with this set's own numbers */
-export function setLine(script: string, total: number, earned: number): string {
-  if (earned >= total) return LINES["set.full"];
-  const left = total - earned;
-  if (script === "kanji") {
-    if (earned === 0) return `${count(left)} words, all face-down. Deal when you're ready.`;
-    return `${count(earned)} earned, ${count(left).toLowerCase()} face-down. Deal when you're ready.`;
-  }
-  if (earned === 0) return `${count(total)} words, none yours yet. Let's fix that.`;
-  return `${count(total)} words, ${count(earned).toLowerCase()} yours. The rest wait.`;
+/**
+ * S6b — the set is always face down and always dealt whole, so the only number
+ * he has to work with is how many words are in it.
+ */
+export function setLine(total: number): string {
+  return `${count(total)} words, face down. Deal when you're ready.`;
 }
 
 /** S7b — the reveal, counting what he just laid down */
@@ -111,19 +106,11 @@ export function revealLine(script: string, chars: number): string {
   return `${count(chars)} characters, one line. Did they all land?`;
 }
 
-/** S8 — collected this round, and what the deck still holds */
-export function resultLine(
-  script: string,
-  collected: number,
-  foil: number,
-  left: number,
-): string {
-  if (left === 0) return LINES["result.full"];
-  if (script === "kanji") return `${count(collected)} in hand. The deck keeps the rest.`;
-  if (foil > 0) {
-    return `${count(collected)} words, ${count(foil).toLowerCase()} foil. Come back for the other ${count(left).toLowerCase()}.`;
-  }
-  return `${count(collected)} words. Come back for the other ${count(left).toLowerCase()}.`;
+/** S8 — what the run minted. There is nothing left over to count: a run is
+    the whole set, so the only variable is how much of it came up shiny. */
+export function resultLine(minted: number, shiny: number): string {
+  if (shiny === 0) return `${count(minted)} cards minted. Deal again whenever.`;
+  return `${count(minted)} cards minted, ${count(shiny).toLowerCase()} shiny. Deal again whenever.`;
 }
 
 function seen(): Set<string> {
@@ -156,8 +143,4 @@ export function markSeen(id: JokerOnce): void {
   } catch {
     // no storage — he repeats himself once in a while; not worth failing over
   }
-}
-
-export function hasSeen(id: JokerOnce): boolean {
-  return seen().has(id);
 }

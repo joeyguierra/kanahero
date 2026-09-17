@@ -66,10 +66,12 @@ console.log(`1. service worker installed and controlling: ${cached} URLs in ${ca
 await context.setOffline(true);
 await page.reload();
 await page.waitForSelector(".deckRow:has-text('HIRAGANA')");
+// the row counts the sets it holds, and those are precached JSON — if the
+// set files had not survived the trip this would read "—"
 assert.equal(
   await page.locator(".deckRow:has-text('HIRAGANA') .deckCount").innerText(),
-  "0/71",
-  "home renders offline, from cache",
+  "1 SET",
+  "home renders offline, from cache, with its set count",
 );
 console.log("2. offline: the shell boots and home renders");
 
@@ -94,34 +96,86 @@ const running = await page.evaluate(
 assert.ok(running > 0, "the stroke animation runs offline — its SVG came from the precache");
 console.log("3. offline: a session starts and the stroke SVG animates");
 
-// --- 3b. offline: a set round, dealt and earned with no network ---
+// --- 3b. offline: two whole runs, dealt, minted and collected with no network ---
 // The kana sets need their JSON and one stroke file per character; if any of
 // that were a runtime fetch rather than precache, this is where it would show.
+// A run is all-or-nothing, so nothing is proved until one finishes offline.
 await page.goto(URL);
 await page.click(".deckRow:has-text('HIRAGANA')");
 await page.click("button:has-text('Start session')");
 await page.click(".setRow");
 await page.waitForSelector("button:has-text('DEAL')");
-const roundLeft = await page.locator(".roundLengthValue").innerText();
-assert.match(roundLeft, /^10 LEFT/, `the set deals its ten words offline, got '${roundLeft}'`);
-await page.click("button:has-text('DEAL')");
-const roundBox = await page.locator("canvas.ink").boundingBox();
-await page.mouse.move(roundBox.x + roundBox.width * 0.3, roundBox.y + roundBox.height * 0.3);
-await page.mouse.down();
-await page.mouse.move(roundBox.x + roundBox.width * 0.7, roundBox.y + roundBox.height * 0.6, { steps: 5 });
-await page.mouse.up();
-await page.click("button:has-text('FLIP')");
-await page.waitForSelector(".wordReveal svg path");
-const cells = await page.locator(".wordRevealCell").count();
-assert.ok(cells >= 2, `the whole word reveals one cell per character, got ${cells}`);
-await page.click("button:has-text('GOT IT')");
-await page.waitForSelector(".earnCard");
 assert.equal(
-  await page.locator(".earnCard .cardChip").innerText(),
-  "FOIL · 1st TRY",
-  "first try offline still mints a foil",
+  await page.locator(".cardBackMark").count(),
+  10,
+  "the set shows its ten words face-down offline",
 );
-console.log(`3b. offline: a set round deals, reveals ${cells} cells and earns a card`);
+
+const sum = (xs) => xs.reduce((a, b) => a + b, 0);
+const totals = async () =>
+  (await page.locator(".setTotal").allInnerTexts()).map((t) => parseInt(t, 10));
+const rowSums = async () =>
+  Promise.all(
+    (await page.locator(".collectionRow").all()).map(async (row) =>
+      sum(
+        (await row.locator(".collectionTimes").allInnerTexts()).map((t) => parseInt(t.slice(1), 10)),
+      ),
+    ),
+  );
+
+async function round(grade) {
+  const box = await page.locator("canvas.ink").boundingBox();
+  await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.3);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width * 0.7, box.y + box.height * 0.6, { steps: 5 });
+  await page.mouse.up();
+  const word = await page.locator(".cardPromptRomaji").innerText();
+  await page.click("button:has-text('FLIP')");
+  await page.waitForSelector(".wordReveal svg path");
+  const cells = await page.locator(".wordRevealCell").count();
+  await page.click(`button:has-text('${grade}')`);
+  return { word, cells };
+}
+
+async function playRun(missFirst) {
+  await page.click("button:has-text('DEAL')");
+  let missed = null;
+  let seen = 0;
+  if (missFirst) missed = (await round("MISSED")).word;
+  let guard = 0;
+  while (!(await page.locator(".resultCount").count())) {
+    assert.ok(++guard < 16, "a run should finish inside its own deck offline");
+    const { cells } = await round("GOT IT");
+    seen = Math.max(seen, cells);
+    await page.waitForSelector(".earnCard");
+    await page.click(".roundEarned");
+  }
+  void missed;
+  return seen;
+}
+
+// 3b.i a whole run, one word missed once
+const widest = await playRun(true);
+assert.ok(widest >= 2, `the whole word reveals one cell per character offline, got ${widest}`);
+assert.match(await page.locator(".resultCount").innerText(), /^10\s*MINTED$/);
+await page.click("button:has-text('BACK TO DECK')");
+await page.click(".setRow");
+const afterOne = await totals();
+assert.equal(sum(afterOne), 10, "a finished offline run mints one copy per word");
+assert.ok(afterOne[1] >= 1, "and the missed word is base");
+await page.click("button:has-text('VIEW COLLECTION')");
+assert.deepEqual(await rowSums(), Array(10).fill(1), "S6d shows every word, one copy deep");
+console.log("3b. offline: a run deals, finishes and mints ten copies");
+
+// 3b.ii and the set replays, offline, onto the same shelf
+await page.click(".backLink"); // ← back to the set
+await playRun(false);
+await page.click("button:has-text('BACK TO DECK')");
+await page.click(".setRow");
+assert.equal(sum(await totals()), 20, "the offline replay stacks a second copy on each word");
+await page.click("button:has-text('VIEW COLLECTION')");
+assert.deepEqual(await rowSums(), Array(10).fill(2));
+console.log("3b. offline: the set replays and the copies stack");
 
 // --- 4. offline: capture, the whole point of the trip ---
 // a second offline reload gets back to home, and re-proves the shell boots

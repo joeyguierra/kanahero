@@ -35,6 +35,7 @@ export interface WordSet {
 export const PLATFORM_SET_IDS = [
   "everyday-hiragana",
   "countries-katakana",
+  "test-kanji",
   "daily-basics-kanji",
   "station-kanji",
 ] as const;

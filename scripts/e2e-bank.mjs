@@ -199,8 +199,8 @@ await run("unzip", ["-o", "-q", zipPath, "-d", path.join(tmp, "unpacked")]);
 const manifest = JSON.parse(await readFile(path.join(tmp, "unpacked", "manifest.json"), "utf8"));
 // v5: the cards leave with the photos, so a restore is a whole restore
 const exported = JSON.parse(await readFile(path.join(tmp, "unpacked", "progress.json"), "utf8"));
-assert.equal(exported.v, 2, "the export carries the current progress blob");
-assert.ok("joker" in exported, "including the Joker's earned cards, even when empty");
+assert.equal(exported.v, 3, "the export carries the current progress blob");
+assert.ok("joker" in exported, "including the copies the Joker has minted, even when none");
 assert.equal(manifest.format, "kanahero-bank");
 assert.equal(manifest.version, 1);
 assert.equal(manifest.captures.length, 1);
@@ -258,8 +258,12 @@ await page.click("button:has-text('Bank')");
 await page.click("button:has-text('Home')");
 await page.waitForSelector(".bankStrip");
 assert.equal(await stripCount(), "2", "home strip carries the live count");
+// the character count moved off S1 with v5a — it is checked where it now
+// lives, on the deck's CHARACTERS card, and it is still untouched
+await page.click(".deckRow:has-text('HIRAGANA')");
+await page.click("button:has-text('Start session')");
 assert.equal(
-  await page.locator(".deckRow:has-text('HIRAGANA') .deckCount").innerText(),
+  await page.locator(".deckCharacters .panelCount").innerText(),
   "0/71",
   "the writing loop never learned the bank exists",
 );

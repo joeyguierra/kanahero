@@ -1427,11 +1427,6 @@ button:not(:disabled):active {
   white-space: nowrap;
 }
 
-.deckRow .bar {
-  margin-top: 10px;
-  height: 6px;
-}
-
 .bankStripOn {
   border-color: var(--strike);
 }
@@ -1575,23 +1570,6 @@ button:not(:disabled):active {
   text-align: right;
 }
 
-.setFoil {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.14em;
-  color: var(--carbon);
-  white-space: nowrap;
-}
-
-.setFoilOn {
-  color: var(--strike);
-}
-
-.setRow .bar {
-  margin-top: 13px;
-  height: 6px;
-}
-
 /* ---- S6b ---- */
 
 .setHead {
@@ -1615,27 +1593,6 @@ button:not(:disabled):active {
   margin-top: 18px;
 }
 
-.roundLength {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 1px solid var(--seam);
-  background: var(--plate);
-  padding: 14px 17px;
-  gap: 12px;
-}
-
-.roundLengthValue {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--bone);
-  white-space: nowrap;
-}
-
-.roundLength + .actionBar {
-  margin-top: 10px;
-}
-
 /* ---- the card ---- */
 
 .card {
@@ -1651,9 +1608,9 @@ button:not(:disabled):active {
   color: var(--bone);
 }
 
-/* the stock: a 45° weave, the same one the prompt and foil faces carry */
+/* the stock: a 45° weave, the same one the prompt and shiny faces carry */
 .card-prompt::before,
-.card-foil::before,
+.card-shiny::before,
 .card-worn::before {
   content: "";
   position: absolute;
@@ -1669,14 +1626,14 @@ button:not(:disabled):active {
   );
 }
 
-.card-foil {
+.card-shiny {
   background: var(--strike);
   border-color: var(--strike);
   color: #000;
   box-shadow: 0 0 34px -10px rgba(255, 46, 136, 0.55);
 }
 
-.card-foil::before {
+.card-shiny::before {
   background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.14) 0 7px, transparent 7px 14px);
 }
 
@@ -1719,6 +1676,16 @@ button:not(:disabled):active {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% - 10px));
 }
 
+.card-shelf {
+  /* the slot is a column, so width — not flex — is what sizes it here */
+  width: 100%;
+  flex: none;
+  aspect-ratio: 5 / 7;
+  padding: 8px;
+  justify-content: space-between;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+
 .card-grid {
   aspect-ratio: 5 / 7;
   width: 100%;
@@ -1745,7 +1712,7 @@ button:not(:disabled):active {
   color: var(--rail);
 }
 
-.card-foil .cardChip {
+.card-shiny .cardChip {
   background: var(--bone);
   border-color: var(--bone);
   color: #000;
@@ -1766,6 +1733,7 @@ button:not(:disabled):active {
 
 /* the compact faces carry the rarity as a bare word, no chip */
 .card-fan .cardChip,
+.card-shelf .cardChip,
 .card-grid .cardChip {
   border: none;
   padding: 0;
@@ -1774,8 +1742,9 @@ button:not(:disabled):active {
   color: var(--carbon);
 }
 
-.card-fan.card-foil .cardChip,
-.card-grid.card-foil .cardChip {
+.card-fan.card-shiny .cardChip,
+.card-shelf.card-shiny .cardChip,
+.card-grid.card-shiny .cardChip {
   background: none;
   color: #000;
   font-weight: 600;
@@ -1824,13 +1793,14 @@ button:not(:disabled):active {
   white-space: nowrap;
 }
 
-.card-foil .cardRomaji,
-.card-foil .cardReading,
-.card-foil .cardKind {
+.card-shiny .cardRomaji,
+.card-shiny .cardReading,
+.card-shiny .cardKind {
   color: rgba(0, 0, 0, 0.72);
 }
 
 .card-fan .cardRomaji,
+.card-shelf .cardRomaji,
 .card-grid .cardRomaji {
   font-size: 7px;
   letter-spacing: 0.1em;
@@ -1843,6 +1813,7 @@ button:not(:disabled):active {
 }
 
 .card-fan .cardMid,
+.card-shelf .cardMid,
 .card-grid .cardMid {
   justify-content: center;
 }
@@ -1882,7 +1853,7 @@ button:not(:disabled):active {
   margin-bottom: 8px;
 }
 
-.card-foil .cardRule {
+.card-shiny .cardRule {
   background: rgba(0, 0, 0, 0.42);
 }
 
@@ -1942,6 +1913,245 @@ button:not(:disabled):active {
   align-items: center;
   justify-content: center;
   background: rgba(10, 10, 11, 0.86);
+}
+
+/* the set row's right-hand number: what the set holds, not how far in you are */
+.setRowWords {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* ---- S6b: the shelf, and the way into it ---- */
+
+.setTotals {
+  border: 1px solid var(--seam);
+  background: var(--plate);
+  padding: 14px 17px;
+}
+
+.setTotalsRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.setTotal {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--bone);
+  white-space: nowrap;
+}
+
+.setTotal-shiny {
+  color: var(--strike);
+}
+
+.setTotal-worn {
+  color: var(--rail);
+}
+
+/* a stock you own none of is present but unlit — the shelf has three slots
+   whether or not anything stands in them */
+.setTotalZero {
+  color: var(--carbon);
+}
+
+.collectionLink {
+  display: block;
+  width: 100%;
+  margin-top: 13px;
+  padding-top: 12px;
+  border-top: 1px solid var(--seam);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--print);
+  text-align: left;
+}
+
+.setTotals + .actionBar {
+  margin-top: 10px;
+}
+
+/* ---- S6d: the collection ---- */
+
+/* the rows scroll under the head; the head is the one fixed thing */
+.screenHeadStick {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--chassis);
+  padding: 10px 0;
+  margin-top: -10px;
+}
+
+.collectionList {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-top: 20px;
+}
+
+/* a row is a word and the three stocks it can be held in */
+.collectionRow {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--seam);
+}
+
+.collectionHead {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.collectionWord {
+  font-family: var(--jp);
+  font-weight: 900;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--bone);
+  white-space: nowrap;
+}
+
+/* the stand-in for a word that has never been earned: the deck's own mark,
+   struck through the way a prompt card wears it — never the word */
+.collectionMark {
+  font-style: normal;
+  color: var(--strike);
+  opacity: 0.55;
+}
+
+.collectionMeaning {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--carbon);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collectionTotal {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--print);
+  white-space: nowrap;
+}
+
+.collectionRowEmpty .collectionTotal {
+  color: var(--carbon);
+}
+
+.collectionCards {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.collectionSlot {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+/* the slot a copy would stand in: the stock's name, and nothing pretending
+   to be a card */
+.shelfSlot {
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--seam);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+
+.shelfSlotStock {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  color: var(--carbon);
+}
+
+.collectionTimes {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bone);
+}
+
+.collectionSlot-shiny .collectionTimes {
+  color: var(--strike);
+}
+
+.collectionSlot-worn .collectionTimes {
+  color: var(--rail);
+}
+
+.collectionTimesZero {
+  color: var(--carbon);
+}
+
+/* the shiny card is the only glowing thing on the page, as everywhere else */
+.collectionSlot .card-shiny {
+  box-shadow: 0 0 22px -8px rgba(255, 46, 136, 0.55);
+}
+
+/* ---- the confirm dialog (S7 ✕) ---- */
+
+.dialogScrim {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--gutter);
+  background: rgba(10, 10, 11, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.dialogPanel {
+  width: 100%;
+  max-width: 374px;
+  border: 1px solid var(--seam);
+  background: var(--plate);
+  padding: 20px;
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+}
+
+.dialogActions {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 20px;
+}
+
+.dialogBtn {
+  height: 54px;
+  flex: none;
+  font-size: 16px;
+  padding: 0;
+}
+
+/* everything behind the dialog is inert, and looks it */
+.frameBehindDialog > *:not(.dialogScrim) {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialogScrim {
+    transition: none;
+  }
 }
 
 /* ---- the round (S7 / S7b) ---- */
@@ -2147,7 +2357,7 @@ button:not(:disabled):active {
   animation: handDeal 260ms ease-out both;
 }
 
-/* each card is dealt over the last one; the seam keeps two foils apart and
+/* each card is dealt over the last one; the seam keeps two shinies apart and
    the inset keeps the word out from under the card on top of it */
 .handCard + .handCard {
   margin-left: -16px;
@@ -2161,7 +2371,7 @@ button:not(:disabled):active {
   color: var(--rail);
 }
 
-.handCard-foil {
+.handCard-shiny {
   background: var(--strike);
   border-color: var(--strike);
   color: #000;
@@ -2208,7 +2418,7 @@ button:not(:disabled):active {
   margin-top: 14px;
 }
 
-.resultFoil {
+.resultShiny {
   font-family: var(--mono);
   font-size: 10px;
   font-weight: 800;

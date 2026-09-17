@@ -3,11 +3,15 @@
 // S7 / S7b / S7c — the round.
 //
 // Prompt → write → FLIP → the model word over your ink → GOT IT / MISSED.
-// A miss goes back in the deck and comes round again; a win writes the card
-// and slides it to the hand. ✕ abandons and keeps everything already earned.
+// A miss goes back in the deck and comes round again; a win mints a card into
+// the hand — provisionally. A run is all-or-nothing (SPEC-v5a §1): the hand
+// reaches storage in one write when the queue empties, and ✕ (through the
+// Joker's confirm) or a reload costs the whole run.
+//
+// Tries are counted here, in the run's own state, and die with it.
 
 import { useEffect, useRef, useState } from "react";
-import { attempt, attemptsSoFar, earn, earnedCount, miss } from "@/lib/joker";
+import { mintRun, miss, rarityFor, type MintedCard } from "@/lib/joker";
 import {
   jokerLine,
   markSeen,
@@ -16,8 +20,8 @@ import {
   type JokerOnce,
   type JokerScreen,
 } from "@/lib/joker-lines";
-import type { EarnedCard } from "@/lib/progress";
 import type { SetWord, WordSet } from "@/lib/sets";
+import AbandonDialog from "./AbandonDialog";
 import Card from "./Card";
 import Joker from "./Joker";
 import WordReveal from "./WordReveal";
@@ -25,7 +29,7 @@ import WritingCanvas, { type WritingCanvasHandle } from "./WritingCanvas";
 
 export interface RoundCard {
   word: SetWord;
-  card: EarnedCard;
+  card: MintedCard;
 }
 
 type Once = { id: JokerOnce; text: string } | null;
@@ -47,7 +51,8 @@ export default function Round({
 }: {
   set: WordSet;
   queue: SetWord[];
-  onAbandon: (hand: RoundCard[]) => void;
+  /** the run is discarded, not banked — nothing of it was ever written */
+  onAbandon: () => void;
   onFinish: (hand: RoundCard[]) => void;
 }) {
   const [queue, setQueue] = useState<SetWord[]>(dealt);
@@ -56,7 +61,13 @@ export default function Round({
   const [hasInk, setHasInk] = useState(false);
   const [justMissed, setJustMissed] = useState(false);
   const [earned, setEarned] = useState<RoundCard | null>(null);
+  const [leaving, setLeaving] = useState(false);
   const canvasRef = useRef<WritingCanvasHandle>(null);
+  const quitRef = useRef<HTMLButtonElement>(null);
+  // attempts within this run, by word — S7b prints the number, so it is state.
+  // It lives and dies with the component, which is the whole of the rule: the
+  // count never crosses a run (SPEC-v5a §1.3).
+  const [tried, setTried] = useState<Record<string, number>>({});
   // the two lines he is allowed exactly once, ever (SPEC-v5 §6): picked when
   // a prompt is dealt, spent only once it has actually been on screen
   const [once, setOnce] = useState<Once>(() => pickOnce(set, dealt[0]));
@@ -64,17 +75,22 @@ export default function Round({
   const kanji = set.script === "kanji";
   const current = queue[0];
   const chars = [...current.word];
-  const tries = attemptsSoFar(set.id, current.word);
+  const tries = tried[current.word] ?? 0;
 
   useEffect(() => {
     if (once) markSeen(once.id);
   }, [once]);
 
-  function nextPrompt(next: SetWord[]) {
+  function nextPrompt(next: SetWord[], won: RoundCard[]) {
     canvasRef.current?.clear();
     setHasInk(false);
     if (next.length === 0) {
-      onFinish(hand);
+      // the run is over, so the run is kept: one write, every word of it
+      mintRun(
+        set.id,
+        won.map(({ word, card }) => ({ wordId: word.word, rarity: card.rarity })),
+      );
+      onFinish(won);
       return;
     }
     setOnce(pickOnce(set, next[0]));
@@ -83,14 +99,14 @@ export default function Round({
   }
 
   function flip() {
-    attempt(set.id, current.word);
+    setTried((t) => ({ ...t, [current.word]: (t[current.word] ?? 0) + 1 }));
     setJustMissed(false);
     setPhase("reveal");
   }
 
   function gotIt() {
-    const card = earn(set.id, current.word, attemptsSoFar(set.id, current.word) || 1);
-    const won = { word: current, card };
+    const n = tried[current.word] || 1;
+    const won: RoundCard = { word: current, card: { rarity: rarityFor(n), tries: n } };
     setHand((h) => [...h, won]);
     setEarned(won);
     setPhase("earned");
@@ -115,7 +131,7 @@ export default function Round({
         onClick={() => {
           const rest = queue.slice(1);
           setEarned(null);
-          nextPrompt(rest);
+          nextPrompt(rest, hand);
         }}
       >
         <div className="rail" aria-hidden />
@@ -124,21 +140,18 @@ export default function Round({
             {set.glyph} {set.name}
           </span>
           <span className="roundDeck">
-            DECK {queue.length - 1} · HAND {earnedCount(set)}
+            DECK {queue.length - 1} · HAND {hand.length}
           </span>
         </div>
 
         <div className="earnStack">
           <Joker line={jokerLine(`earned.${rarity}` as JokerScreen)} size={84} />
           <div className="earnLabel">
-            {rarity === "foil" ? "EARNED ON THE FIRST TRY" : `EARNED IN ${earned.card.tries} TRIES`}
+            {rarity.toUpperCase()} ·{" "}
+            {earned.card.tries === 1 ? "FIRST TRY" : `${earned.card.tries} TRIES`}
           </div>
           <Card word={earned.word} set={set} size="earn" card={earned.card} className="earnCard" />
-          <div className="earnNote">
-            RARITY IS WRITTEN ON THE CARD
-            <br />
-            AND NEVER CHANGES
-          </div>
+          <div className="earnNote">KEPT WHEN THE RUN FINISHES</div>
         </div>
 
         <div className="handStrip">
@@ -169,14 +182,14 @@ export default function Round({
       : (once?.text ?? jokerLine(kanji ? "round.kanji" : "round.kana"));
 
   return (
-    <main className="frame round">
+    <main className={`frame round${leaving ? " frameBehindDialog" : ""}`}>
       <div className="rail" aria-hidden />
       <div className="roundHead">
         <span className={`roundChip${reveal ? " roundChipBone" : ""}`}>
           {set.glyph} {set.name}
         </span>
         <span className="roundDeck">
-          DECK {queue.length} · HAND {earnedCount(set)}
+          DECK {queue.length} · HAND {hand.length}
         </span>
         {reveal ? (
           <span className="revealing">
@@ -184,7 +197,7 @@ export default function Round({
             REVEALING
           </span>
         ) : (
-          <button type="button" className="quit" onClick={() => onAbandon(hand)}>
+          <button ref={quitRef} type="button" className="quit" onClick={() => setLeaving(true)}>
             ✕
           </button>
         )}
@@ -244,6 +257,16 @@ export default function Round({
             FLIP
           </button>
         </div>
+      )}
+
+      {leaving && (
+        <AbandonDialog
+          onCancel={() => {
+            setLeaving(false);
+            quitRef.current?.focus();
+          }}
+          onConfirm={onAbandon}
+        />
       )}
     </main>
   );

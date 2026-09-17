@@ -13,8 +13,10 @@
 //   7. Second session: the once-missed kana earns on its new first attempt -> 71
 //   8. The dakuten toggle and Katakana produce the right deck, and the
 //      katakana count is scored separately
-//  10. The set round: deal, earn one on the first try (foil), miss then earn
-//      one (base), abandon, and reopen the set on its new fraction and chips
+//  10. The run: S1 and the deck row carry no fractions; S6d is empty before
+//      any run; a finished run mints one copy per word; a replay mints a
+//      second; leaving through the Joker's confirm mints nothing, and neither
+//      does a reload; a v2 blob is wiped once with a line about it
 //   9. A self-intersecting stroke animates as ONE pen stroke: its clipped
 //      copies run concurrently, not one after the other
 
@@ -59,15 +61,25 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
 page.setDefaultTimeout(15000);
 
-// Home has no single hero number any more: each deck row carries its own
-// count, and the complete screen restates it in the track summary.
-const trackCount = async (name) =>
-  (
-    await page.locator(`.deckRow:has-text("${name.toUpperCase()}") .deckCount`).innerText()
-  ).split("/")[0];
+// S1 carries no counts at all now (v5a §3) — a deck row says how many sets it
+// holds and nothing else. The character fraction lives on the deck screen's
+// CHARACTERS card, which is the only place it is still true.
+const charCount = async () =>
+  (await page.locator(".deckCharacters .panelCount").innerText()).split("/")[0];
+const setsLabel = (name) =>
+  page.locator(`.deckRow:has-text("${name.toUpperCase()}") .deckCount`).innerText();
+
+/** back to S1 from wherever we are, without throwing the blob away */
+const goHome = async () => {
+  if (await page.locator(".deckRow").count()) return;
+  const back = page.locator("button:has-text('← HOME')");
+  if (await back.count()) await back.click();
+  else await page.goto(URL);
+};
 
 /** S1 selects, the CTA commits — every deck is two taps from home now */
 const openDeck = async (name = "HIRAGANA") => {
+  await goHome();
   await page.waitForSelector(`.deckRow:has-text("${name}")`);
   await page.click(`.deckRow:has-text("${name}")`);
   await page.waitForSelector("button:has-text('Start session'):not([disabled])");
@@ -83,15 +95,14 @@ const openDrill = async (name = "HIRAGANA") => {
 };
 const doneCount = async () =>
   (await page.locator(".trackSummaryRow span").innerText()).split("/")[0];
-const waitTrack = (name, n) =>
-  page.waitForFunction(
-    ([name, n]) =>
-      [...document.querySelectorAll(".deckRow")]
-        .find((t) => t.textContent.toLowerCase().includes(name))
-        ?.querySelector(".deckCount")
-        ?.textContent.trim() === `${n}/71`,
-    [name, n],
+/** open a deck and wait for its characters card to read n/71 */
+const waitTrack = async (name, n) => {
+  await openDeck(name);
+  await page.waitForFunction(
+    (n) => document.querySelector(".deckCharacters .panelCount")?.textContent.trim() === `${n}/71`,
+    n,
   );
+};
 const leftCount = async () =>
   parseInt(await page.locator(".sessionLeft").innerText(), 10);
 const promptRomaji = () => page.locator(".promptRomaji").innerText();
@@ -155,13 +166,35 @@ async function showAndGrade(grade, watch = false) {
 
 // --- 1. home ---
 await page.goto(URL);
-await waitTrack("hiragana", 0);
-console.log("home: hiragana deck starts at 0/71");
+await page.waitForSelector(".deckRow");
 assert.ok(
   await page.locator("button:has-text('Start session')").isDisabled(),
   "the CTA is present but inert until a deck is selected",
 );
-await openDrill("HIRAGANA");
+// 10.1 cold start: rows carry set counts, no fraction and no bar anywhere
+await page.waitForFunction(
+  () =>
+    [...document.querySelectorAll(".deckRow")].every((r) =>
+      /^\d+ SETS?$/.test(r.querySelector(".deckCount")?.textContent.trim() ?? ""),
+    ),
+);
+assert.equal(await setsLabel("KANJI"), "3 SETS", "the kanji deck ships three sets");
+assert.equal(await setsLabel("HIRAGANA"), "1 SET", "and hiragana one");
+assert.equal(await page.locator(".deckRow .bar").count(), 0, "S1 rows carry no progress bar");
+console.log("home: rows read '1 SET' / '2 SETS', no fractions, no bars");
+
+await openDeck("HIRAGANA");
+assert.equal(
+  await page.locator(".setRow .setRowMeta").innerText(),
+  "≤5 KANA",
+  "the set row's description drops its word count",
+);
+assert.equal(await page.locator(".setRow .setRowWords").innerText(), "10 WORDS");
+assert.equal(await page.locator(".setRow .bar").count(), 0, "and the set row has no bar");
+assert.equal(await charCount(), "0", "the characters card still counts characters");
+console.log("deck: set row reads '10 WORDS · ≤5 KANA', no bar, no stock count");
+await page.click(".deckCharacters");
+await page.waitForSelector("canvas.ink");
 
 // --- 2. ink gating ---
 assert.equal(await leftCount(), 71, "session starts with 71 cards");
@@ -234,8 +267,7 @@ console.log(`stroke concurrency: ${peaks.join("  ")}`);
 
 // --- 6. persistence across reload ---
 await page.click("button:has-text('Deck')");
-await page.click("button:has-text('← HOME')");
-assert.equal(await trackCount("hiragana"), "70", "home shows 70 after session");
+assert.equal(await charCount(), "70", "the deck's characters card shows 70 after the session");
 await page.reload();
 await waitTrack("hiragana", 70);
 console.log("persistence: count survives reload");
@@ -265,7 +297,6 @@ await page.waitForSelector(".deckRow:has-text('KATAKANA')");
 await waitTrack("katakana", 0);
 console.log("katakana: count is scored separately from hiragana (0, not 71)");
 
-await openDeck("KATAKANA");
 assert.equal(
   await text(".deckNote"),
   "missed cards replay until zero.",
@@ -285,32 +316,57 @@ await page.goto(URL);
 await waitTrack("katakana", 1);
 console.log("katakana: deck is 71 katakana, earning one moves the katakana number to 1");
 
+await page.click("button:has-text('← HOME')");
 await waitTrack("hiragana", 71);
-console.log("switchboard: both deck counts are shown at once, hiragana still 71");
+console.log("decks are scored separately: hiragana still 71 after a katakana earn");
 
-// --- 10. the set round ---
-// Four taps from home to a dealt prompt (F10), then the whole of F11: earn on
-// the first try, miss one and earn it on its second, and abandon with the
-// earned cards kept.
+// --- 10. the run ---
+// A run is the whole set, dealt every time, and nothing of it is kept until
+// it finishes (v5a §1). Everything below is that rule, from both sides.
 await page.goto(URL);
 await openDeck("HIRAGANA");
-const rowFraction = () => page.locator(".setRow .panelCount").innerText();
-assert.equal(await rowFraction(), "0/10", "the platform set starts undrawn");
-assert.equal(
-  await page.locator(".setRow .setFoil").innerText(),
-  "0 FOIL",
-  "and with no foil to its name",
-);
 await page.click(".setRow");
+await page.waitForSelector("button:has-text('DEAL')");
 assert.equal(
   await page.locator(".cardBackMark").count(),
   10,
-  "every unearned word is face-down on S6b",
+  "every word of the set is face-down on S6b, earned or not",
 );
-assert.match(await page.locator(".roundLengthValue").innerText(), /^10 LEFT/);
-await page.click("button:has-text('DEAL')");
+assert.equal(await page.locator(".setHead .panelCount").innerText(), "10 WORDS");
 
-/** draw a mark, flip, and grade — the round's own loop */
+/** the three stock counts under the grid, as numbers */
+const totals = async () =>
+  (await page.locator(".setTotal").allInnerTexts()).map((t) => parseInt(t, 10));
+const sum = (xs) => xs.reduce((a, b) => a + b, 0);
+assert.deepEqual(await totals(), [0, 0, 0], "a set with no finished run owns nothing");
+
+// 10.2 the collection, before any run has finished
+await page.click("button:has-text('VIEW COLLECTION')");
+await page.waitForSelector(".collectionRow");
+assert.equal(await page.locator(".collectionRow").count(), 10, "one row per word, always");
+assert.equal(
+  await page.locator(".collectionRowEmpty").count(),
+  10,
+  "and every one of them is still a back",
+);
+assert.equal(
+  await page.locator(".shelfSlot").count(),
+  30,
+  "three empty stock slots per word, thirty in all",
+);
+assert.equal(await page.locator(".collectionRow .card").count(), 0, "not one card on the shelf");
+assert.equal(await page.locator(".collectionRow .cardWord").count(), 0, "no word is shown yet");
+assert.deepEqual(
+  await page.locator(".collectionRow").first().locator(".collectionTimes").allInnerTexts(),
+  ["×0", "×0", "×0"],
+  "all three stocks are listed at zero",
+);
+// his line is typed out: the untyped tail is hidden, so read textContent
+assert.match(await page.locator(".jokerLine").textContent(), /Nothing here yet/);
+console.log("S6d: thirty empty slots, no faces, and he says so");
+await page.click(".backLink"); // ← back to the set
+
+/** draw a mark, flip, and grade — the run's own loop */
 async function round(grade) {
   const box = await page.locator("canvas.ink").boundingBox();
   await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.35);
@@ -331,78 +387,162 @@ async function round(grade) {
   return { word, cells };
 }
 
-// the reveal is one cell per character, at canvas-width / N
-const firstWord = await round("GOT IT");
-assert.ok(
-  firstWord.cells >= 2,
-  `whole-word reveal draws a cell per character, got ${firstWord.cells}`,
-);
-await page.waitForSelector(".earnCard");
-assert.equal(
-  await page.locator(".earnCard .cardChip").innerText(),
-  "FOIL · 1st TRY",
-  "first try mints a foil",
-);
-assert.equal(await page.locator(".handCard").count(), 1, "the card slides into the hand");
-await page.click(".roundEarned");
-
-// abandon: the round ends, the card stays
-await page.click(".quit");
-await page.waitForSelector("button:has-text('DEAL')");
-assert.equal(await page.locator(".setHead .panelCount").innerText(), "1/10", "S6b keeps the earn");
-assert.equal(await page.locator(".card-foil").count(), 1, "the foil is on the set screen");
-assert.equal(await page.locator(".cardBackMark").count(), 9, "the other nine are face-down");
-assert.match(
-  await page.locator(".roundLengthValue").innerText(),
-  /^9 LEFT/,
-  "the next round is only what is left",
-);
-await page.click("button:has-text('← HIRAGANA')");
-assert.equal(await rowFraction(), "1/10", "the deck row reads the set's new fraction");
-assert.equal(await page.locator(".setRow .setFoil").innerText(), "1 FOIL");
-console.log("set round: abandon keeps the earned card, S6b and the deck row agree");
-
-// --- 10b. a miss costs the rarity, and the round ends on S8 ---
-await page.click(".setRow");
-await page.click("button:has-text('DEAL')");
-const missedWord = await page.locator(".cardPromptRomaji").innerText();
-await round("MISSED");
-assert.notEqual(
-  await page.locator(".cardPromptRomaji").innerText(),
-  missedWord,
-  "a missed word never returns as the next prompt",
-);
-let guard10 = 0;
-let rarity = null;
-while (guard10 < 12) {
-  assert.ok(++guard10 < 12, "the round should finish inside its own deck");
-  const isMissed = (await page.locator(".cardPromptRomaji").innerText()) === missedWord;
-  await round("GOT IT");
-  await page.waitForSelector(".earnCard");
-  if (isMissed) rarity = await page.locator(".earnCard .cardChip").innerText();
-  await page.click(".roundEarned");
-  if (await page.locator(".resultCount").count()) break;
+/** play a whole run out, missing the first word once. Returns the S8 count. */
+async function playRun({ missFirst = true } = {}) {
+  await page.click("button:has-text('DEAL')");
+  let missed = null;
+  if (missFirst) {
+    missed = (await round("MISSED")).word;
+    assert.notEqual(
+      await page.locator(".cardPromptRomaji").innerText(),
+      missed,
+      "a missed word never returns as the next prompt",
+    );
+  }
+  let guard = 0;
+  let missedRarity = null;
+  while (!(await page.locator(".resultCount").count())) {
+    assert.ok(++guard < 16, "a run should finish inside its own deck");
+    const isMissed = (await page.locator(".cardPromptRomaji").innerText()) === missed;
+    const { cells } = await round("GOT IT");
+    if (guard === 1) assert.ok(cells >= 2, `the reveal draws a cell per character, got ${cells}`);
+    await page.waitForSelector(".earnCard");
+    if (isMissed) missedRarity = await page.locator(".earnLabel").innerText();
+    await page.click(".roundEarned");
+  }
+  return missedRarity;
 }
-assert.equal(rarity, "BASE · 2nd TRY", "a word earned on its second attempt is base, not foil");
 
-// S8: the count, the foil chip, and the breakdown
-assert.match(await page.locator(".resultCount").innerText(), /^9\s*COLLECTED$/);
-assert.equal(await page.locator(".resultFoil").innerText(), "8 FOIL");
+// 10.3 one finished run mints exactly one copy of every word
+const missedRarity = await playRun();
+assert.equal(missedRarity, "BASE · 2 TRIES", "a word written on its second try is base, not shiny");
+assert.match(await page.locator(".resultCount").innerText(), /^10\s*MINTED$/);
+assert.equal(await page.locator(".resultShiny").innerText(), "9 SHINY");
 assert.equal(await page.locator(".resultRest").innerText(), "1 BASE · 0 WORN");
-assert.equal(
-  await page.locator(".resultGrid .card").count(),
-  9,
-  "past five cards the result is a grid, not a fan",
-);
+assert.equal(await page.locator(".resultGrid .card").count(), 10, "past five, the hand is a grid");
 await page.click("button:has-text('BACK TO DECK')");
-assert.equal(await rowFraction(), "10/10", "the deck row reads the set out");
 await page.click(".setRow");
+const afterOne = await totals();
+assert.equal(sum(afterOne), 10, "the run minted one copy per word, in one write");
+assert.ok(afterOne[1] >= 1, "and at least one of them is base");
 assert.equal(
   await page.locator("button:has-text('DEAL')").count(),
-  0,
-  "a set at N/N has nothing left to deal",
+  1,
+  "a set is never finished — DEAL is always there",
 );
-console.log("set round: miss then earn is base, S8 tallies, and a full set stops dealing");
+await page.click("button:has-text('VIEW COLLECTION')");
+assert.equal(await page.locator(".collectionRowEmpty").count(), 0, "every word now has a face");
+assert.equal(await page.locator(".collectionRow .card").count(), 10, "one card each, one stock each");
+assert.equal(await page.locator(".collectionRow .cardWord").count(), 10);
+const rowSums = async () =>
+  Promise.all(
+    (await page.locator(".collectionRow").all()).map(async (row) =>
+      sum((await row.locator(".collectionTimes").allInnerTexts()).map((t) => parseInt(t.slice(1), 10))),
+    ),
+  );
+assert.deepEqual(await rowSums(), Array(10).fill(1), "one copy per word, no more, no less");
+console.log("run 1: 10 MINTED, one copy of every word, S6d shows ten faces");
+
+// 10.4 a replay mints a second copy of the same ten words
+await page.click(".backLink"); // ← back to the set
+await playRun({ missFirst: false });
+await page.click("button:has-text('BACK TO DECK')");
+await page.click(".setRow");
+assert.equal(sum(await totals()), 20, "the second run stacked on the first");
+await page.click("button:has-text('VIEW COLLECTION')");
+assert.deepEqual(await rowSums(), Array(10).fill(2), "every word is two copies deep");
+console.log("run 2: the set replays and the copies stack");
+await page.click(".backLink"); // ← back to the set
+
+// 10.5 leaving costs the run — and cancelling costs nothing
+const banked = await totals();
+await page.click("button:has-text('DEAL')");
+await round("GOT IT");
+await page.click(".roundEarned");
+await round("GOT IT"); // ink is on the canvas, the card is not yet flipped away
+await page.click(".roundEarned");
+await page.click(".quit");
+await page.waitForSelector(".dialogPanel");
+assert.match(await page.locator(".dialogPanel .jokerLine").textContent(), /Leave now/);
+await page.click("button:has-text('KEEP WRITING')");
+assert.equal(await page.locator(".dialogPanel").count(), 0, "cancel closes the dialog");
+assert.equal(await page.locator(".canvasBox").count(), 1, "and the run is still standing");
+const held = await page.locator(".roundDeck").innerText();
+assert.match(held, /HAND 2/, "the hand it held is untouched");
+await page.click(".quit");
+await page.click("button:has-text('LEAVE RUN')");
+await page.waitForSelector("button:has-text('DEAL')");
+assert.deepEqual(await totals(), banked, "leaving a run mints nothing at all");
+console.log("abandon: KEEP WRITING resumes the run, LEAVE RUN discards it whole");
+
+// 10.6 and neither does a reload
+await page.click("button:has-text('DEAL')");
+await round("GOT IT");
+await page.click(".roundEarned");
+await page.reload();
+await openDeck("HIRAGANA");
+await page.click(".setRow");
+assert.deepEqual(await totals(), banked, "a run that never finished was never written");
+console.log("reload: an unfinished run leaves storage exactly as it found it");
+
+// 10.7 a v2 blob is wiped once, with a line about it, and keeps its characters
+await page.evaluate(() => {
+  localStorage.setItem(
+    "kanahero:v1",
+    JSON.stringify({
+      v: 2,
+      earned: ["あ", "い", "う"],
+      setChoice: "all",
+      script: "hiragana",
+      joker: {
+        "everyday-hiragana": { はい: { tries: 1, rarity: "foil", earnedAt: "2026-01-01T00:00:00Z" } },
+      },
+    }),
+  );
+});
+await page.goto(URL);
+await page.waitForSelector(".deckRow");
+assert.match(
+  await page.locator(".jokerLine").textContent(),
+  /reshuffled/,
+  "he owns the wipe on the way in",
+);
+await page.click(".deckRow:has-text('HIRAGANA')"); // reading it spends it
+await page.click("button:has-text('Start session')");
+assert.equal(await charCount(), "3", "the characters the v2 blob earned are still there");
+await page.click(".setRow");
+assert.deepEqual(await totals(), [0, 0, 0], "the v2 cards are gone, not converted");
+await page.goto(URL);
+await page.waitForSelector(".deckRow");
+assert.equal(
+  await page.locator(".jokerLine").textContent(),
+  "Pick a deck. I'll deal, you write.",
+  "and he says it exactly once",
+);
+console.log("migration: v2 cards wiped once, characters kept, one line about it");
+
+// 10.8 nothing anywhere still calls it foil.
+// This file is the one exemption, and it is the reason for the rule: it has to
+// write a v2 blob with a foil card in it to prove the migration throws one away.
+const SRC = ["lib", "components", "app", "scripts"];
+const SELF = path.resolve(import.meta.filename);
+const offenders = [];
+for (const dir of SRC) {
+  const root = path.join(import.meta.dirname, "..", dir);
+  const walk = async (d) => {
+    for (const entry of await readdir(d, { withFileTypes: true })) {
+      if (entry.name.startsWith(".")) continue;
+      const full = path.join(d, entry.name);
+      if (entry.isDirectory()) await walk(full);
+      else if (/\.(ts|tsx|css|mjs|json)$/.test(entry.name) && path.resolve(full) !== SELF) {
+        if (/foil/i.test(await readFile(full, "utf8"))) offenders.push(full);
+      }
+    }
+  };
+  await walk(root);
+}
+assert.deepEqual(offenders, [], `foil survives in: ${offenders.join(", ")}`);
+console.log("rename: no 'foil' left in lib, components, app or scripts");
 
 await browser.close();
 kill();

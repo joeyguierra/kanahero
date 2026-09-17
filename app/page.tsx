@@ -17,7 +17,7 @@ import {
 } from "@/lib/progress";
 import { getBank, getServerBank, subscribeBank } from "@/lib/bank";
 import { shuffle } from "@/lib/session";
-import { deal, earnedCount, newSeed } from "@/lib/joker";
+import { deal, newSeed } from "@/lib/joker";
 import { jokerLine, type JokerScreen } from "@/lib/joker-lines";
 import { loadPlatformSets, type SetWord, type WordSet } from "@/lib/sets";
 import Session, { type SessionSummary } from "@/components/Session";
@@ -26,6 +26,7 @@ import CaptureDetail from "@/components/CaptureDetail";
 import Joker from "@/components/Joker";
 import Deck from "@/components/Deck";
 import SetScreen from "@/components/SetScreen";
+import Collection from "@/components/Collection";
 import Round, { type RoundCard } from "@/components/Round";
 import Result from "@/components/Result";
 import Credits from "@/components/Credits";
@@ -34,6 +35,7 @@ type Phase =
   | "home"
   | "deck"
   | "set"
+  | "collection"
   | "round"
   | "result"
   | "session"
@@ -113,6 +115,16 @@ export default function App() {
     setPhase("deck");
   }
 
+  /**
+   * S1 rows and the bank strip. Choosing anything spends the Joker's wipe line
+   * (SPEC-v5a §2): it stands on a cold home screen until it has been read, and
+   * the first tap is the acknowledgement that retires it for good.
+   */
+  function choose(next: Selection) {
+    if (progress.wiped) updateProgress({ wiped: false });
+    setSelection(next);
+  }
+
   function commit() {
     if (selection === null) return;
     if (selection === "bank") {
@@ -131,6 +143,7 @@ export default function App() {
         set={activeSet}
         deckName={deckLabel}
         onBack={() => setPhase("deck")}
+        onCollection={() => setPhase("collection")}
         onDeal={() => {
           setQueue(deal(activeSet, newSeed()));
           setHand([]);
@@ -138,6 +151,10 @@ export default function App() {
         }}
       />
     );
+  }
+
+  if (phase === "collection" && activeSet) {
+    return <Collection set={activeSet} onBack={() => setPhase("set")} />;
   }
 
   if (phase === "round" && activeSet && queue.length > 0) {
@@ -337,7 +354,13 @@ export default function App() {
 
   // ---- S1 ----
 
-  const line = jokerLine(selection === null ? "home" : (`home.${selection}` as JokerScreen));
+  const line = jokerLine(
+    selection === null
+      ? progress.wiped
+        ? "home.wiped"
+        : "home"
+      : (`home.${selection}` as JokerScreen),
+  );
 
   return (
     <main className="frame">
@@ -353,22 +376,18 @@ export default function App() {
       <div className="deckList">
         {DECKS.map((d) => {
           const on = selection === d.id;
-          const kana = d.id !== "kanji";
-          const chars = kana ? BY_SCRIPT[d.id as Script] : [];
-          const done = kana ? chars.filter((k) => progress.earned.has(k.kana)).length : 0;
+          // the row says what the deck holds, not how far through it you are:
+          // a set is never finished, so there is no fraction to show and no
+          // bar to fill (SPEC-v5a §3)
           const deckSets = setsFor(d.id);
-          const setWords = deckSets.reduce((n, s) => n + s.words.length, 0);
-          const setDone = deckSets.reduce((n, s) => n + earnedCount(s), 0);
-          const value = kana
-            ? `${done}/${chars.length}`
-            : `${deckSets.length} SET${deckSets.length === 1 ? "" : "S"} · ${setDone}/${setWords}`;
+          const value = `${deckSets.length} SET${deckSets.length === 1 ? "" : "S"}`;
           return (
             <button
               type="button"
               key={d.id}
               className={`deckRow${on ? " deckRowOn" : ""}`}
               aria-pressed={on}
-              onClick={() => setSelection(d.id)}
+              onClick={() => choose(d.id)}
             >
               <span className="deckRowTop">
                 <span className="deckRowName">
@@ -376,15 +395,6 @@ export default function App() {
                   <span className="deckLabel">{d.label}</span>
                 </span>
                 <span className="deckCount">{loaded ? value : "—"}</span>
-              </span>
-              <span
-                className={`bar${on ? " barOn" : ""}`}
-                style={fill(
-                  loaded ? (kana ? done : setDone) : 0,
-                  kana ? chars.length : setWords || 1,
-                )}
-              >
-                <i />
               </span>
             </button>
           );
@@ -394,7 +404,7 @@ export default function App() {
           type="button"
           className={`bankStrip${selection === "bank" ? " bankStripOn" : ""}`}
           aria-pressed={selection === "bank"}
-          onClick={() => setSelection("bank")}
+          onClick={() => choose("bank")}
         >
           <span className="legend">BANK</span>
           <span className="grow" />

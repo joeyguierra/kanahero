@@ -1,0 +1,5 @@
+{"id":"test-kanji","name":"TEST","glyph":"試","place":"試","label":"TEST","blurb":"THREE CHARACTERS","script":"kanji","origin":"platform","words":[
+{"word":"日","reading":"ひ","romaji":"hi","meaning":"sun, day","kind":"test"},
+{"word":"人","reading":"ひと","romaji":"hito","meaning":"person","kind":"test"},
+{"word":"口","reading":"くち","romaji":"kuchi","meaning":"mouth","kind":"test"}
+]}

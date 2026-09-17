@@ -1,11 +1,14 @@
 "use client";
 
-// S8 — the set dealt out. The count, the breakdown, the Joker's line, and the
-// hand itself: a fan up to five cards, a seven-column grid from six (the deck
-// ceiling is 21, which is three full rows). Tap a card to see its face.
+// S8 — the run, minted. A run is the whole set, so the count is the set size
+// every time and the only thing that varies is the stock it came up in: a fan
+// up to five cards, a seven-column grid from six (the ceiling is 21, three
+// full rows). Tap a card to see its face.
+//
+// The tries printed on these faces come from the run that just ended, not from
+// storage — nothing keeps a copy's try count past the run (SPEC-v5a §2).
 
 import { useState } from "react";
-import { earnedCount } from "@/lib/joker";
 import { resultLine } from "@/lib/joker-lines";
 import type { Rarity } from "@/lib/progress";
 import type { WordSet } from "@/lib/sets";
@@ -27,8 +30,7 @@ export default function Result({
 }) {
   const [open, setOpen] = useState<RoundCard | null>(null);
   const tally = (r: Rarity) => hand.filter((c) => c.card.rarity === r).length;
-  const foil = tally("foil");
-  const left = set.words.length - earnedCount(set);
+  const shiny = tally("shiny");
   const fan = hand.length <= FAN_MAX;
 
   return (
@@ -41,22 +43,21 @@ export default function Result({
         <span className="screenTitle">SET DEALT OUT</span>
         <span className="screenTitle">
           {set.glyph} {set.name}
-          {left === 0 ? " · FULL" : ""}
         </span>
       </div>
 
       <div className="resultCount">
         {hand.length}
-        <span className="resultCountWord">COLLECTED</span>
+        <span className="resultCountWord">MINTED</span>
       </div>
       <div className="resultTally">
-        <span className="resultFoil">{foil} FOIL</span>
+        <span className="resultShiny">{shiny} SHINY</span>
         <span className="resultRest">
           {tally("base")} BASE · {tally("worn")} WORN
         </span>
       </div>
 
-      <Joker line={resultLine(set.script, hand.length, foil, left)} className="jokerDeck" />
+      <Joker line={resultLine(hand.length, shiny)} className="jokerDeck" />
 
       <div className={fan ? "resultFan" : "resultGrid"}>
         {hand.map(({ word, card }, i) => (
@@ -72,11 +73,7 @@ export default function Result({
         ))}
       </div>
 
-      <div className="resultNote">
-        TAP A CARD TO SEE ITS FACE. TRIES ARE
-        <br />
-        PRINTED ON EVERY CARD, FOREVER.
-      </div>
+      <div className="resultNote">TAP A CARD TO SEE ITS FACE.</div>
       <button type="button" className="btnBone actionBar" onClick={onBackToDeck}>
         BACK TO DECK
       </button>

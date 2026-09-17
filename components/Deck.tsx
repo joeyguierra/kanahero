@@ -2,12 +2,15 @@
 
 // S2 / S2k / S3 — a deck is characters plus sets.
 //
-// Kana decks carry the characters card (the v3 drill) and their one platform
-// set. Kanji has no alphabet to drill, so its deck is sets and nothing else.
+// Kana decks carry the characters card (the v3 drill) and their platform sets.
+// Kanji has no alphabet to drill, so its deck is sets and nothing else.
 // YOUR SETS and NEW SET are not in this build (SPEC-v5 §0.4).
+//
+// A set row shows what the set is and how many words it holds — no fraction,
+// no bar, no stock count. A set is never finished, so there is nothing to fill
+// (SPEC-v5a §3). The characters card keeps its fraction: it counts characters.
 
 import type { Script } from "@/lib/kana";
-import { earnedCount, foilCount } from "@/lib/joker";
 import { jokerLine, type JokerScreen } from "@/lib/joker-lines";
 import type { WordSet } from "@/lib/sets";
 import Joker from "./Joker";
@@ -109,47 +112,34 @@ export default function Deck({
 
       <div className="legend legendSpaced">SETS</div>
       <div className="legend legendFaint">PLATFORM</div>
-      {sets.map((set) => {
-        const done = earnedCount(set);
-        const foil = foilCount(set);
-        return (
-          <button
-            type="button"
-            key={set.id}
-            className="panel panelNotch setRow"
-            onClick={() => onOpenSet(set)}
-          >
-            <div className="setRowTop">
-              <span className="setGlyph">{set.glyph}</span>
-              <span className="setRowName">
-                <span className="panelName">{set.name}</span>
-                <span className="setRowMeta">
-                  {set.words.length} WORDS · {setDescription(set)}
-                </span>
-              </span>
-              <span className="setRowNumbers">
-                <span className="panelCount">
-                  {done}/{set.words.length}
-                </span>
-                <span className={`setFoil${foil > 0 ? " setFoilOn" : ""}`}>{foil} FOIL</span>
-              </span>
-            </div>
-            <span
-              className="bar barBone"
-              style={{ "--fill": `${(done / set.words.length) * 100}%` } as React.CSSProperties}
-            >
-              <i />
+      {sets.map((set) => (
+        <button
+          type="button"
+          key={set.id}
+          className="panel panelNotch setRow"
+          onClick={() => onOpenSet(set)}
+        >
+          <div className="setRowTop">
+            <span className="setGlyph">{set.glyph}</span>
+            <span className="setRowName">
+              <span className="panelName">{set.name}</span>
+              <span className="setRowMeta">{setDescription(set)}</span>
             </span>
-          </button>
-        );
-      })}
+            <span className="panelCount setRowWords">{set.words.length} WORDS</span>
+          </div>
+        </button>
+      ))}
 
       <div className="grow" />
     </main>
   );
 }
 
-/** the row's second line: what the set is, in the canvas's own words */
+/**
+ * The row's second line: what the set is, in the canvas's own words. It no
+ * longer carries the word count — the count is the row's right-hand number
+ * now that there is no fraction to show (SPEC-v5a §3).
+ */
 function setDescription(set: WordSet): string {
   if (set.blurb) return set.blurb;
   if (set.script === "kanji") return "EXITS, SIGNS";
