@@ -1,6 +1,6 @@
 "use client";
 
-// S8 — the run, minted. A run is the whole set, so the count is the set size
+// S8 — the run, earned. A run is the whole set, so the count is the set size
 // every time and the only thing that varies is the stock it came up in: a fan
 // up to five cards, a seven-column grid from six (the ceiling is 21, three
 // full rows). Tap a card to see its face.
@@ -48,7 +48,7 @@ export default function Result({
 
       <div className="resultCount">
         {hand.length}
-        <span className="resultCountWord">MINTED</span>
+        <span className="resultCountWord">EARNED</span>
       </div>
       <div className="resultTally">
         <span className="resultShiny">{shiny} SHINY</span>

@@ -117,11 +117,11 @@ export function revealLine(script: string, chars: number): string {
   return `${count(chars)} characters, one line. Did they all land?`;
 }
 
-/** S8 — what the run minted. There is nothing left over to count: a run is
+/** S8 — what the run earned. There is nothing left over to count: a run is
     the whole set, so the only variable is how much of it came up shiny. */
-export function resultLine(minted: number, shiny: number): string {
-  if (shiny === 0) return `${count(minted)} cards minted. Deal again whenever.`;
-  return `${count(minted)} cards minted, ${count(shiny).toLowerCase()} shiny. Deal again whenever.`;
+export function resultLine(earned: number, shiny: number): string {
+  if (shiny === 0) return `${count(earned)} cards earned. Deal again whenever.`;
+  return `${count(earned)} cards earned, ${count(shiny).toLowerCase()} shiny. Deal again whenever.`;
 }
 
 function seen(): Set<string> {

@@ -1,5 +1,5 @@
 // The dealer. No difficulty model, no scheduling, no SRS — it deals the whole
-// set every time, puts a miss back in the deck, and mints one copy of every
+// set every time, puts a miss back in the deck, and earns one copy of every
 // word when the run finishes. That is the whole of it (SPEC-v5a §1–2).
 //
 // A run is all-or-nothing: nothing reaches storage until the queue empties.
@@ -12,8 +12,8 @@ import type { SetWord, WordSet } from "./sets";
 /** a missed word never comes straight back: this is how far down it goes */
 const MISS_GAP = 2;
 
-/** a card as it exists inside a run — minted, but not kept until the finish */
-export interface MintedCard {
+/** a card as it exists inside a run — earned, but not kept until the finish */
+export interface EarnedCard {
   rarity: Rarity;
   /** attempts within this run, up to and including the correct one */
   tries: number;
@@ -103,10 +103,10 @@ export function miss(queue: SetWord[]): SetWord[] {
 
 /**
  * The only write. One save at the end of a finished run: every word of the run
- * adds one copy of the stock it was minted in. Called nowhere else — an
+ * adds one copy of the stock it was earned in. Called nowhere else — an
  * abandoned or reloaded run leaves storage exactly as it found it.
  */
-export function mintRun(setId: string, run: { wordId: string; rarity: Rarity }[]): void {
+export function earnRun(setId: string, run: { wordId: string; rarity: Rarity }[]): void {
   if (run.length === 0) return;
   const joker = getProgress().joker;
   const set = { ...(joker[setId] ?? {}) };

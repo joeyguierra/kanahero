@@ -3,7 +3,7 @@
 // S7 / S7b / S7c — the round.
 //
 // Prompt → write → FLIP → the model word over your ink → GOT IT / MISSED.
-// A miss goes back in the deck and comes round again; a win mints a card into
+// A miss goes back in the deck and comes round again; a win earns a card into
 // the hand — provisionally. A run is all-or-nothing (SPEC-v5a §1): the hand
 // reaches storage in one write when the queue empties, and ✕ (through the
 // Joker's confirm) or a reload costs the whole run.
@@ -11,7 +11,7 @@
 // Tries are counted here, in the run's own state, and die with it.
 
 import { useEffect, useRef, useState } from "react";
-import { mintRun, miss, rarityFor, type MintedCard } from "@/lib/joker";
+import { earnRun, miss, rarityFor, type EarnedCard } from "@/lib/joker";
 import {
   jokerLine,
   markSeen,
@@ -30,7 +30,7 @@ import WritingCanvas, { type WritingCanvasHandle } from "./WritingCanvas";
 
 export interface RoundCard {
   word: SetWord;
-  card: MintedCard;
+  card: EarnedCard;
 }
 
 type Once = { id: JokerOnce; text: string } | null;
@@ -106,7 +106,7 @@ export default function Round({
     setHasInk(false);
     if (next.length === 0) {
       // the run is over, so the run is kept: one write, every word of it
-      mintRun(
+      earnRun(
         set.id,
         won.map(({ word, card }) => ({ wordId: word.word, rarity: card.rarity })),
       );

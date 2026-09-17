@@ -27,7 +27,7 @@ const FLASH_MS = 180;
 
 /** Thumbnails render from the stored blob; a separate thumb blob is an
     optimization to add only if a long grid measurably janks. The URLs are
-    minted with the list they belong to and revoked once that list is off
+    made with the list they belong to and revoked once that list is off
     screen — the new set is live before the old one is released, so a capture
     never paints as a blank frame. */
 function useObjectUrls(captures: Capture[]): Map<string, string> {

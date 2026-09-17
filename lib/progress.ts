@@ -6,10 +6,10 @@ import type { Script } from "./kana";
 
 export type SetChoice = "all" | "base";
 
-/** 1 try = shiny, 2 = base, 3+ = worn. Fixed when the copy is minted. */
+/** 1 try = shiny, 2 = base, 3+ = worn. Fixed when the copy is earned. */
 export type Rarity = "shiny" | "base" | "worn";
 
-/** how many copies of each stock a word has been minted (v5a §2) */
+/** how many copies of each stock a word has been earned (v5a §2) */
 export interface RarityCounts {
   shiny: number;
   base: number;
@@ -23,10 +23,14 @@ export interface Progress {
   // kana characters ever written correctly on first attempt. Flat across both
   // scripts — あ and ア are different codepoints, so they never collide, and
   // the home screen counts whichever script is selected.
+  // Two different "earned" meet in this file: THIS one is the character
+  // drill's written-from-memory set and is a storage key that predates the
+  // word sets. The cards a run earns live under `joker` below, and the
+  // Joker's {earned} token counts those — never these (SPEC-v5b §10.2).
   earned: Set<string>;
   setChoice: SetChoice;
   script: Script;
-  /** copies minted from word sets — see lib/joker.ts */
+  /** copies earned from word sets — see lib/joker.ts */
   joker: JokerProgress;
   /** one-shot: a v2 blob was wiped by the v3 migration and he owes a line */
   wiped: boolean;

@@ -45,7 +45,7 @@ export default function Session({
   const canvasRef = useRef<WritingCanvasHandle>(null);
   const playerRef = useRef<StrokePlayer | null>(null);
   // kana attempted at least once this session — a requeued "Got it" is not
-  // from memory, so only first attempts can mint the number
+  // from memory, so only first attempts can earn the number
   const attempted = useRef(new Set<string>());
   const earnedThisSession = useRef(0);
   const gotFirstTry = useRef(0);

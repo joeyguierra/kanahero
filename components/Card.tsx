@@ -12,7 +12,7 @@
 
 import type { Ref } from "react";
 
-import type { MintedCard } from "@/lib/joker";
+import type { EarnedCard } from "@/lib/joker";
 import type { SetWord, WordSet } from "@/lib/sets";
 
 export type CardSize = "round" | "earn" | "fan" | "grid" | "shelf";
@@ -65,7 +65,7 @@ export default function Card({
   set: WordSet;
   size: CardSize;
   /** present = the earned face; absent = the prompt face */
-  card?: MintedCard;
+  card?: EarnedCard;
   /** false: the face without its rarity stamp */
   stamp?: boolean;
   attempt?: number;

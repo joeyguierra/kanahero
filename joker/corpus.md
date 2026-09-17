@@ -5,8 +5,8 @@ Governed by `docs/design/joker-character.md`. Set-specific lines do NOT live her
 the set's own JSON under `joker` (bible §7.1).
 
 Line format: `- [id] text ·· tag ·· tag`. Tags: `when:` `once` `tier:rare` `ja:` `subj:` `needs:` `status:`.
-Only `status:ship` is bundled. Ids are forever: keep the id when the wording changes, mint a new
-one when the meaning does. Tokens: `{bank}` `{shiny}` `{minted}` `{words}` `{chars}` — he counts in words.
+Only `status:ship` is bundled. Ids are forever: keep the id when the wording changes, make a new
+one when the meaning does. Tokens: `{bank}` `{shiny}` `{earned}` `{words}` `{chars}` — he counts in words.
 
 ## home
 <!-- pool approved by cold read 2026-09-17 · the style reference for every other pool -->
@@ -38,7 +38,7 @@ one when the meaning does. Tokens: `{bank}` `{shiny}` `{minted}` `{words}` `{cha
 - [home.26] {bank} characters in the bank, unread. We can fix that. ·· when:bank>0 ·· subj:you ·· needs:feature.bank ·· status:ship
 - [home.27] {shiny} shiny cards so far. I am almost impressed. ·· when:shiny>0 ·· subj:you ·· needs:rule.rarityByTries ·· status:ship
 - [home.28] No shiny yet. One word, first try. That's all it takes. ·· when:runsFinished>0,shiny=0 ·· subj:you ·· needs:rule.rarityByTries ·· status:ship
-- [home.29] Nothing minted yet. Finish one run and the cards stay. ·· when:!firstEver,runsFinished=0 ·· subj:you ·· needs:rule.allOrNothing ·· status:ship
+- [home.29] Nothing earned yet. Finish one run and the cards stay. ·· when:!firstEver,runsFinished=0 ·· subj:you ·· needs:rule.allOrNothing ·· status:ship
 - [home.30] お帰り. Your cards are right where you left them. ·· when:runsFinished>0 ·· ja:お帰り ·· subj:you ·· needs:feature.localProgress ·· status:ship
 - [home.31] さあ. Same deal as always: I show, you grade, honestly. ·· when:!firstEver ·· ja:さあ ·· subj:you ·· needs:rule.selfGrade ·· status:ship
 - [home.32] I'm the Joker. I deal, you write. Pick a deck. ·· when:firstEver ·· once ·· subj:app ·· status:ship
@@ -119,8 +119,8 @@ one when the meaning does. Tokens: `{bank}` `{shiny}` `{minted}` `{words}` `{cha
 - [reveal.kana.02] One character, one box. Did it land? ·· when:chars=1 ·· status:ship
 
 ## result
-- [result.01] {minted} cards minted, {shiny} shiny. Deal again whenever. ·· when:shiny>0 ·· status:ship
-- [result.02] {minted} cards minted. Deal again whenever. ·· when:shiny=0 ·· status:ship
+- [result.01] {earned} cards earned, {shiny} shiny. Deal again whenever. ·· when:shiny>0 ·· status:ship
+- [result.02] {earned} cards earned. Deal again whenever. ·· when:shiny=0 ·· status:ship
 
 ## once (global)
 - [once.wholeWord] Whole word, one box. Make it fit. ·· once ·· when:script!=kanji ·· status:ship

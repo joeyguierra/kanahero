@@ -6,7 +6,7 @@
 //   2. Show is gated on ink; Clear re-disables it
 //   2b. The canvas is the same box before and after the flip, every card
 //   3. Miss the first card -> it requeues exactly REQUEUE_AT positions later
-//   4. Got-it on the requeue does NOT mint the number (first-attempt rule)
+//   4. Got-it on the requeue does NOT earn the number (first-attempt rule)
 //   5. Finish all 71 -> complete screen shows 70 got / 1 missed, "+70 from memory",
 //      and offers to replay exactly the missed card
 //   6. Reload -> count persisted
@@ -14,8 +14,8 @@
 //   8. The dakuten toggle and Katakana produce the right deck, and the
 //      katakana count is scored separately
 //  10. The run: S1 and the deck row carry no fractions; S6d is empty before
-//      any run; a finished run mints one copy per word; a replay mints a
-//      second; leaving through the Joker's confirm mints nothing, and neither
+//      any run; a finished run earns one copy per word; a replay earns a
+//      second; leaving through the Joker's confirm earns nothing, and neither
 //      does a reload; a v2 blob is wiped once with a line about it
 //   9. A self-intersecting stroke animates as ONE pen stroke: its clipped
 //      copies run concurrently, not one after the other
@@ -413,17 +413,17 @@ async function playRun({ missFirst = true } = {}) {
   return missedRarity;
 }
 
-// 10.3 one finished run mints exactly one copy of every word
+// 10.3 one finished run earns exactly one copy of every word
 const missedRarity = await playRun();
 assert.equal(missedRarity, "BASE · 2 TRIES", "a word written on its second try is base, not shiny");
-assert.match(await page.locator(".resultCount").innerText(), /^10\s*MINTED$/);
+assert.match(await page.locator(".resultCount").innerText(), /^10\s*EARNED$/);
 assert.equal(await page.locator(".resultShiny").innerText(), "9 SHINY");
 assert.equal(await page.locator(".resultRest").innerText(), "1 BASE · 0 WORN");
 assert.equal(await page.locator(".resultGrid .card").count(), 10, "past five, the hand is a grid");
 await page.click("button:has-text('BACK TO DECK')");
 await page.click(".setRow");
 const afterOne = await totals();
-assert.equal(sum(afterOne), 10, "the run minted one copy per word, in one write");
+assert.equal(sum(afterOne), 10, "the run earned one copy per word, in one write");
 assert.ok(afterOne[1] >= 1, "and at least one of them is base");
 assert.equal(
   await page.locator("button:has-text('DEAL')").count(),
@@ -441,9 +441,9 @@ const rowSums = async () =>
     ),
   );
 assert.deepEqual(await rowSums(), Array(10).fill(1), "one copy per word, no more, no less");
-console.log("run 1: 10 MINTED, one copy of every word, S6d shows ten faces");
+console.log("run 1: 10 EARNED, one copy of every word, S6d shows ten faces");
 
-// 10.4 a replay mints a second copy of the same ten words
+// 10.4 a replay earns a second copy of the same ten words
 await page.click(".backLink"); // ← back to the set
 await playRun({ missFirst: false });
 await page.click("button:has-text('BACK TO DECK')");
@@ -472,7 +472,7 @@ assert.match(held, /HAND 2/, "the hand it held is untouched");
 await page.click(".quit");
 await page.click("button:has-text('LEAVE RUN')");
 await page.waitForSelector("button:has-text('DEAL')");
-assert.deepEqual(await totals(), banked, "leaving a run mints nothing at all");
+assert.deepEqual(await totals(), banked, "leaving a run earns nothing at all");
 console.log("abandon: KEEP WRITING resumes the run, LEAVE RUN discards it whole");
 
 // 10.6 and neither does a reload

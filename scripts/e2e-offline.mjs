@@ -96,7 +96,7 @@ const running = await page.evaluate(
 assert.ok(running > 0, "the stroke animation runs offline — its SVG came from the precache");
 console.log("3. offline: a session starts and the stroke SVG animates");
 
-// --- 3b. offline: two whole runs, dealt, minted and collected with no network ---
+// --- 3b. offline: two whole runs, dealt, earned and collected with no network ---
 // The kana sets need their JSON and one stroke file per character; if any of
 // that were a runtime fetch rather than precache, this is where it would show.
 // A run is all-or-nothing, so nothing is proved until one finishes offline.
@@ -157,15 +157,15 @@ async function playRun(missFirst) {
 // 3b.i a whole run, one word missed once
 const widest = await playRun(true);
 assert.ok(widest >= 2, `the whole word reveals one cell per character offline, got ${widest}`);
-assert.match(await page.locator(".resultCount").innerText(), /^10\s*MINTED$/);
+assert.match(await page.locator(".resultCount").innerText(), /^10\s*EARNED$/);
 await page.click("button:has-text('BACK TO DECK')");
 await page.click(".setRow");
 const afterOne = await totals();
-assert.equal(sum(afterOne), 10, "a finished offline run mints one copy per word");
+assert.equal(sum(afterOne), 10, "a finished offline run earns one copy per word");
 assert.ok(afterOne[1] >= 1, "and the missed word is base");
 await page.click("button:has-text('VIEW COLLECTION')");
 assert.deepEqual(await rowSums(), Array(10).fill(1), "S6d shows every word, one copy deep");
-console.log("3b. offline: a run deals, finishes and mints ten copies");
+console.log("3b. offline: a run deals, finishes and earns ten copies");
 
 // 3b.ii and the set replays, offline, onto the same shelf
 await page.click(".backLink"); // ← back to the set

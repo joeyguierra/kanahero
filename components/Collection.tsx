@@ -1,12 +1,12 @@
 "use client";
 
 // S6d — the set's collection. The only screen in the app where a card is shown
-// face up outside the run that minted it, and the only one whose job is to be
+// face up outside the run that earned it, and the only one whose job is to be
 // looked at rather than used.
 //
 // One row per word, in set-file order and never the run's: the shelf stands
 // still while the runs shuffle. A row is three slots — shiny, base, worn — and
-// a stock you have never minted is an empty slot with the stock's name in it,
+// a stock you have never earned is an empty slot with the stock's name in it,
 // so the row reads as a set to fill rather than a list of zeroes. A word you
 // have never finished a run on shows no face at all: the word's first
 // appearance is still the card you earned (SPEC-v5a §3).

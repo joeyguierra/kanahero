@@ -200,7 +200,7 @@ const manifest = JSON.parse(await readFile(path.join(tmp, "unpacked", "manifest.
 // v5: the cards leave with the photos, so a restore is a whole restore
 const exported = JSON.parse(await readFile(path.join(tmp, "unpacked", "progress.json"), "utf8"));
 assert.equal(exported.v, 3, "the export carries the current progress blob");
-assert.ok("joker" in exported, "including the copies the Joker has minted, even when none");
+assert.ok("joker" in exported, "including the copies the Joker has earned, even when none");
 assert.equal(manifest.format, "kanahero-bank");
 assert.equal(manifest.version, 1);
 assert.equal(manifest.captures.length, 1);
