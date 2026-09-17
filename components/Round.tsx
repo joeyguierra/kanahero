@@ -146,6 +146,7 @@ export default function Round({
     flight.current?.();
     if (card && handRef.current) {
       flight.current = flyToHand(card, handRef.current, mark, () => {
+        // sfx: hand.tick
         flight.current = null;
         setShown({ deck: rest.length, hand: held.length });
         popCount(handRef.current);
