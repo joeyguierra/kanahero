@@ -39,12 +39,21 @@ export type JokerScreen =
   | "earned.shiny"
   | "earned.base"
   | "earned.worn"
-  | "credits";
+  | "credits"
+  // S6b and S8 are screens like any other; their lines were helper functions
+  // because they carry numbers, which tokens now handle (SPEC-v5b §5)
+  | "set"
+  | "result";
 
 /** lines that may be shown once ever, then never again */
 export type JokerOnce = "wholeWord" | "kuchi";
 
-const LINES: Record<JokerScreen, string> = {
+/** `set` and `result` carry numbers, so today they are built by setLine and
+    resultLine rather than looked up here. The runtime rewrite (SPEC-v5b §5)
+    collapses both into ordinary pools with tokens and this table goes away. */
+export type StaticScreen = Exclude<JokerScreen, "set" | "result">;
+
+const LINES: Record<StaticScreen, string> = {
   home: "こんにちは. Pick a deck, I'll deal, you write.",
   // once, after the v2 → v3 wipe (SPEC-v5a §2) — then never again
   "home.wiped": "New rules, so I reshuffled. Your old cards are gone.",
@@ -88,7 +97,7 @@ const ONCE: Record<JokerOnce, string> = {
   kuchi: "",
 };
 
-export function jokerLine(screen: JokerScreen): string {
+export function jokerLine(screen: StaticScreen): string {
   return LINES[screen];
 }
 

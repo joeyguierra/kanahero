@@ -18,7 +18,7 @@ import {
   peekOnce,
   revealLine,
   type JokerOnce,
-  type JokerScreen,
+  type StaticScreen,
 } from "@/lib/joker-lines";
 import type { SetWord, WordSet } from "@/lib/sets";
 import AbandonDialog from "./AbandonDialog";
@@ -167,7 +167,7 @@ export default function Round({
         </div>
 
         <div className="earnStack">
-          <Joker line={jokerLine(`earned.${rarity}` as JokerScreen)} size={84} />
+          <Joker line={jokerLine(`earned.${rarity}` as StaticScreen)} size={84} />
           <div className="earnLabel">
             {rarity.toUpperCase()} ·{" "}
             {earned.card.tries === 1 ? "FIRST TRY" : `${earned.card.tries} TRIES`}

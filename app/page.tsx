@@ -18,7 +18,7 @@ import {
 import { getBank, getServerBank, subscribeBank } from "@/lib/bank";
 import { shuffle } from "@/lib/session";
 import { deal, newSeed } from "@/lib/joker";
-import { jokerLine, type JokerScreen } from "@/lib/joker-lines";
+import { jokerLine, type StaticScreen } from "@/lib/joker-lines";
 import { loadPlatformSets, type SetWord, type WordSet } from "@/lib/sets";
 import Session, { type SessionSummary } from "@/components/Session";
 import Bank from "@/components/Bank";
@@ -359,7 +359,7 @@ export default function App() {
       ? progress.wiped
         ? "home.wiped"
         : "home"
-      : (`home.${selection}` as JokerScreen),
+      : (`home.${selection}` as StaticScreen),
   );
 
   return (

@@ -43,3 +43,6 @@ next-env.d.ts
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
 instructions
+
+# compiled by scripts/joker-audit.mjs from joker/corpus.md — never hand-edited
+lib/joker-corpus.generated.json
