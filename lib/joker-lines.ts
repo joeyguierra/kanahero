@@ -38,7 +38,7 @@ export type JokerScreen =
 export type JokerOnce = "wholeWord" | "kuchi";
 
 const LINES: Record<JokerScreen, string> = {
-  home: "Pick a deck. I'll deal, you write.",
+  home: "こんにちは. Pick a deck, I'll deal, you write.",
   // once, after the v2 → v3 wipe (SPEC-v5a §2) — then never again
   "home.wiped": "New rules, so I reshuffled. Your old cards are gone.",
   "home.hiragana": "Native words, particles, endings. The first script.",
