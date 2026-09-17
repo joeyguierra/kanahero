@@ -7,7 +7,7 @@
     "build": "node scripts/joker-audit.mjs && next build && node scripts/gen-sw.mjs",
     "start": "next start",
     "lint": "eslint",
-    "e2e": "node scripts/e2e-loop.mjs && node scripts/e2e-bank.mjs && node scripts/e2e-offline.mjs",
+    "e2e": "node scripts/e2e-joker.mjs && node scripts/e2e-loop.mjs && node scripts/e2e-bank.mjs && node scripts/e2e-offline.mjs",
     "strokes": "node scripts/fetch-strokes.mjs && node scripts/verify-strokes.mjs",
     "icons": "node scripts/gen-icons.mjs",
     "joker": "node scripts/joker-audit.mjs",

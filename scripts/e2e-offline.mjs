@@ -47,7 +47,12 @@ for (let i = 0; i < 40; i++) {
 }
 
 const browser = await chromium.launch();
-const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+const context = await browser.newContext({
+  viewport: { width: 390, height: 844 },
+  // the round's animations all have a reduced-motion path to the same end
+  // state; nothing offline should be waiting on a clock (SPEC-v5a §9.6)
+  reducedMotion: "reduce",
+});
 const page = await context.newPage();
 page.setDefaultTimeout(60000);
 
@@ -73,7 +78,20 @@ assert.equal(
   "1 SET",
   "home renders offline, from cache, with its set count",
 );
-console.log("2. offline: the shell boots and home renders");
+// He talks in a tunnel. The corpus is imported, not fetched, so it rides in
+// the JS bundle and the precache carries it — confirmed here rather than
+// assumed (SPEC-v5b §6).
+await page.waitForSelector(".jokerPanel[data-line]");
+assert.match(
+  await page.getAttribute(".jokerPanel", "data-line"),
+  /^(home\.\d+|home\.32)$/,
+  "he has a line with no network: the corpus is in the bundle, not behind a fetch",
+);
+assert.ok(
+  (await page.locator(".jokerLine").textContent()).trim().length > 0,
+  "and it has words in it",
+);
+console.log("2. offline: the shell boots, home renders, and he still has a line");
 
 // --- 3. offline: the writing loop, including the stroke data ---
 // S1 selects, the CTA commits, the deck's characters card opens the drill
@@ -147,8 +165,6 @@ async function playRun(missFirst) {
     assert.ok(++guard < 16, "a run should finish inside its own deck offline");
     const { cells } = await round("GOT IT");
     seen = Math.max(seen, cells);
-    await page.waitForSelector(".earnCard");
-    await page.click(".roundEarned");
   }
   void missed;
   return seen;

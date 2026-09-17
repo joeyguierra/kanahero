@@ -58,7 +58,13 @@ for (let i = 0; i < 40; i++) {
 }
 
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+const page = await browser.newPage({
+  viewport: { width: 390, height: 844 },
+  // The round is animated now (the deal, the melt, the hand tick, the S8
+  // reveal). Every one of them has a reduced-motion path that lands on the
+  // same end state, so the assertions here are about the app, not the clock.
+  reducedMotion: "reduce",
+});
 page.setDefaultTimeout(15000);
 
 // S1 carries no counts at all now (v5a §3) — a deck row says how many sets it
@@ -334,6 +340,15 @@ assert.equal(
 );
 assert.equal(await page.locator(".setHead .panelCount").innerText(), "10 WORDS");
 
+/** which line he is saying, by corpus id — never his wording: with pools that
+    would be a coin flip, and the corpus owns the words (SPEC-v5b §6) */
+const said = async (scope = "") => {
+  // he picks his line in an effect, a tick after the screen paints — the panel
+  // is there first, at its full height, and the id arrives with the words
+  await page.waitForSelector(`${scope} .jokerPanel[data-line]`.trim());
+  return page.locator(`${scope} .jokerPanel`.trim()).getAttribute("data-line");
+};
+
 /** the three stock counts under the grid, as numbers */
 const totals = async () =>
   (await page.locator(".setTotal").allInnerTexts()).map((t) => parseInt(t, 10));
@@ -361,8 +376,7 @@ assert.deepEqual(
   ["×0", "×0", "×0"],
   "all three stocks are listed at zero",
 );
-// his line is typed out: the untyped tail is hidden, so read textContent
-assert.match(await page.locator(".jokerLine").textContent(), /Nothing here yet/);
+assert.equal(await said(), "collection.empty.01", "he says the shelf is empty");
 console.log("S6d: thirty empty slots, no faces, and he says so");
 await page.click(".backLink"); // ← back to the set
 
@@ -387,7 +401,14 @@ async function round(grade) {
   return { word, cells };
 }
 
-/** play a whole run out, missing the first word once. Returns the S8 count. */
+/** the S7c markup, which must not exist at any point in a run (§9.6.2) */
+const S7C = ".roundEarned, .earnStack, .earnLabel, .earnCard, .earnNote, .handStrip, .handCard";
+
+/** the header's HAND count, which ticks as the card lands in it */
+const handCount = async () =>
+  parseInt((await page.locator(".roundHand").innerText()).replace(/\D/g, ""), 10);
+
+/** play a whole run out, missing the first word once. Returns the missed word. */
 async function playRun({ missFirst = true } = {}) {
   await page.click("button:has-text('DEAL')");
   let missed = null;
@@ -400,26 +421,56 @@ async function playRun({ missFirst = true } = {}) {
     );
   }
   let guard = 0;
-  let missedRarity = null;
   while (!(await page.locator(".resultCount").count())) {
     assert.ok(++guard < 16, "a run should finish inside its own deck");
-    const isMissed = (await page.locator(".cardPromptRomaji").innerText()) === missed;
+    const before = await handCount();
     const { cells } = await round("GOT IT");
     if (guard === 1) assert.ok(cells >= 2, `the reveal draws a cell per character, got ${cells}`);
-    await page.waitForSelector(".earnCard");
-    if (isMissed) missedRarity = await page.locator(".earnLabel").innerText();
-    await page.click(".roundEarned");
+    assert.equal(await page.locator(S7C).count(), 0, "S7c is gone, at every point in the run");
+    if (await page.locator(".resultCount").count()) break;
+    // §9.6.1: the next prompt is already up, with no tap in between, and the
+    // hand has the card the last one earned
+    assert.equal(await page.locator(".canvasBox").count(), 1, "the next prompt needs no tap");
+    assert.equal(await handCount(), before + 1, "the hand ticked as the card landed in it");
+    assert.equal(await page.locator("button:has-text('FLIP')").count(), 1);
   }
-  return missedRarity;
+  return missed;
 }
 
 // 10.3 one finished run earns exactly one copy of every word
-const missedRarity = await playRun();
-assert.equal(missedRarity, "BASE · 2 TRIES", "a word written on its second try is base, not shiny");
+const missedWord = await playRun();
+
+// §9.6.4: the run reached storage before S8 ever mounted — the reveal is
+// presentation, and leaving in the middle of it costs nothing
+const storedAtMount = await page.evaluate(
+  () => JSON.parse(localStorage.getItem("kanahero:v1")).joker["everyday-hiragana"],
+);
+assert.equal(
+  Object.values(storedAtMount).reduce((n, row) => n + row.shiny + row.base + row.worn, 0),
+  10,
+  "the run was written before S8 mounted",
+);
+
+// §9.6.3: with motion off, S8 arrives finished — every card up, counts final
+assert.equal(await page.locator(".revealSlot").count(), 10, "every card is in its slot");
+assert.equal(await page.locator(".revealUp").count(), 10, "and face up, motion being off");
+assert.deepEqual(
+  (await page.locator(".revealFaceUp .card").evaluateAll((els) =>
+    els.map((el) => [...el.classList].find((c) => /^card-(shiny|base|worn)$/.test(c))),
+  )).filter((c, i, all) => i === 0 || c !== all[i - 1]),
+  ["card-base", "card-shiny"],
+  "worn, then base, then shiny — the best card of the run lands last",
+);
+assert.equal(
+  await page.locator(".resultGrid .card-base .cardRomaji").first().innerText(),
+  missedWord,
+  "the word missed once is the base card, not a shiny",
+);
 assert.match(await page.locator(".resultCount").innerText(), /^10\s*EARNED$/);
 assert.equal(await page.locator(".resultShiny").innerText(), "9 SHINY");
 assert.equal(await page.locator(".resultRest").innerText(), "1 BASE · 0 WORN");
-assert.equal(await page.locator(".resultGrid .card").count(), 10, "past five, the hand is a grid");
+assert.equal(await page.locator(".resultGrid .revealSlot").count(), 10, "past five, the hand is a grid");
+assert.equal(await said(), "result.01", "and he counts it up once the last card has landed");
 await page.click("button:has-text('BACK TO DECK')");
 await page.click(".setRow");
 const afterOne = await totals();
@@ -458,12 +509,10 @@ await page.click(".backLink"); // ← back to the set
 const banked = await totals();
 await page.click("button:has-text('DEAL')");
 await round("GOT IT");
-await page.click(".roundEarned");
 await round("GOT IT"); // ink is on the canvas, the card is not yet flipped away
-await page.click(".roundEarned");
 await page.click(".quit");
 await page.waitForSelector(".dialogPanel");
-assert.match(await page.locator(".dialogPanel .jokerLine").textContent(), /Leave now/);
+assert.equal(await said(".dialogPanel"), "abandon.01", "the dialog is his, and he owns the cost");
 await page.click("button:has-text('KEEP WRITING')");
 assert.equal(await page.locator(".dialogPanel").count(), 0, "cancel closes the dialog");
 assert.equal(await page.locator(".canvasBox").count(), 1, "and the run is still standing");
@@ -478,7 +527,6 @@ console.log("abandon: KEEP WRITING resumes the run, LEAVE RUN discards it whole"
 // 10.6 and neither does a reload
 await page.click("button:has-text('DEAL')");
 await round("GOT IT");
-await page.click(".roundEarned");
 await page.reload();
 await openDeck("HIRAGANA");
 await page.click(".setRow");
@@ -502,11 +550,7 @@ await page.evaluate(() => {
 });
 await page.goto(URL);
 await page.waitForSelector(".deckRow");
-assert.match(
-  await page.locator(".jokerLine").textContent(),
-  /reshuffled/,
-  "he owns the wipe on the way in",
-);
+assert.equal(await said(), "home.wiped.01", "he owns the wipe on the way in");
 await page.click(".deckRow:has-text('HIRAGANA')"); // reading it spends it
 await page.click("button:has-text('Start session')");
 assert.equal(await charCount(), "3", "the characters the v2 blob earned are still there");
@@ -514,11 +558,7 @@ await page.click(".setRow");
 assert.deepEqual(await totals(), [0, 0, 0], "the v2 cards are gone, not converted");
 await page.goto(URL);
 await page.waitForSelector(".deckRow");
-assert.equal(
-  await page.locator(".jokerLine").textContent(),
-  "Pick a deck. I'll deal, you write.",
-  "and he says it exactly once",
-);
+assert.match(await said(), /^home\.\d+$/, "and then an ordinary home line: he says it once");
 console.log("migration: v2 cards wiped once, characters kept, one line about it");
 
 // 10.8 nothing anywhere still calls it foil.
@@ -543,6 +583,160 @@ for (const dir of SRC) {
 }
 assert.deepEqual(offenders, [], `foil survives in: ${offenders.join(", ")}`);
 console.log("rename: no 'foil' left in lib, components, app or scripts");
+
+// --- 11. the Joker draws from pools, and never repeats himself into the
+// ground (SPEC-v5b §6). Every assertion here is on a corpus id: a pool makes
+// his wording a coin flip, and the corpus — not this file — owns the words.
+
+const fresh = async () => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const pg = await ctx.newPage();
+  pg.setDefaultTimeout(15000);
+  return { ctx, pg };
+};
+const lineOn = async (pg) => {
+  await pg.waitForSelector(".jokerPanel[data-line]");
+  return pg.getAttribute(".jokerPanel", "data-line");
+};
+
+// 11.1 a browser that has never seen this app gets the introduction, once
+{
+  const { ctx, pg } = await fresh();
+  await pg.goto(URL);
+  assert.equal(await lineOn(pg), "home.32", "the first line he ever says is who he is");
+  const rest = [];
+  for (let i = 0; i < 6; i++) {
+    await pg.goto(URL);
+    rest.push(await lineOn(pg));
+  }
+  assert.ok(!rest.includes("home.32"), "and he never introduces himself twice");
+  assert.ok(rest.every((id) => /^home\.\d+$/.test(id)), `every later line is a home line: ${rest}`);
+  await ctx.close();
+  console.log("joker: the introduction is said once, ever");
+}
+
+// 11.2 forty loads: the bag hands out every eligible line before any repeat
+{
+  const { ctx, pg } = await fresh();
+  const seen = [];
+  for (let i = 0; i < 40; i++) {
+    await pg.goto(URL);
+    seen.push(await lineOn(pg));
+  }
+  const firstRepeat = seen.findIndex((id, i) => seen.indexOf(id) !== i);
+  const distinct = new Set(seen.slice(0, firstRepeat < 0 ? seen.length : firstRepeat)).size;
+  assert.ok(
+    distinct >= 20,
+    `he got through ${distinct} lines before repeating one — the bag is not shuffling`,
+  );
+  await ctx.close();
+  console.log(`joker: ${distinct} distinct home lines before the first repeat, in forty loads`);
+}
+
+// 11.3 the corpus changed under a live bag: the new line is the next one shown
+{
+  const { ctx, pg } = await fresh();
+  // twice: the first line a new browser gets is the introduction, which is a
+  // once-line and spends nothing out of a bag
+  await pg.goto(URL);
+  await lineOn(pg);
+  await pg.goto(URL);
+  await lineOn(pg);
+  await pg.evaluate(() => {
+    const raw = JSON.parse(localStorage.getItem("kanahero:v1.joker.bags"));
+    // a version that is not the shipped one, with a line that did not exist
+    // before it — reconciliation puts new ids at the front
+    localStorage.setItem(
+      "kanahero:v1.joker.bags",
+      JSON.stringify({ v: "stale-corpus", bags: { home: ["not.a.real.line", ...raw.bags.home] } }),
+    );
+  });
+  await pg.goto(URL);
+  const after = await lineOn(pg);
+  const bag = await pg.evaluate(() =>
+    JSON.parse(localStorage.getItem("kanahero:v1.joker.bags")),
+  );
+  assert.ok(!bag.bags.home.includes("not.a.real.line"), "an id that no longer exists is dropped");
+  assert.match(after, /^home\.\d+$/, "and he carries on from a reconciled bag");
+  await ctx.close();
+  console.log("joker: a corpus change drops dead ids and keeps him talking");
+}
+
+// 11.4 the aside that belongs to STATION, and only to STATION
+{
+  const { ctx, pg } = await fresh();
+  const stepThrough = async (setName, limit) => {
+    await pg.goto(URL);
+    await pg.click(".deckRow:has-text('KANJI')");
+    await pg.click("button:has-text('Start session')");
+    await pg.click(`.setRow:has-text("${setName}")`);
+    await pg.click("button:has-text('DEAL')");
+    const said = [];
+    for (let i = 0; i < limit; i++) {
+      await pg.waitForSelector(".jokerPanel[data-line]");
+      said.push({
+        id: await pg.getAttribute(".jokerPanel", "data-line"),
+        text: (await pg.locator(".jokerLine").textContent()).trim(),
+      });
+      const box = await pg.locator("canvas.ink").boundingBox();
+      await pg.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.35);
+      await pg.mouse.down();
+      await pg.mouse.move(box.x + box.width * 0.7, box.y + box.height * 0.6, { steps: 5 });
+      await pg.mouse.up();
+      await pg.click("button:has-text('FLIP')");
+      await pg.click("button:has-text('GOT IT')");
+      if (await pg.locator(".resultCount").count()) break;
+    }
+    return said;
+  };
+
+  const station = await stepThrough("STATION", 10);
+  const aside = station.find((l) => l.id === "station-kanji/kuchi");
+  assert.ok(aside, `the station aside never came up: ${station.map((l) => l.id).join(" ")}`);
+  assert.match(aside.text, /Seven/, `it counts the set it is about, got "${aside.text}"`);
+
+  const test = await stepThrough("TEST", 5);
+  assert.ok(
+    !test.some((l) => l.id === "station-kanji/kuchi"),
+    "and it cannot be spent in a set it is not about",
+  );
+  await ctx.close();
+  console.log("joker: the 口 aside fires in STATION, says Seven, and never fires in TEST");
+}
+
+// --- 12. S8 with motion on: face down, then turned over, and skippable
+// (SPEC-v5a §9.6)
+{
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const pg = await ctx.newPage();
+  pg.setDefaultTimeout(15000);
+  await pg.goto(URL);
+  await pg.click(".deckRow:has-text('KANJI')");
+  await pg.click("button:has-text('Start session')");
+  await pg.click(".setRow:has-text('TEST')");
+  await pg.click("button:has-text('DEAL')");
+  for (let i = 0; i < 6 && !(await pg.locator(".resultCount").count()); i++) {
+    const box = await pg.locator("canvas.ink").boundingBox();
+    await pg.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.35);
+    await pg.mouse.down();
+    await pg.mouse.move(box.x + box.width * 0.7, box.y + box.height * 0.6, { steps: 5 });
+    await pg.mouse.up();
+    await pg.click("button:has-text('FLIP')");
+    await pg.click("button:has-text('GOT IT')");
+  }
+  await pg.waitForSelector(".resultCount");
+  assert.equal(await pg.locator(".revealUp").count(), 0, "S8 mounts with every card face down");
+  assert.match(await pg.locator(".resultCount").innerText(), /^0\s*EARNED$/, "and nothing counted");
+  assert.equal(await pg.locator(".jokerPanel[data-line]").count(), 0, "he waits for the last card");
+
+  await pg.click(".resultTally"); // a tap anywhere is a skip
+  const slots = await pg.locator(".revealSlot").count();
+  assert.equal(await pg.locator(".revealUp").count(), slots, "the skip turns every card over");
+  assert.match(await pg.locator(".resultCount").innerText(), new RegExp(`^${slots}\\s*EARNED$`));
+  assert.equal(await lineOn(pg), "result.01", "and he speaks at once");
+  await ctx.close();
+  console.log("S8: mounts face down at zero, and one tap skips to the end");
+}
 
 await browser.close();
 kill();

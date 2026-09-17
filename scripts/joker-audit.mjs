@@ -25,11 +25,15 @@ import { readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const ROOT = path.join(import.meta.dirname, "..");
-const CORPUS = path.join(ROOT, "joker", "corpus.md");
-const FACTS = path.join(ROOT, "joker", "facts.json");
+// The corpus and the bundle are overridable so the audit can be pointed at a
+// fixture — `scripts/e2e-joker.mjs` feeds it corpora that are wrong in exactly
+// one way each and checks what comes back. Nothing else sets these.
+const JOKER = process.env.KANAHERO_JOKER_DIR ?? path.join(ROOT, "joker");
+const CORPUS = path.join(JOKER, "corpus.md");
+const FACTS = path.join(JOKER, "facts.json");
 const SETS_DIR = path.join(ROOT, "public", "sets");
 const SCREEN_TYPE = path.join(ROOT, "lib", "joker-lines.ts");
-const OUT = path.join(ROOT, "lib", "joker-corpus.generated.json");
+const OUT = process.env.KANAHERO_JOKER_OUT ?? path.join(ROOT, "lib", "joker-corpus.generated.json");
 
 /** the pool key that is not a screen: lines he may say exactly once, ever */
 const ONCE_POOL = "once";
