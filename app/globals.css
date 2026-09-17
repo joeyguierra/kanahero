@@ -2234,6 +2234,18 @@ button:not(:disabled):active {
 
 .roundCard {
   flex: none;
+  /* PromptMelt.tsx melts it in and leaves it hard; it is transparent here so
+     there is no hard frame before the melt starts. Nothing else turns it on,
+     so every path out of `meltIn` has to end opaque. */
+  opacity: 0;
+  will-change: transform, opacity, filter;
+}
+
+/* the melt's filter chain: a definition, not a picture */
+.meltFilter {
+  position: absolute;
+  width: 0;
+  height: 0;
 }
 
 .round .canvasWrap {

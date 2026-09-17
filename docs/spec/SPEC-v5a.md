@@ -115,3 +115,64 @@ Delete now-dead keys and branches: `set.kana`, `set.kanji`, `set.full`, `result.
 
 ## 8. Part 2 — not in this build
 The creator's new flow (how the app is presented), new and updated screens, and new dialogue. It will arrive as its own section or file and may replace any interim line in §4.
+
+---
+
+# v5a addendum — the reward moment (UI)
+*Appended 2026-09-17, against `cb7eada` plus the uncommitted S7 prompt melt (`components/PromptMelt.tsx`). §1–7 above shipped; read this as a change to what shipped. Commit or stash the melt work before starting, and do not fold it into these commits.*
+**Wording** of every Joker line named here belongs to `SPEC-v5b-joker.md` and `docs/design/joker-character.md`. This addendum only says **when** a line is shown, never what it says.
+**No sound.** There is no sound engine. Build none, add no audio code or assets. §9.4 marks where one will attach later.
+
+## 9. The reward moves from every word to the end of the run
+**Why:** the S7c earn screen stops the drill after every correct word and asks for a tap. The run should flow prompt → write → grade → next prompt, with a small, non-blocking acknowledgement on each `GOT IT`, and the full reward — every card, one by one — on S8. This also matches §1.1: nothing is kept until the run finishes, so the celebration belongs there.
+
+### 9.1 S7c removed
+- Delete the `"earned"` phase in `Round.tsx`, the `earnStack` / `earnLabel` / `earnNote` / `earnCard` markup, the `handStrip` / `handCards` hand strip, and their CSS (`.earnStack` … `.handCard-shiny`, `@keyframes handDeal`, and any reduced-motion overrides for them).
+- `GOT IT` no longer waits for a tap. It adds the card to the run's hand and goes straight to the next prompt (or, on the last word, to S8 — §9.3).
+- `MISSED` is unchanged: no animation, the word goes back in the deck, the next prompt melts in as today.
+
+### 9.2 S7 — the hand tick on `GOT IT`
+One acknowledgement, under half a second, never blocking input.
+1. **The card leaves.** On `GOT IT`, clone the prompt card's box (`getBoundingClientRect`) into a fixed-position ghost showing the **card back** (deck mark, set glyph — the same back as S6b). The ghost flies to the `HAND n` text in the round header: translate to its centre, scale to ~0.2, one ease-out, **~260 ms** (the v5 slide duration). Remove the ghost on finish.
+   - No rarity is shown on the ghost. Rarity is revealed on S8.
+   - The ghost is `pointer-events: none` and sits above the round, below the abandon dialog.
+2. **The count ticks.** When the ghost lands, `HAND n` becomes `n+1` with a single small pop (scale 1 → 1.15 → 1, ~160 ms). `DECK n` updates at the same moment.
+3. **The next prompt arrives at the same time as the flight starts** — the slot does not wait for the ghost. The canvas clears, the real card element becomes the next prompt, and the existing melt-in (`meltIn`) fires. Because the ghost is a clone, the flight and the melt never touch the same element.
+4. **The Joker** does not get a separate beat. The line shown with the next prompt is the `earned.<rarity>` line for the word just graded, in place of that prompt's usual `round.*` line; the prompt after that returns to `round.*`. A pending once-line (`wholeWord`, set-scoped once-lines from v5b) takes precedence and the earned line is dropped for that prompt. One line at a time, as always.
+5. **Input** is never locked: the user can draw on the new prompt during the flight. `✕` stays available; opening the abandon dialog mid-flight lets the flight finish behind the blur.
+6. **Reduced motion:** no ghost and no pop. `HAND n` and `DECK n` update immediately; the melt already has its own reduced-motion path.
+
+### 9.3 S8 — the reveal
+S8 keeps its layout (fan ≤5, seven-column grid from 6), its tap-to-view overlay and `BACK TO DECK`. What changes is how it arrives.
+1. **Order.** Cards are laid out and revealed **worn → base → shiny**; within a rarity, in the order they were graded in the run. The layout uses the same order, so the reveal sweeps left to right, top to bottom, and the shinies land last.
+2. **Mount state.** Every card is already in its slot **face down** (the S6b back) — nothing reflows as cards turn. The count reads `0 MINTED`; the tally reads `0 SHINY · 0 BASE · 0 WORN`. The Joker panel is laid out at full height with no text yet.
+3. **The flips.** A short beat after mount (~300 ms), cards turn one at a time: a Y-axis flip from back to face (`backface-visibility: hidden`, both faces in one element), **~240 ms** each. Card-to-card interval **160 ms** for worn and base.
+   - **Pacing cap:** the whole reveal, excluding the shiny holds, fits in ~2.4 s — interval = `min(160, 2400 / cards)` ms, so a 21-card set does not drag.
+4. **Shiny.** Before the **first** shiny turns, hold **~450 ms**. Each shiny turns with a longer interval (**~320 ms**) and, as it lands face up, one sweep of the existing shiny treatment across the face (a single pass, ~400 ms, then the card rests with its normal shiny finish). Shiny stays the only glowing element on the screen.
+5. **Counters.** Each flip adds 1 to `MINTED` and 1 to its rarity in the tally, at the moment the face lands.
+6. **The Joker's line** (`result`) starts typing when the last card lands — never during the reveal.
+7. **Skip.** A tap anywhere on the screen during the reveal (except `BACK TO DECK`) jumps to the end state: every face up, final counts, no shiny sweep, the Joker's line starts. After the reveal ends, taps behave as today (tap a card → face overlay). `BACK TO DECK` works at any time.
+8. **Reduced motion:** mount straight into the end state with one 120 ms fade; the Joker's line starts at once.
+9. Storage is unchanged: the run is minted in one write the moment the last word is graded, **before** S8 mounts (§1.1, §2). The reveal is presentation only — leaving S8 mid-reveal loses nothing.
+
+### 9.4 Where sound will attach later (comments only)
+Mark each moment with a one-line `// sfx: <name>` comment at the exact call site, and nothing else: `hand.tick` (§9.2 step 2), `reveal.flip` with the card's rarity (§9.3 step 3), `reveal.shinyHold` (§9.3 step 4, before the first shiny), `reveal.end` (§9.3 step 6), `reveal.skip` (§9.3 step 7).
+
+### 9.5 Copy and lines
+- No new visible copy. Nothing on S7 mentions keeping or rarity during the run (§1.6 still holds).
+- `earned.*` stays a live Joker key (now spoken on the next prompt, §9.2 step 4); v5b's pools and audit apply unchanged.
+- S8's note `TAP A CARD TO SEE ITS FACE.` appears only once the reveal has ended.
+
+### 9.6 Verification
+- `npm run lint`, `npm run build` clean.
+- `e2e-loop.mjs`: remove every tap that advanced S7c. Run the round steps with Playwright's `reducedMotion: "reduce"` so they do not depend on animation timing, and assert:
+  1. after `GOT IT`, the next prompt is on screen with no further tap, and `HAND` has incremented;
+  2. no element matching the old S7c markup exists at any point in a run;
+  3. on the last `GOT IT`, S8 mounts with every card face up, counts final, and cards ordered worn → base → shiny;
+  4. storage already holds the minted run when S8 mounts.
+- One additional run **with motion on**: on S8, assert cards start face down and the count reads `0 MINTED`; tap the screen; assert every card is face up and the counts are final (skip works).
+- `e2e-offline.mjs`: the reduced-motion run, offline.
+- Report: commits, and a 390px screen recording (or frame sequence) of one kana run showing two hand ticks and the full S8 reveal with at least one shiny.
+
+### 9.7 Build order
+1 remove S7c, `GOT IT` advances (§9.1) → 2 hand tick + Joker earned line on next prompt (§9.2) → 3 S8 mount state, ordering, flips, counters (§9.3 steps 1–3, 5) → 4 shiny hold + sweep (§9.3 step 4) → 5 skip, Joker timing, reduced motion (§9.3 steps 6–8) → 6 `// sfx:` markers (§9.4) → 7 e2e + report. Commit per step.

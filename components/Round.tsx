@@ -24,6 +24,7 @@ import type { SetWord, WordSet } from "@/lib/sets";
 import AbandonDialog from "./AbandonDialog";
 import Card from "./Card";
 import Joker from "./Joker";
+import { MeltFilter, meltIn } from "./PromptMelt";
 import WordReveal from "./WordReveal";
 import WritingCanvas, { type WritingCanvasHandle } from "./WritingCanvas";
 
@@ -64,6 +65,12 @@ export default function Round({
   const [leaving, setLeaving] = useState(false);
   const canvasRef = useRef<WritingCanvasHandle>(null);
   const quitRef = useRef<HTMLButtonElement>(null);
+  const promptRef = useRef<HTMLDivElement>(null);
+  const jokerRef = useRef<HTMLImageElement>(null);
+  // every prompt he puts up gets its own melt (S7 anim sheet) — including the
+  // one a miss brings back round. The flip is not a new prompt: the card is
+  // the same card, so this counts presentations rather than renders.
+  const [presented, setPresented] = useState(0);
   // attempts within this run, by word — S7b prints the number, so it is state.
   // It lives and dies with the component, which is the whole of the rule: the
   // count never crosses a run (SPEC-v5a §1.3).
@@ -81,6 +88,12 @@ export default function Round({
     if (once) markSeen(once.id);
   }, [once]);
 
+  useEffect(() => {
+    const card = promptRef.current;
+    if (!card) return;
+    return meltIn(card, jokerRef.current);
+  }, [presented]);
+
   function nextPrompt(next: SetWord[], won: RoundCard[]) {
     canvasRef.current?.clear();
     setHasInk(false);
@@ -96,6 +109,7 @@ export default function Round({
     setOnce(pickOnce(set, next[0]));
     setQueue(next);
     setPhase("write");
+    setPresented((n) => n + 1);
   }
 
   function flip() {
@@ -120,6 +134,7 @@ export default function Round({
     canvasRef.current?.clear();
     setHasInk(false);
     setQueue((q) => miss(q));
+    setPresented((n) => n + 1);
   }
 
   // ---- S7c: the earn beat, in place, then the hand ----
@@ -203,14 +218,17 @@ export default function Round({
         )}
       </div>
 
+      <MeltFilter />
+
       <div className="roundTop">
-        <Joker line={line} tail="top" className="jokerRound" />
+        <Joker line={line} tail="top" markRef={jokerRef} className="jokerRound" />
         <Card
           word={current}
           set={set}
           size="round"
           attempt={reveal ? tries : undefined}
           className="roundCard"
+          ref={promptRef}
         />
       </div>
 

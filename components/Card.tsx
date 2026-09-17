@@ -58,6 +58,8 @@ export default function Card({
   attempt,
   onClick,
   className = "",
+  /** S7 melts the prompt card in through it */
+  ref,
 }: {
   word: SetWord;
   set: WordSet;
@@ -69,6 +71,7 @@ export default function Card({
   attempt?: number;
   onClick?: () => void;
   className?: string;
+  ref?: Ref<HTMLDivElement>;
 }) {
   const kanji = set.script === "kanji";
   const mark = kanji ? (set.place ?? set.glyph) : set.glyph;
@@ -177,7 +180,11 @@ export default function Card({
       </button>
     );
   }
-  return <div className={classes}>{body}</div>;
+  return (
+    <div className={classes} ref={ref}>
+      {body}
+    </div>
+  );
 }
 
 /** the face-down back: deck mark on stripe, no word anywhere */
