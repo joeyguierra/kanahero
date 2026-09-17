@@ -212,3 +212,39 @@ bundled vs. silenced** — that number is video material and must come from the 
   or real set?
 - `docs/design/joker-corpus.md` is now history (draft 1, draft 2 and the cold-read verdicts).
   All further line work happens in `joker/corpus.md` as `status:draft` → `status:ship`.
+
+---
+
+## 10. Addendum — "minted" becomes "earned" (2026-09-17)
+*Creator decision. "Minted" is trading-card jargon that means nothing to someone here to learn kana. The UI says **EARNED**; the code follows now, while the codebase is small.*
+**This section overrides the word "minted" / `MINTED` / `{minted}` wherever it appears in this file (§5 context table and tokens, §6), in `SPEC-v5a.md` (§3 S8, §4, §6, and the §9 reveal addendum), and in `docs/design/joker-character.md`.** Read every one of them as the renamed form below. Do not edit the older spec files; this section is the record.
+
+### 10.1 What the user sees
+| where | was | becomes |
+| :-- | :-- | :-- |
+| S8 count label | `10 MINTED` | `10 EARNED` |
+| S8 reveal mount state (SPEC-v5a §9.3) | `0 MINTED` | `0 EARNED` |
+| `result.01` | `{minted} cards minted, {shiny} shiny. Deal again whenever.` | `{earned} cards earned, {shiny} shiny. Deal again whenever.` |
+| `result.02` | `{minted} cards minted. Deal again whenever.` | `{earned} cards earned. Deal again whenever.` |
+| `home.29` | `Nothing minted yet. Finish one run and the cards stay.` | `Nothing earned yet. Finish one run and the cards stay.` |
+
+Keep each line's **id** (`result.01`, `result.02`, `home.29`) — the meaning is unchanged, only the word (corpus rule: ids are forever). SPEC-v5a §1.6 still holds: nothing on S7 says "earned" during a run; the word appears only once the run has finished.
+
+### 10.2 Code names
+| was | becomes |
+| :-- | :-- |
+| `mintRun()` (`lib/joker.ts`) | `earnRun()` |
+| `MintedCard` (`lib/joker.ts`, imported by `Card.tsx`, `Round.tsx`) | `EarnedCard` |
+| token `{minted}` and the context field `minted` (§5, `joker-audit.mjs` known-token list) | `{earned}` / `earned` |
+| `counts.minted` in `joker-character.md`'s context shape | `counts.earned` |
+| `/MINTED/` assertions in `e2e-loop.mjs`, `e2e-offline.mjs` | `/EARNED/` |
+
+- Rewrite every comment and assertion message that says mint / minted / mints in `lib/`, `components/`, `app/`, `scripts/` and `joker/` to earn / earned / earns (e.g. `// a finished run earns one copy per word`). `joker/corpus.md` line 8's "mint a new one" becomes "make a new one".
+- **Do not rename** `Progress.earned` or the `earned` array in the `kanahero:v1` blob. That field is the character drill's written-from-memory set, it is a storage key, and it predates this. Where both appear in one file, a one-line comment says which is which; the token `{earned}` counts **cards earned this run**, never characters.
+- No storage change, no version bump — "minted" was never persisted.
+- `docs/design/joker-corpus.md` and older specs (`SPEC.md`, `SPEC-v3.md`, `SPEC-v5.md`) are history: leave them.
+
+### 10.3 Order and checks
+- One commit, **after §7 step 1 (truth fixes) and before step 3 (runtime rewrite)**, so the token is born as `{earned}`. If SPEC-v5a §9 (the reveal) is built later, it uses `EARNED` from the start.
+- `grep -rni mint lib components app scripts joker` returns nothing.
+- `npm run lint`, `npm run build`, `npm run e2e` clean; `joker-audit` passes with `{earned}` as a known token and fails on a fixture still using `{minted}` (unknown token, check as in §6.5).
