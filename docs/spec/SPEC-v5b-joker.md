@@ -20,8 +20,9 @@ touching framework APIs.
 4. Runtime: pools, conditions, tokens, shuffle bag, bag reconciliation (§5).
 5. e2e stops asserting on his wording (§6).
 
-**Not in this build:** writing any pool other than `home` (every other key migrates as a pool of
-one — interim, by design); a gloss UI for seeded Japanese; any change to `Joker.tsx`'s typing
+**Not in this build:** the language toggle (bible §10 — build so a `text.ja` variant per id can be
+added without touching the selector); writing pools beyond `home`, `earned.*`, `round.missed` and `collection` (every
+other key migrates as a pool of one — interim, by design); a tutorial / how-it-works screen (part 2); a gloss UI for seeded Japanese; any change to `Joker.tsx`'s typing
 animation or art; generation for user-created sets (online / paid-tier — `paid-tier-prep.md`);
 the rare tier's odds tuning beyond the default in §5.
 
@@ -56,7 +57,7 @@ public/sets/*.json  set-specific lines, under a `joker` key (§4)
 lib/joker-corpus.generated.json   what the app imports. Git-ignored. Never hand-edited.
 ```
 **Do not retype any line.** `joker/corpus.md` was generated from the approved draft and from the
-shipped table by script; move text only by script or by copy. It holds 60 lines, 27 pools.
+shipped table by script; move text only by script or by copy. It holds 95 lines, 27 pools; Japanese line coverage is 69% overall and 72–88% in the written pools.
 
 Line grammar: `- [id] text ·· tag ·· tag`. Tags:
 - `status:ship|draft` — **required.** Only `ship` is bundled.
@@ -64,6 +65,7 @@ Line grammar: `- [id] text ·· tag ·· tag`. Tags:
   `key>n`, `key>=n`. Keys in §5.
 - `once` — retired forever after one showing. `tier:rare` — see §5.
 - `needs:` — comma-separated fact ids. `ja:` seeded Japanese. `subj:you|app|him`.
+  `dialect:kansai` — a Kansai retort; the audit reports these as their own count.
 - An HTML comment or a line not starting `- [` is ignored. `## key` opens a pool; `key` must be a
   `JokerScreen` or `once`.
 
@@ -82,12 +84,12 @@ bundle.
 | 5 | a digit or number-word (`one`…`twenty`, case-insensitive) in a line with no `{token}` and no `needs:` | **fail**. Allow-list by id for idiom ("One character, one box", "first try" is not a number-word). |
 | 6 | every `{token}` used is one §5 defines | **fail** |
 | 7 | pool depth under its frequency-tier minimum (bible §5 table) | **warn only in this build** — every pool but `home` is a pool of one on purpose |
-| 8 | per pool of ≥ 8 lines: `subj:him` > 1 in 3, or `ja:` outside 1-in-3 … 1-in-5 | warn |
+| 8 | per pool of ≥ 8 lines: `subj:him` > 1 in 3, or Japanese line coverage under 60% | warn |
 | 9 | a set in `PLATFORM_SET_IDS` with no `joker` block | warn: "speaks generic only" |
 
 Check 4's "reachable context" is cheap to do honestly: for each pool, evaluate the `when:` sets
 against the small product of flags that pool can see, and fail if any combination leaves zero
-eligible non-`once` lines. `home` today passes (23 unconditional lines).
+eligible non-`once` lines. `home` today passes (23 unconditional lines); `earned.*`, `round.missed` and `collection` are unconditional pools.
 
 Report to stdout: counts per pool, silenced lines with the fact that silenced them, warnings.
 Exit non-zero on any **fail**.
@@ -143,7 +145,8 @@ panel reserves its height before the line arrives, as `Joker.tsx`'s header comme
 | `script` `setId` `words` | the active set |
 | `chars` `minted` `missStreak` `triesThisWord` | round state, passed by the caller |
 
-**Tokens** — `{bank} {shiny} {minted} {words} {chars} {n:X}`. All render through the existing
+**Tokens** — `{bank} {shiny} {minted} {words} {chars} {tries} {n:X}`. Keep the renderer behind
+one function: bible §10 makes it locale-aware (Japanese counters) in a later build. All render through the existing
 `count()` so he keeps counting in words ("Seven"), falling back to digits past twenty-one.
 Capitalized at the start of a line, lowercase elsewhere. **A token whose value is unavailable
 makes the line ineligible** — never render a blank, a zero he did not mean, or `NaN`.

@@ -360,3 +360,128 @@ the entire visible payoff of shipping them. Spent `once` ids are kept forever.
 ### 7.5 Out of scope, routed
 Runtime generation for user-created sets is online/paid-tier territory (`paid-tier-prep.md`)
 and is **not** part of this build. The `joker` block in the set file is the only seam it needs.
+
+---
+
+## 8. Placement — where he explains and where he doesn't *(added 2026-09-18)*
+
+Creator's read of the earned lines (*"First try. Shiny — if you finish the run."*): vague to a
+first-timer, and the wrong place for it. New law:
+
+**Mechanics are explained where they are seen, never while performing.** On the drill screens
+(S4, S7, S7b, S7c) he reacts and cues the next card; the UI carries the mechanic (`SHINY · FIRST
+TRY`, `KEPT WHEN THE RUN FINISHES`, the hand strip). Card rules — rarity by tries, one copy per
+finished run, all-or-nothing — are explained on **home** (one fact at a time, in rotation) and on
+the **collection** screen (in depth, where the cards are). The one drill-screen exception is the
+miss line, which may say the word comes back, because the drill needs the user to know that.
+
+This keeps the truth rule (SPEC-v5a §1.6) for free: a reaction line never claims a card is kept.
+
+**Corrected frequency tiers (amends §5).** `earned.*` and `round.missed` fire once **per word**,
+not once per session — ten times a run. They are top-tier and need 30–40 lines each, not 15–25.
+The 2026-09-18 pools (10 / 8 / 8 / 8) are a first pass toward that depth.
+
+**Routed to part 2 (SPEC-v5a §8):** a dedicated how-it-works / tutorial screen. Until it exists,
+home + collection are the explanation surfaces.
+
+---
+
+## 9. The mix, and his Japanese *(added 2026-09-18 — amends §3)*
+
+**Creator call: more Japanese. Target 70/30.** The measure is **line coverage** — the share of
+lines in a pool that carry at least one Japanese phrase. Before this pass the corpus sat at 28%;
+after it, 69–88% per written pool. The *word* share is 8–12% and cannot go much higher under §3.1
+(never load-bearing): a line that is one-third Japanese by words stops reading in English. Line
+coverage is the honest number and the one the audit reports.
+
+### What the research changed
+- **He is the tsukkomi.** Manzai runs on a *boke* (the fool) and a *tsukkomi* (the retort). Your
+  stroke is the boke; he is the retort. That is the exact shape of the button law (§ amendment 4):
+  information, then a short comeback. The retort words (惜しい, なんでやねん, おっと, まさか) are the
+  purest non-load-bearing Japanese there is — reactions carry no information the English needs.
+- **A signature word.** Hosts have a tic (Monokuma's laugh; the King of All Cosmos's record
+  scratch). His is **ほら / ほらね** — "see? told you." It is the word of a man who knew what you
+  would get wrong. Use it on reveals and returns, never more than once per pool.
+- **The emotional swing is the reward.** The King of All Cosmos belittles constantly and then
+  praises exuberantly, and the swing is what makes approval land. He keeps law 6 (never gush) on
+  base and worn; on shiny he is allowed one visible flicker — ほう, おっと, 完璧.
+- **The 日本語上手 joke.** Japanese speakers tell any foreigner who manages one word that their
+  Japanese is 上手 (skilled). Every learner knows this. When he says 上手 after a first try, the
+  learners who know will laugh; the rest will learn it — and then get the joke retroactively.
+  Same mechanism as 俺 (§3).
+- **親 and 子.** In mahjong the dealer is 親 (parent) and the other players are 子 (children). The
+  app's home ghost glyph is already 親 (`page.tsx`: "親 is the dealer"). He is 親; the user is 子.
+  He may call the user 子 exactly once, late, as a rare line — it is condescension and affection in
+  one character, which is the whole register.
+- **Kansai.** The app was born on a train between Kyoto and Osaka, and Osaka is manzai's home.
+  A few Kansai retorts are in character (なんでやねん, ええやん, 知らんけど). Rule: **Kansai only in
+  comedy retorts, never in anything informational** — the app must not teach dialect as standard.
+  Tagged `dialect:kansai` so the whole layer can be removed with one filter if it ever misleads.
+
+### Lexicon (extends §3)
+| word | reading | he uses it for | register |
+| :-- | :-- | :-- | :-- |
+| ほら / ほらね | hora / hora ne | "see?" — his signature, reveals and returns | casual |
+| 惜しい | oshii | the near miss; the kindest miss word in the language | neutral |
+| おっと | otto | "whoa / oops" — catching himself reacting | casual |
+| ほう | hou | "oh?" — intrigued, one eyebrow | casual, slightly old-fashioned |
+| まさか | masaka | "no way" — mock disbelief at a clean stroke | neutral |
+| なるほど | naruhodo | "I see" — conceding you did something | neutral |
+| まだ | mada | "not yet" — the bank, the empty collection, a miss | neutral |
+| やっと | yatto | "finally" — the worn tier | neutral |
+| 上手 | jouzu | skilled — the 日本語上手 joke, first tries | neutral |
+| 完璧 | kanpeki | perfect — the rare shiny flicker | neutral |
+| 余裕 | yoyuu | "easy, plenty of margin" — about himself | casual |
+| 根性 | konjou | guts, grit — the worn tier, said with respect | casual |
+| はい次 | hai, tsugi | "okay, next" — the drill's metronome | neutral |
+| お疲れ | otsukare | "good work" — the end of a run, and nowhere else | casual |
+| はじめまして | hajimemashite | "pleased to meet you" — the first-launch line only | polite |
+| よろしく | yoroshiku | "counting on you" — handing you the pen | neutral |
+| 正直に | shoujiki ni | "honestly" — the grading prompt | neutral |
+| 約束 | yakusoku | "promise" — a missed word will return | neutral |
+| どっち | docchi | "which?" — a choice of two | casual |
+| どんどん | dondon | "more and more" — copies stacking up | casual |
+| たぶん | tabun | "probably" — undercutting his own trust in you | neutral |
+| だいたい | daitai | "mostly, roughly" — the stroke-order caveat | neutral |
+| 基本 | kihon | "the basics" — hiragana | neutral |
+| 地下 | chika | "underground" — where it still works | neutral |
+| 親 / 子 | oya / ko | dealer / player — mahjong's terms; the ghost glyph already says 親 | — |
+| なんでやねん | nande ya nen | the Osaka retort — "what the—" | **Kansai**, retorts only |
+| ええやん | ee yan | "nice, why not" | **Kansai**, retorts only |
+| 知らんけど | shiran kedo | "…but what do I know" — after an opinion, never a fact | **Kansai**, retorts only |
+
+### Guardrails that stay
+- §3.1–3.3 unchanged: never load-bearing, never self-translated, never romaji.
+- A Japanese word may **replace** an English word only when the English word was itself a
+  button, never when it carried the information (だいたい may replace "Mostly"; nothing may
+  replace "first try").
+- The examples in a line may be Japanese when the line is *about* Japanese — "Katakana spells
+  borrowed words. コーヒー, タクシー, probably your name." demonstrates the script and still reads
+  with the examples removed.
+
+---
+
+## 10. Language toggle — designed now, built later *(added 2026-09-18)*
+
+The creator foresees an English ⇄ Japanese UI toggle. The Joker is bilingual in both modes; the
+toggle flips his **mix**: English mode ≈ 70/30 English/Japanese by line coverage, Japanese mode
+≈ 70/30 Japanese/English. Not this build. What is designed now so nothing has to be rebuilt:
+
+- **One id, two texts.** A line is a meaning with a `text.en` (the current mix) and a `text.ja`
+  (the flipped mix — Japanese carries the information, English is the seasoning). Same id, same
+  `when`, same `needs`, same `subj`. Bags and `once` are keyed by id, so switching language
+  mid-life loses no state and repeats nothing.
+- **`text.ja` may be missing.** The audit warns per pool ("ja-mix: 12 of 32") and the runtime
+  falls back to `text.en`. Coverage is a number on the report, never a build failure, so the
+  toggle can ship with partial coverage and grow.
+- **The audit's laws are per text.** Word count, `!`, load-bearing and coverage are checked on
+  each variant. In `text.ja` the non-load-bearing rule inverts: remove the *English* and the line
+  must still read in Japanese.
+- **Counters.** He counts in words, and Japanese counts with counters: cards are 枚 (七枚), words
+  are 語, tries are 回. The token renderer becomes locale-aware: `{tries}` → "three" / "三回".
+  This is the only piece of real logic the toggle adds to the runtime.
+- **UI chrome is a separate concern.** Labels (`DECKS`, `KEPT WHEN THE RUN FINISHES`, `VIEW
+  COLLECTION`) go through whatever string table the UI toggle introduces; the Joker's corpus does
+  not hold UI strings and the UI never holds his.
+- **Corpus grammar, when it lands:** a second line under the same id, `- [home.11] ja: …`,
+  parsed as the `text.ja` variant. No new file, no new id.
