@@ -1,30 +1,49 @@
 "use client";
 
-// S8 — the run, earned, and the only reward beat in the app (SPEC-v5a §9.3).
-// A run is the whole set, so the count is the set size every time and the only
-// thing that varies is the stock it came up in: a fan up to five cards, a
-// seven-column grid from six (the ceiling is 21, three full rows).
+// S8 — the run, earned, and the only reward beat in the app.
+// Drawn from `docs/design/v5-anims/v5c/S8 earned.dc.html`.
 //
-// The screen mounts with every card already in its slot, FACE DOWN, and with
-// nothing counted: 0 EARNED, 0 · 0 · 0, and his panel at full height with no
-// line in it. Then the cards turn, worn first and shiny last, and each one
-// adds itself to the counts as it lands. He speaks when the last one has.
+// A run is the whole set, so the count is the set size every time and the only
+// thing that varies is the stock it came up in. There is no fan: the hand is
+// rows of at most seven cards, each one twice the old grid card and overlapping
+// the one before it, dealt left to right so the rightmost card is on top. A
+// card is one solid piece — chip and romaji left, the word dead centre — and
+// the next card simply covers part of it. Tapping one opens its full face over
+// the screen, which is where the whole card is read: stock and tries, the set's
+// mark, the word, its reading and what it means.
+//
+// Two beats. THE DEAL: he flicks the whole hand out of his hand face down,
+// 80ms apart, and the count reads 0. THE TURN: worn first, then base, then
+// shiny, each a flip in place with the count and the tally ticking up per card;
+// before each shiny he holds, the card lifts and flares, and once it is face up
+// a white swipe crosses it every three seconds. He speaks when the last card is
+// down, and the note appears with him. A tap through any of it hurries the rest
+// of the hand over rather than cutting to the end — see `fastSchedule`.
 //
 // None of this is load-bearing. The run was written the moment the last word
-// was graded, before this screen existed (§1.1, §9.3.9) — leaving mid-reveal
-// costs nothing, which is exactly why a tap may skip to the end.
-//
-// The tries printed on these faces come from the run that just ended, not from
-// storage — nothing keeps a copy's try count past the run (SPEC-v5a §2).
+// was graded, before this screen existed (SPEC-v5a §1.1, §9.3.9) — leaving
+// mid-reveal costs nothing, which is exactly why a tap may skip to the end.
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useJokerLine } from "@/lib/joker-lines";
 import type { Rarity } from "@/lib/progress";
 import {
+  COLS,
+  DEAL_GAP_MS,
+  FAST_FLIP_MS,
+  FAST_STEP_MS,
+  FLICK_MS,
+  FLIGHT_MS,
   FLIP_MS,
-  SWEEP_MS,
+  SHINE_STAGGER_MS,
+  SHINY_FLIP_MS,
+  SHINY_LIFT_EXTRA_MS,
+  SPEAK_AFTER_MS,
+  fastSchedule,
   revealOrder,
-  revealSchedule,
+  revealRows,
+  turnEnd,
+  turnSchedule,
 } from "@/lib/reveal";
 import type { WordSet } from "@/lib/sets";
 import type { RoundCard } from "./Round";
@@ -32,74 +51,205 @@ import Card from "./Card";
 import Joker from "./Joker";
 import RevealCard from "./RevealCard";
 
-/** past five cards the fan stops fanning */
-const FAN_MAX = 5;
+/** his hand inside the mark's square box, measured off `joker-mascot.png` */
+const HAND = { x: 0.72, y: 0.58 };
+
+function reduced(): boolean {
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+}
 
 export default function Result({
   set,
   hand,
+  /** how many of the hand are a stock this shelf has never held before */
+  newStock,
   onBackToDeck,
 }: {
   set: WordSet;
   hand: RoundCard[];
+  newStock: number;
   onBackToDeck: () => void;
 }) {
-  const [open, setOpen] = useState<RoundCard | null>(null);
   const order = useMemo(() => revealOrder(hand), [hand]);
-  /** how many have started turning, and how many have landed — the counts are
-      the landed ones, so a number never arrives before the face it belongs to */
-  const [turning, setTurning] = useState(0);
-  const [landed, setLanded] = useState(0);
-  const [sweeping, setSweeping] = useState(-1);
-  const done = landed >= order.length;
+  const rows = useMemo(() => revealRows(order), [order]);
+  const turns = useMemo(() => turnSchedule(order), [order]);
+  /** how many cards have started turning — the counts tick with the turn */
+  const [turned, setTurned] = useState(0);
+  /** he waits for the last card, then speaks; the note arrives with him */
+  const [spoken, setSpoken] = useState(false);
+  /** the card a tap opened, face up over the screen */
+  const [open, setOpen] = useState<RoundCard | null>(null);
+  /** a tap hurried the rest of the hand over */
+  const [fast, setFast] = useState(false);
+  /** a second tap snapped what was left of it flat */
+  const [snapped, setSnapped] = useState(false);
+  const done = turned >= order.length;
+
+  const jokerRef = useRef<HTMLImageElement>(null);
+  const countRef = useRef<HTMLDivElement>(null);
+  const slots = useRef<(HTMLDivElement | null)[]>([]);
+  const anims = useRef<Animation[]>([]);
   const timers = useRef<number[]>([]);
 
-  const fan = hand.length <= FAN_MAX;
-  const tally = (r: Rarity) => order.slice(0, landed).filter((c) => c.card.rarity === r).length;
+  const tally = (r: Rarity) => order.slice(0, turned).filter((c) => c.card.rarity === r).length;
   const shiny = tally("shiny");
 
-  /** everything face up, counted, and no shine left to sweep */
-  function skip() {
-    // sfx: reveal.skip
+  function stop() {
+    anims.current.forEach((a) => a.cancel());
+    anims.current = [];
     timers.current.forEach(clearTimeout);
     timers.current = [];
-    setTurning(order.length);
-    setLanded(order.length);
-    setSweeping(-1);
+  }
+
+  /** the hand lands at once, wherever it was: nothing in the air, nothing mid-turn */
+  function land() {
+    slots.current.forEach((el) => {
+      if (el) el.style.opacity = "1";
+    });
+  }
+
+  /**
+   * A tap through the reveal. The first one riffles the rest of the hand over
+   * at the hurried cadence — every card still turns and still counts itself,
+   * it just stops taking its time. A second one snaps what is left flat.
+   */
+  function hurry() {
+    // sfx: reveal.skip
+    stop();
+    land();
+    if (fast) {
+      setSnapped(true);
+      setTurned(order.length);
+      setSpoken(true);
+      return;
+    }
+    setFast(true);
+    const from = turned;
+    fastSchedule(from, order.length).forEach((at, i) => {
+      timers.current.push(window.setTimeout(() => setTurned(from + i + 1), at));
+    });
+    timers.current.push(
+      window.setTimeout(
+        () => setSpoken(true),
+        Math.max(0, order.length - from) * FAST_STEP_MS + FAST_FLIP_MS + SPEAK_AFTER_MS,
+      ),
+    );
   }
 
   useEffect(() => {
-    // Reduced motion is the same reveal with no time in it: every card lands
-    // at once, nothing sweeps, and the screen fades in once (CSS).
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
-    const at = reduced ? order.map(() => 0) : revealSchedule(order);
-    const flip = reduced ? 0 : FLIP_MS;
-    const wait = (ms: number, run: () => void) => {
+    const joker = jokerRef.current;
+    const els = slots.current.slice(0, order.length);
+    const at = (ms: number, run: () => void) => {
       timers.current.push(window.setTimeout(run, ms));
     };
-    order.forEach((card, i) => {
-      wait(at[i], () => {
-        // sfx: reveal.flip <card.card.rarity>
-        setTurning(i + 1);
+
+    // Reduced motion is the same reveal with no time in it: nothing is dealt,
+    // nothing turns, the screen fades in once (CSS) already finished.
+    if (reduced() || !joker || els.some((el) => !el) || typeof els[0]?.animate !== "function") {
+      els.forEach((el) => {
+        if (el) el.style.opacity = "1";
       });
-      wait(at[i] + flip, () => {
-        setLanded(i + 1);
-        if (!reduced && card.card.rarity === "shiny") {
-          // sfx: reveal.shinyHold before the first one — the beat itself is in
-          // the schedule; this is the single pass of shine as it lands
-          setSweeping(i);
-          wait(SWEEP_MS, () => setSweeping((n) => (n === i ? -1 : n)));
+      setTurned(order.length);
+      setSpoken(true);
+      return;
+    }
+
+    // ---- beat one: the deal ----
+    // his hand, in page coordinates — measured off the mark's box, which is
+    // the whole square PNG, transparent margins included
+    const jr = joker.getBoundingClientRect();
+    const hx = jr.left + jr.width * HAND.x;
+    const hy = jr.top + jr.height * HAND.y;
+
+    els.forEach((el, i) => {
+      if (!el) return;
+      el.style.opacity = "0";
+      const cr = el.getBoundingClientRect();
+      // the hand, as an offset from the slot the card is going to
+      const dx = hx - (cr.left + cr.width / 2);
+      const dy = hy - (cr.top + cr.height / 2);
+      const delay = i * DEAL_GAP_MS;
+      anims.current.push(
+        el.animate(
+          [
+            {
+              transform: `translate(${dx}px,${dy}px) rotate(-25deg) scale(.5)`,
+              opacity: 0,
+              offset: 0,
+            },
+            { opacity: 1, offset: 0.12 },
+            {
+              transform: `translate(${dx * 0.55}px,${dy * 0.55 - 22}px) rotate(-12deg) scale(.78)`,
+              offset: 0.45,
+              easing: "cubic-bezier(.3,.7,.4,1)",
+            },
+            { transform: "translate(0,0) rotate(0deg) scale(1)", opacity: 1, offset: 1 },
+          ],
+          { duration: FLIGHT_MS, delay, easing: "cubic-bezier(.2,.9,.25,1.12)", fill: "forwards" },
+        ),
+      );
+      // one flick of his wrist per card, and back before the next one leaves
+      anims.current.push(
+        joker.animate(
+          [
+            { transform: "rotate(0deg)" },
+            { transform: "rotate(-7deg) translateX(3px)", offset: 0.3 },
+            { transform: "rotate(0deg)" },
+          ],
+          { duration: FLICK_MS, delay, easing: "ease-out" },
+        ),
+      );
+    });
+
+    // ---- beat two: the turn ----
+    order.forEach((card, i) => {
+      const { at: start, dur } = turns[i];
+      at(start, () => {
+        // sfx: reveal.shinyHold is the beat before this one; reveal.flip <rarity>
+        const el = slots.current[i];
+        if (el && card.card.rarity === "shiny") {
+          // it lifts out of the row and flares as it comes over
+          anims.current.push(
+            el.animate(
+              [
+                { transform: "translateY(0)", filter: "drop-shadow(0 0 0 rgba(255,46,136,0))" },
+                {
+                  transform: "translateY(-6px)",
+                  filter: "drop-shadow(0 0 18px rgba(255,46,136,.9))",
+                  offset: 0.5,
+                },
+                { transform: "translateY(0)", filter: "drop-shadow(0 0 0 rgba(255,46,136,0))" },
+              ],
+              { duration: dur + SHINY_LIFT_EXTRA_MS, easing: "ease-out" },
+            ),
+          );
         }
-        // sfx: reveal.end on the last one
+        setTurned(i + 1);
+        const count = countRef.current;
+        if (count && typeof count.animate === "function") {
+          anims.current.push(
+            count.animate(
+              [
+                { transform: "scale(1)" },
+                { transform: "scale(1.04)", offset: 0.4 },
+                { transform: "scale(1)" },
+              ],
+              { duration: 180, easing: "ease-out" },
+            ),
+          );
+        }
       });
     });
-    const kept = timers.current;
-    return () => kept.forEach(clearTimeout);
-  }, [order]);
+
+    // sfx: reveal.end — he speaks once the last card is down
+    at(turnEnd(order), () => setSpoken(true));
+
+    return stop;
+  }, [order, turns]);
 
   // {earned} counts the cards this run earned, never the drill's characters.
-  // Null until the last card lands: he does not talk over the reveal.
-  const line = useJokerLine(done ? "result" : null, {
+  // Null until he is due to speak: he does not talk over the reveal.
+  const line = useJokerLine(spoken ? "result" : null, {
     set,
     earned: hand.length,
     shiny: order.filter((c) => c.card.rarity === "shiny").length,
@@ -107,8 +257,16 @@ export default function Result({
     worn: order.filter((c) => c.card.rarity === "worn").length,
   });
 
+  const copies = hand.length - newStock;
+  const note = spoken
+    ? `${newStock} NEW STOCK · ${copies} ${copies === 1 ? "COPY" : "COPIES"} TO THE COLLECTION`
+    : " ";
+
   return (
-    <main className="frame resultScreen" onClick={() => !done && skip()}>
+    <main
+      className={`frame resultScreen${snapped ? " resultSnapped" : ""}`}
+      onClick={() => !done && hurry()}
+    >
       <div className="livery" aria-hidden>
         <span className="ghost ghostResult">{set.glyph}</span>
       </div>
@@ -120,37 +278,50 @@ export default function Result({
         </span>
       </div>
 
-      <div className="resultCount">
-        {landed}
+      <div className="resultCount" ref={countRef}>
+        {turned}
         <span className="resultCountWord">EARNED</span>
       </div>
       <div className="resultTally">
-        <span className="resultShiny">{shiny} SHINY</span>
+        <span className={`resultShiny${shiny ? "" : " resultShinyCold"}`}>{shiny} SHINY</span>
         <span className="resultRest">
           {tally("base")} BASE · {tally("worn")} WORN
         </span>
       </div>
 
-      <Joker line={line.text} lineId={line.id} className="jokerDeck" />
+      <Joker line={line.text} lineId={line.id} markRef={jokerRef} className="jokerDeck" />
 
-      <div className={fan ? "resultFan" : "resultGrid"}>
-        {order.map(({ word, card }, i) => (
-          <RevealCard
-            key={word.word}
-            word={word}
-            set={set}
-            card={card}
-            size={fan ? "fan" : "grid"}
-            up={i < turning}
-            sweep={i === sweeping}
-            onClick={done ? () => setOpen({ word, card }) : undefined}
-            className={fan ? `fanCard fanCard${i}` : ""}
-          />
+      <div className="resultRows">
+        {rows.map((row, r) => (
+          <div className="resultRow" key={r}>
+            {row.map(({ word, card }, j) => {
+              // its place in the whole hand: the deal, the turn and the shine
+              // stagger all count in reveal order, not per row
+              const index = r * COLS + j;
+              return (
+                <RevealCard
+                  key={word.word}
+                  word={word}
+                  set={set}
+                  card={card}
+                  up={index < turned}
+                  z={j + 1}
+                  flipMs={
+                    fast ? FAST_FLIP_MS : card.rarity === "shiny" ? SHINY_FLIP_MS : FLIP_MS
+                  }
+                  shineDelay={SHINY_FLIP_MS + index * SHINE_STAGGER_MS}
+                  onClick={done ? () => setOpen({ word, card }) : undefined}
+                  ref={(el) => {
+                    slots.current[index] = el;
+                  }}
+                />
+              );
+            })}
+          </div>
         ))}
       </div>
 
-      {/* the instruction is only true once there is a face to tap */}
-      <div className="resultNote">{done ? "TAP A CARD TO SEE ITS FACE." : "\u00a0"}</div>
+      <div className="resultNote">{note}</div>
       <button
         type="button"
         className="btnBone actionBar"
@@ -162,6 +333,8 @@ export default function Result({
         BACK TO DECK
       </button>
 
+      {/* the whole card, the way it is read: stock and tries, the set's mark,
+          the word, its reading, what it means. Tap anywhere to put it back. */}
       {open && (
         <div
           className="cardOverlay"

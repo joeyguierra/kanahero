@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<title>KanaHero S8 — result, ten earned</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&amp;family=JetBrains+Mono:wght@400;600;800&amp;family=Noto+Sans+JP:wght@400;700;900&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#151517;color:#F2F0EB;font-family:Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#FF2E88;text-decoration:none}a:hover{color:#F2F0EB}
+</style>
+</helmet>
+
+<section style="padding:44px 48px 40px">
+  <div style="display:flex;align-items:baseline;gap:11px;margin-bottom:8px">
+    <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#FF2E88;color:#000">S8</span>
+    <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#2E9DFF;color:#000;white-space:nowrap">M6 · THE REVEAL</span>
+    <b style="font:700 14px Archivo,sans-serif">Result — ten earned, seven to a row, overlapped</b>
+  </div>
+  <div style="font:400 12px/1.6 'JetBrains Mono',monospace;color:#8C8C93;max-width:940px;letter-spacing:.02em;margin-bottom:32px">
+    FAN REMOVED. CARDS ARE 2× THE OLD GRID SIZE (<span style="color:#F2F0EB">{{ cardW }}PX</span> WIDE), MAX SEVEN PER ROW, LAID LEFT TO RIGHT SO EACH NEW CARD LANDS ON TOP OF THE LAST. A CARD IS ONE SOLID PIECE — CHIP AND ROMAJI LEFT, KANJI DEAD CENTER — AND THE NEXT CARD SIMPLY COVERS PART OF IT. TAP A CARD FOR ITS FULL FACE. TEN CARDS: THREE WORN, FIVE BASE, TWO SHINY.
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:38px;align-items:flex-start">
+    <div style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S8</span>Result — done, ten cards face up
+      </div>
+
+      <div data-screen-label="S8 Result ten earned" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;padding:44px 28px 36px;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+        <div style="position:absolute;inset:0;overflow:hidden;z-index:-1;pointer-events:none">
+          <span style="position:absolute;right:-52px;bottom:200px;font:900 250px/1 'Noto Sans JP',sans-serif;color:transparent;-webkit-text-stroke:1px #1D1D21;user-select:none">駅</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93;white-space:nowrap">SET DEALT OUT</span>
+          <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93;white-space:nowrap">駅 STATION</span>
+        </div>
+        <div ref="{{ countRef }}" style="font:900 64px/.92 Archivo,sans-serif;letter-spacing:-.04em;margin-top:28px">{{ earned }}<span style="font-size:26px;letter-spacing:-.01em;margin-left:.14em">EARNED</span></div>
+        <div style="display:flex;align-items:center;gap:9px;margin-top:14px">
+          <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;background:{{ shinyBg }};color:{{ shinyInk }};padding:5px 8px;white-space:nowrap">{{ shiny }} SHINY</span>
+          <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#8C8C93;white-space:nowrap">{{ base }} BASE · {{ worn }} WORN</span>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center;min-width:0;margin-top:22px">
+          <img ref="{{ jokerRef }}" onClick="{{ replay }}" src="assets/joker.png" alt="" style="flex:none;object-fit:contain;width:78px;height:78px;margin:-10px -4px -10px -10px;filter:drop-shadow(0 12px 22px rgba(255,46,136,.28));cursor:pointer;transform-origin:70% 60%">
+          <div style="position:relative;flex:1;min-width:0;border:1px solid #2A2A2E;background:#141416;padding:10px 13px 11px">
+            <span style="position:absolute;width:10px;height:10px;background:#141416;transform:rotate(45deg);left:-6px;top:50%;margin-top:-5px;border-left:1px solid #2A2A2E;border-bottom:1px solid #2A2A2E"></span>
+            <div style="font:400 8px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#FF2E88;margin-bottom:4px">JOKER</div>
+            <p style="font:400 13px/1.45 Archivo,sans-serif;color:#F2F0EB;min-height:2.9em">{{ jokerLine }}</p>
+          </div>
+        </div>
+
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px;margin:16px -28px 0;padding:0 12px">
+          <sc-for list="{{ rows }}" as="row" hint-placeholder-count="2">
+            <div style="display:flex;align-items:flex-start;position:relative">
+              <sc-for list="{{ row.cards }}" as="c" hint-placeholder-count="7">
+                <div ref="{{ c.ref }}" onClick="{{ replay }}" style="position:relative;flex:none;width:{{ cardW }}px;height:{{ cardH }}px;margin-left:{{ c.ml }}px;z-index:{{ c.z }};perspective:600px;opacity:0;cursor:pointer;will-change:transform">
+                  <div ref="{{ c.innerRef }}" style="position:absolute;inset:0;transform-style:preserve-3d;transform:rotateY(180deg)">
+                    <div style="position:absolute;inset:0;backface-visibility:hidden;background:{{ c.bg }};border:1px solid {{ c.border }};color:{{ c.ink }};box-shadow:{{ c.shadow }};clip-path:polygon(0 0,100% 0,100% 100%,8px 100%,0 calc(100% - 8px))">
+                      <div style="position:absolute;inset:0;background:{{ c.stripe }};pointer-events:none"></div>
+                      <div ref="{{ c.shineRef }}" style="position:absolute;inset:-30% -60%;pointer-events:none;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.18) 47%,rgba(255,255,255,.82) 50%,rgba(255,255,255,.18) 53%,transparent 60%);transform:translateX(-70%);mix-blend-mode:screen;display:{{ c.shineDisplay }}"></div>
+                      <div style="position:absolute;inset:0;padding:7px 7px 8px;display:flex;flex-direction:column;justify-content:space-between">
+                        <span style="font:{{ c.chipWeight }} 8px 'JetBrains Mono',monospace;letter-spacing:.12em;color:{{ c.chipInk }};white-space:nowrap">{{ c.tier }}</span>
+                        <span style="font:900 {{ c.wordSize }}px/1 'Noto Sans JP',sans-serif;white-space:nowrap;text-align:center">{{ c.word }}</span>
+                        <span style="font:600 {{ c.romajiSize }}px 'JetBrains Mono',monospace;letter-spacing:.02em;color:{{ c.subInk }};white-space:nowrap">{{ c.romaji }}</span>
+                      </div>
+                    </div>
+                    <div style="position:absolute;inset:0;backface-visibility:hidden;transform:rotateY(180deg);display:flex;align-items:center;justify-content:center;border:1px solid #FF2E88;background:#0A0A0B repeating-linear-gradient(45deg,rgba(255,46,136,.26) 0 6px,transparent 6px 12px);clip-path:polygon(0 0,100% 0,100% 100%,8px 100%,0 calc(100% - 8px))">
+                      <span style="font:900 18px 'Noto Sans JP',sans-serif;color:#FF2E88">駅</span>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="font:400 9px/1.7 'JetBrains Mono',monospace;letter-spacing:.14em;color:#5A5A5F;min-height:1.7em">{{ note }}</div>
+        <div style="margin-top:16px;height:62px;flex:none;background:#F2F0EB;color:#0A0A0B;font:900 21px Archivo,sans-serif;display:flex;align-items:center;justify-content:center;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px))">BACK TO DECK</div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-width:300px;max-width:440px;border:1px solid #2A2A2E;background:#141416;padding:20px 22px;font:400 12.5px/1.65 Archivo,sans-serif;color:#B9B6B1">
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">THE ROW</h4>
+      <p style="margin:0 0 14px">Cards are <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">{{ cardW }}×{{ cardH }}</span>. Rows bleed to the phone edge with a 10px gutter, so a full row of seven has <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">{{ overlap }}px</span> of overlap per card. Dealt left to right, so the rightmost card is on top of the stack. A short row keeps the same overlap and left-aligns — it does not spread.</p>
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">ONE PIECE</h4>
+      <p style="margin:0 0 14px">Nothing inside a card moves to dodge the overlap. Chip top-left, romaji bottom-left, kanji centered — identical on every card. The card on top hides the right <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">{{ overlap }}px</span> of the one beneath; tapping a card opens its full face over the screen — stock and tries, the set's mark, the word, its reading and what it means — which is where a card is read. The shelf on S6d opens the same face, counting copies instead of tries.</p>
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">THE REVEAL</h4>
+      <p style="margin:0 0 14px">Two beats. <b style="color:#F2F0EB">Deal</b> — the Joker flicks all ten face down from his hand, left to right, 80ms apart, same arc as S6b; the count reads 0. <b style="color:#F2F0EB">Turn</b> — worn first, then base, then shiny, each a 240ms Y-flip in place 160ms apart, the count and tally ticking up per card. Before each shiny he holds 450ms, the card lifts 6px and flips slower (320ms) with a pink flare. He speaks and the note appears when the last card is down. Once a shiny is face up, a diagonal white swipe crosses it in 700ms, every 3s, the two shinies offset so they never swipe together.</p>
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">HOOK</h4>
+      <p style="margin:0">Budget ≈ 1.2s deal + 2.4s turn at defaults. In the app a tap through the reveal hurries the rest of the hand over rather than cutting it — 140ms flips, 70ms apart, no shiny holds — and a second tap snaps what is left flat. On this sheet, tap any card or the Joker to replay. Reduced motion: all faces up, counts final, one 160ms fade.</p>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;cardWidth&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:84,&quot;min&quot;:56,&quot;max&quot;:110,&quot;step&quot;:2,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Cards&quot;},&quot;flipMs&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:240,&quot;min&quot;:120,&quot;max&quot;:600,&quot;step&quot;:20,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Reveal&quot;},&quot;flipGap&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:160,&quot;min&quot;:40,&quot;max&quot;:500,&quot;step&quot;:20,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Reveal&quot;},&quot;shinyHold&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:450,&quot;min&quot;:0,&quot;max&quot;:1200,&quot;step&quot;:50,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Reveal&quot;},&quot;shinePeriod&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:3000,&quot;min&quot;:1500,&quot;max&quot;:8000,&quot;step&quot;:250,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Shiny&quot;}}">
+class Component extends DCLogic {
+  cards = [
+    { tier: "WORN", word: "新幹線", romaji: "SHINKANSEN" },
+    { tier: "WORN", word: "中央口", romaji: "CHUUOUGUCHI" },
+    { tier: "WORN", word: "北口", romaji: "KITAGUCHI" },
+    { tier: "BASE", word: "入口", romaji: "IRIGUCHI" },
+    { tier: "BASE", word: "禁煙", romaji: "KIN'EN" },
+    { tier: "BASE", word: "西口", romaji: "NISHIGUCHI" },
+    { tier: "BASE", word: "南口", romaji: "MINAMIGUCHI" },
+    { tier: "BASE", word: "切符", romaji: "KIPPU" },
+    { tier: "SHINY", word: "出口", romaji: "DEGUCHI" },
+    { tier: "SHINY", word: "改札", romaji: "KAISATSU" }
+  ];
+  state = { earned: 0, shiny: 0, base: 0, worn: 0, jokerLine: "\u00a0", note: "\u00a0" };
+  refs = Array.from({ length: 10 }, () => ({ ref: React.createRef(), innerRef: React.createRef(), shineRef: React.createRef() }));
+  shine(i) {
+    const s = this.refs[i].shineRef.current; if (!s) return;
+    const period = this.props.shinePeriod ?? 3000;
+    this.anims.push(s.animate([
+      { transform: "translateX(-70%)", offset: 0 },
+      { transform: "translateX(70%)", offset: Math.min(.95, 700 / period), easing: "cubic-bezier(.4,0,.2,1)" },
+      { transform: "translateX(70%)", offset: 1 }
+    ], { duration: period, iterations: Infinity, delay: i * 140 }));
+  }
+  jokerRef = React.createRef(); countRef = React.createRef();
+  anims = []; timers = [];
+  componentDidMount() { this.timers.push(setTimeout(() => this.replay(), 500)); }
+  componentDidUpdate(prev) {
+    if (prev.cardWidth !== this.props.cardWidth || prev.flipMs !== this.props.flipMs || prev.flipGap !== this.props.flipGap || prev.shinyHold !== this.props.shinyHold || prev.shinePeriod !== this.props.shinePeriod) this.replay();
+  }
+  componentWillUnmount() { this.stop(); }
+  stop() { this.anims.forEach(a => a.cancel()); this.anims = []; this.timers.forEach(clearTimeout); this.timers = []; }
+  at(ms, fn) { this.timers.push(setTimeout(fn, ms)); }
+  replay = () => {
+    this.stop();
+    const joker = this.jokerRef.current; if (!joker) return;
+    const els = this.refs.map(r => r.ref.current), inners = this.refs.map(r => r.innerRef.current);
+    if (els.some(e => !e) || inners.some(e => !e)) return;
+    const flipMs = this.props.flipMs ?? 240, gap = this.props.flipGap ?? 160, hold = this.props.shinyHold ?? 450;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const totals = { earned: 10, shiny: 2, base: 5, worn: 3 };
+    const finalLine = "Ten cards earned, two shiny. お疲れ. Deal again whenever.";
+    const finalNote = "2 NEW STOCK · 8 COPIES TO THE COLLECTION";
+    this.setState({ earned: 0, shiny: 0, base: 0, worn: 0, jokerLine: "\u00a0", note: "\u00a0" });
+    if (reduced) {
+      els.forEach(el => { el.style.opacity = "1"; el.style.transform = "none"; });
+      inners.forEach(inn => { inn.style.transform = "rotateY(0deg)"; });
+      this.cards.forEach((c, i) => { if (c.tier === "SHINY") this.shine(i); });
+      this.setState({ ...totals, jokerLine: finalLine, note: finalNote });
+      return;
+    }
+    const jr = joker.getBoundingClientRect();
+    const hx = jr.left + jr.width * .72, hy = jr.top + jr.height * .58;
+    const dealGap = 80, flight = 380;
+    els.forEach((el, i) => {
+      inners[i].style.transform = "rotateY(180deg)";
+      el.style.opacity = "0";
+      const cr = el.getBoundingClientRect();
+      const dx = hx - (cr.left + cr.width / 2), dy = hy - (cr.top + cr.height / 2);
+      const delay = i * dealGap;
+      this.anims.push(el.animate([
+        { transform: `translate(${dx}px,${dy}px) rotate(-25deg) scale(.5)`, opacity: 0, offset: 0 },
+        { opacity: 1, offset: .12 },
+        { transform: `translate(${dx * .55}px,${dy * .55 - 22}px) rotate(-12deg) scale(.78)`, offset: .45, easing: "cubic-bezier(.3,.7,.4,1)" },
+        { transform: "translate(0,0) rotate(0deg) scale(1)", opacity: 1, offset: 1 }
+      ], { duration: flight, delay, easing: "cubic-bezier(.2,.9,.25,1.12)", fill: "forwards" }));
+      this.anims.push(joker.animate([
+        { transform: "rotate(0deg)" }, { transform: "rotate(-7deg) translateX(3px)", offset: .3 }, { transform: "rotate(0deg)" }
+      ], { duration: 130, delay, easing: "ease-out" }));
+    });
+    let t = 9 * dealGap + flight + 260;
+    const tally = { earned: 0, shiny: 0, base: 0, worn: 0 };
+    this.cards.forEach((c, i) => {
+      const inner = inners[i], el = els[i], isShiny = c.tier === "SHINY";
+      if (isShiny) t += hold;
+      const dur = isShiny ? 320 : flipMs;
+      this.at(t, () => {
+        if (isShiny) {
+          this.anims.push(el.animate([
+            { transform: "translateY(0)", filter: "drop-shadow(0 0 0 rgba(255,46,136,0))" },
+            { transform: "translateY(-6px)", filter: "drop-shadow(0 0 18px rgba(255,46,136,.9))", offset: .5 },
+            { transform: "translateY(0)", filter: "drop-shadow(0 0 0 rgba(255,46,136,0))" }
+          ], { duration: dur + 260, easing: "ease-out" }));
+        }
+        const f = inner.animate([{ transform: "rotateY(180deg)" }, { transform: "rotateY(0deg)" }], { duration: dur, easing: "cubic-bezier(.3,.6,.3,1)", fill: "forwards" });
+        this.anims.push(f);
+        f.onfinish = () => { inner.style.transform = "rotateY(0deg)"; if (isShiny) this.shine(i); };
+        tally.earned++; tally[c.tier.toLowerCase()]++;
+        this.setState({ ...tally });
+        const cnt = this.countRef.current;
+        if (cnt) this.anims.push(cnt.animate([{ transform: "scale(1)" }, { transform: "scale(1.04)", offset: .4 }, { transform: "scale(1)" }], { duration: 180, easing: "ease-out" }));
+      });
+      t += dur + gap;
+    });
+    this.at(t + 200, () => this.setState({ jokerLine: finalLine, note: finalNote }));
+  };
+  renderVals() {
+    const cardW = this.props.cardWidth ?? 84;
+    const cardH = Math.round(cardW * 7 / 5);
+    const cols = 7, avail = 390 - 2 - 24;
+    const overlap = Math.max(0, Math.ceil((cols * cardW - avail) / (cols - 1)));
+    const visW = cardW - overlap;
+    const skin = {
+      WORN: { bg: "#101011", border: "#1D1D21", ink: "#8C8C93", chipInk: "#5A5A5F", subInk: "#5A5A5F", shadow: "none", chipWeight: 400,
+        stripe: "repeating-linear-gradient(-45deg,rgba(242,240,235,.03) 0 1px,transparent 1px 5px)" },
+      BASE: { bg: "#141416", border: "#2A2A2E", ink: "#F2F0EB", chipInk: "#5A5A5F", subInk: "#8C8C93", shadow: "none", chipWeight: 400, stripe: "none" },
+      SHINY: { bg: "#FF2E88", border: "#FF2E88", ink: "#000", chipInk: "#000", subInk: "rgba(0,0,0,.72)", shadow: "0 0 22px -8px rgba(255,46,136,.55)", chipWeight: 600,
+        stripe: "repeating-linear-gradient(45deg,rgba(0,0,0,.14) 0 7px,transparent 7px 14px)" }
+    };
+    const rows = [];
+    for (let i = 0; i < this.cards.length; i += cols) {
+      const slice = this.cards.slice(i, i + cols);
+      rows.push({ cards: slice.map((c, j) => ({ ...c, ...skin[c.tier], ...this.refs[i + j], shineDisplay: c.tier === "SHINY" ? "block" : "none", ml: j === 0 ? 0 : -overlap, z: j + 1,
+        wordSize: c.word.length > 2 ? Math.round(cardW * .22) : Math.round(cardW * .3),
+        romajiSize: Math.max(6, Math.min(8.5, Math.floor(((cardW - 14) / c.romaji.length / 0.62) * 10) / 10)) })) });
+    }
+    const s = this.state;
+    return { rows, cardW, cardH, overlap, visW, replay: this.replay, jokerRef: this.jokerRef, countRef: this.countRef,
+      earned: s.earned, shiny: s.shiny, base: s.base, worn: s.worn, jokerLine: s.jokerLine, note: s.note,
+      shinyBg: s.shiny ? "#FF2E88" : "#141416", shinyInk: s.shiny ? "#000" : "#5A5A5F" };
+  }
+}
+</script>
+</body>
+</html>

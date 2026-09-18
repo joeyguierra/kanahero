@@ -134,13 +134,17 @@ export function miss(queue: SetWord[]): SetWord[] {
  * adds one copy of the stock it was earned in. Called nowhere else — an
  * abandoned or reloaded run leaves storage exactly as it found it.
  */
-export function earnRun(setId: string, run: { wordId: string; rarity: Rarity }[]): void {
-  if (run.length === 0) return;
+export function earnRun(setId: string, run: { wordId: string; rarity: Rarity }[]): number {
+  if (run.length === 0) return 0;
   const joker = getProgress().joker;
   const set = { ...(joker[setId] ?? {}) };
+  // a stock the shelf has never held before — what S8's note counts as NEW
+  let fresh = 0;
   for (const { wordId, rarity } of run) {
     const row = set[wordId] ?? NO_COPIES;
+    if (row[rarity] === 0) fresh += 1;
     set[wordId] = { ...row, [rarity]: row[rarity] + 1 };
   }
   updateProgress({ joker: { ...joker, [setId]: set } });
+  return fresh;
 }

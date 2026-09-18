@@ -1708,13 +1708,21 @@ button:not(:disabled):active {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 18px 100%, 0 calc(100% - 18px));
 }
 
-.card-fan {
-  width: 104px;
-  height: 146px;
+/* S8's card: one solid piece, sized by its slot, 84 x 118 in a 390 screen.
+   Chip top-left, the word dead centre, romaji bottom-left — identical on every
+   card, because the card next to it covers part of it and nothing inside may
+   move to dodge that. */
+.card-earned {
+  width: 100%;
+  height: 100%;
   flex: none;
-  padding: 8px;
+  padding: 7px 7px 8px;
   justify-content: space-between;
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+
+.card-earned.card-shiny {
+  box-shadow: 0 0 22px -8px rgba(255, 46, 136, 0.55);
 }
 
 .card-shelf {
@@ -1725,14 +1733,6 @@ button:not(:disabled):active {
   padding: 8px;
   justify-content: space-between;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-}
-
-.card-grid {
-  aspect-ratio: 5 / 7;
-  width: 100%;
-  padding: 4px;
-  justify-content: space-between;
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 6px 100%, 0 calc(100% - 6px));
 }
 
 .cardHead {
@@ -1773,9 +1773,8 @@ button:not(:disabled):active {
 }
 
 /* the compact faces carry the rarity as a bare word, no chip */
-.card-fan .cardChip,
-.card-shelf .cardChip,
-.card-grid .cardChip {
+.card-earned .cardChip,
+.card-shelf .cardChip {
   border: none;
   padding: 0;
   font-size: 7px;
@@ -1783,16 +1782,16 @@ button:not(:disabled):active {
   color: var(--carbon);
 }
 
-.card-fan.card-shiny .cardChip,
-.card-shelf.card-shiny .cardChip,
-.card-grid.card-shiny .cardChip {
+.card-earned .cardChip {
+  font-size: 8px;
+  letter-spacing: 0.12em;
+}
+
+.card-earned.card-shiny .cardChip,
+.card-shelf.card-shiny .cardChip {
   background: none;
   color: #000;
   font-weight: 600;
-}
-
-.card-grid .cardChip {
-  font-size: 5px;
 }
 
 .cardMark {
@@ -1840,22 +1839,24 @@ button:not(:disabled):active {
   color: rgba(0, 0, 0, 0.72);
 }
 
-.card-fan .cardRomaji,
-.card-shelf .cardRomaji,
-.card-grid .cardRomaji {
+.card-earned .cardRomaji,
+.card-shelf .cardRomaji {
   font-size: 7px;
   letter-spacing: 0.1em;
   overflow: hidden;
 }
 
-.card-grid .cardRomaji {
-  font-size: 4.5px;
-  letter-spacing: 0.04em;
+/* S8 sets its own size, the widest that still fits one line of romaji */
+.card-earned .cardRomaji {
+  letter-spacing: 0.02em;
 }
 
-.card-fan .cardMid,
-.card-shelf .cardMid,
-.card-grid .cardMid {
+.card-earned.card-worn .cardRomaji {
+  color: var(--carbon);
+}
+
+.card-earned .cardMid,
+.card-shelf .cardMid {
   justify-content: center;
 }
 
@@ -2375,6 +2376,12 @@ button:not(:disabled):active {
   white-space: nowrap;
 }
 
+/* no shiny in the run yet: the chip is unlit until one lands */
+.resultShinyCold {
+  background: var(--plate);
+  color: var(--carbon);
+}
+
 .resultRest {
   font-family: var(--mono);
   font-size: 10px;
@@ -2383,109 +2390,67 @@ button:not(:disabled):active {
   white-space: nowrap;
 }
 
-/* a fan up to five cards; the cards may bleed, their content never does */
-.resultFan {
+/* ---- S8: the hand, in rows (design: v5c "S8 earned") ---- */
+
+/* he deals this hand from the other side of the art, so the flick pivots there
+   rather than on the S6b shoulder */
+.resultScreen .jokerMark {
+  transform-origin: 70% 60%;
+}
+
+/* the rows bleed to the phone's edge and keep a 12px gutter of their own */
+.resultRows {
   flex: 1;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  margin: 0 calc(var(--gutter) * -1);
-  min-height: 190px;
+  gap: 12px;
+  margin: 16px calc(var(--gutter) * -1) 0;
+  padding: 0 12px;
 }
 
-.fanCard {
-  transform-origin: bottom center;
-}
-
-/* the fan overlaps by a third of a card; the covered edge is padding, so the
-   cards bleed but their content never does. The overlap is the slot's, the
-   padding the card's — S8 turns the slot, so the two cannot share an element */
-.fanCard + .fanCard {
-  margin-left: -34px;
-}
-
-.fanCard + .fanCard .card {
-  padding-left: 36px;
-}
-
-.fanCard0 {
-  transform: rotate(-14deg) translateY(20px);
-  z-index: 5;
-}
-.fanCard1 {
-  transform: rotate(-7deg) translateY(6px);
-  z-index: 4;
-}
-.fanCard2 {
-  transform: rotate(0deg) translateY(-4px);
-  z-index: 3;
-}
-.fanCard3 {
-  transform: rotate(7deg) translateY(6px);
-  z-index: 2;
-}
-.fanCard4 {
-  transform: rotate(14deg) translateY(20px);
-  z-index: 1;
-}
-
-/* from six, the fan stops fanning: seven columns, 21 cards at the ceiling */
-.resultGrid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  align-content: center;
-  flex: 1;
-  margin-top: 16px;
-}
-
-/* ---- S8: the reveal (SPEC-v5a §9.3) ---- */
-
-/* the depth the cards turn in; without it a Y rotation is a flat squash */
-.resultFan,
-.resultGrid {
-  perspective: 900px;
+.resultRow {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
 }
 
 /* One slot, two faces, one of them always turned away. Both are in the slot
    from the first frame, so a card landing face up reflows nothing. */
 .revealSlot {
   position: relative;
-  transform-style: preserve-3d;
-  transition: transform 240ms ease-out;
-}
-
-.revealSlot-fan {
-  width: 104px;
-  height: 146px;
   flex: none;
+  width: 84px;
+  height: 118px;
+  perspective: 600px;
+  cursor: pointer;
+  will-change: transform;
 }
 
-.revealSlot-grid {
-  width: 100%;
-  aspect-ratio: 5 / 7;
+/* A full row of seven overflows the gutter, so the cards overlap to fit: each
+   one covers the right edge of the one before it. A short row keeps the same
+   overlap and left-aligns — it does not spread. */
+.resultRow .revealSlot + .revealSlot {
+  margin-left: min(0px, calc((100% - 7 * 84px) / 6));
 }
 
-/* the fan's own angle multiplies with the turn, so it is written here rather
-   than on the card, and the turn is composed on top of it */
-.revealUp {
+.revealInner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  /* his back to you until the card is turned over; the duration is the card's
+     own — a shiny takes longer than the rest */
   transform: rotateY(180deg);
+  transition: transform 240ms cubic-bezier(0.3, 0.6, 0.3, 1);
 }
 
-.fanCard0.revealUp {
-  transform: rotate(-14deg) translateY(20px) rotateY(180deg);
+.revealUp .revealInner {
+  transform: rotateY(0deg);
 }
-.fanCard1.revealUp {
-  transform: rotate(-7deg) translateY(6px) rotateY(180deg);
-}
-.fanCard2.revealUp {
-  transform: rotate(0deg) translateY(-4px) rotateY(180deg);
-}
-.fanCard3.revealUp {
-  transform: rotate(7deg) translateY(6px) rotateY(180deg);
-}
-.fanCard4.revealUp {
-  transform: rotate(14deg) translateY(20px) rotateY(180deg);
+
+/* the second tap: what is left of the reveal snaps flat rather than turning */
+.resultSnapped .revealInner {
+  transition: none;
 }
 
 .revealFace {
@@ -2493,6 +2458,9 @@ button:not(:disabled):active {
   inset: 0;
   backface-visibility: hidden;
   display: flex;
+  /* the face carries the card's own notch, so the shine runs behind it */
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  overflow: hidden;
 }
 
 .revealFace > .card {
@@ -2500,49 +2468,54 @@ button:not(:disabled):active {
   height: 100%;
 }
 
-.revealFaceUp {
+.revealFaceBack {
   transform: rotateY(180deg);
 }
 
-/* One pass of shine across a shiny face as it lands, and then it rests with
-   the finish it would have had anyway. It is drawn inside the card so the
-   card's own clip — notched corner and all — is what the shine runs behind. */
-.revealSweep .card::after {
-  content: "";
+/* One diagonal swipe across a shiny face, every three seconds, once it has
+   landed. Each card waits a little longer than the last, so no two shinies in
+   a hand ever swipe together. */
+.cardShine {
   position: absolute;
-  inset: 0;
+  inset: -30% -60%;
   pointer-events: none;
   background: linear-gradient(
     105deg,
-    transparent 35%,
-    rgba(255, 255, 255, 0.55) 50%,
-    transparent 65%
+    transparent 40%,
+    rgba(255, 255, 255, 0.18) 47%,
+    rgba(255, 255, 255, 0.82) 50%,
+    rgba(255, 255, 255, 0.18) 53%,
+    transparent 60%
   );
-  animation: revealSweep 400ms ease-out both;
+  transform: translateX(-70%);
+  mix-blend-mode: screen;
 }
 
-@keyframes revealSweep {
-  from {
-    transform: translateX(-120%);
+.revealUp .cardShine {
+  animation: cardShine 3000ms linear infinite;
+}
+
+@keyframes cardShine {
+  0% {
+    transform: translateX(-70%);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
-  to {
-    transform: translateX(120%);
+  23.33% {
+    transform: translateX(70%);
+  }
+  100% {
+    transform: translateX(70%);
   }
 }
 
 /* reduced motion: the screen arrives finished, once */
 @media (prefers-reduced-motion: reduce) {
-  .revealSlot {
+  .revealInner {
     transition: none;
   }
 
   .resultScreen {
-    animation: resultFade 120ms ease-out both;
-  }
-
-  .revealSweep .card::after {
-    animation: none;
-    opacity: 0;
+    animation: resultFade 160ms ease-out both;
   }
 }
 
@@ -2555,12 +2528,16 @@ button:not(:disabled):active {
   }
 }
 
+
 .resultNote {
   font-family: var(--mono);
   font-size: 9px;
   letter-spacing: 0.14em;
   color: var(--carbon);
   line-height: 1.7;
+  /* he is silent through the reveal and so is this line — it holds its row so
+     the button under it never moves when the note arrives */
+  min-height: 1.7em;
 }
 
 .btnBone {

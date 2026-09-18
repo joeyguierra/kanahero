@@ -462,15 +462,39 @@ assert.deepEqual(
   "worn, then base, then shiny — the best card of the run lands last",
 );
 assert.equal(
-  await page.locator(".resultGrid .card-base .cardRomaji").first().innerText(),
+  await page.locator(".resultRows .card-base .cardRomaji").first().innerText(),
   missedWord,
   "the word missed once is the base card, not a shiny",
 );
 assert.match(await page.locator(".resultCount").innerText(), /^10\s*EARNED$/);
 assert.equal(await page.locator(".resultShiny").innerText(), "9 SHINY");
 assert.equal(await page.locator(".resultRest").innerText(), "1 BASE · 0 WORN");
-assert.equal(await page.locator(".resultGrid .revealSlot").count(), 10, "past five, the hand is a grid");
+assert.equal(await page.locator(".resultRow").count(), 2, "ten cards is seven and three");
+assert.deepEqual(
+  await page.locator(".resultRow").evaluateAll((rows) => rows.map((r) => r.children.length)),
+  [7, 3],
+  "seven to a row, the short row left-aligned",
+);
+assert.equal(
+  await page.locator(".resultNote").innerText(),
+  "10 NEW STOCK · 0 COPIES TO THE COLLECTION",
+  "the first run on a set is ten stocks nobody had",
+);
 assert.equal(await said(), "result.01", "and he counts it up once the last card has landed");
+
+// a tap on a card opens its whole face — stock and tries, the mark, the word,
+// its reading and what it means — over the screen, and a tap puts it back
+await page.locator(".resultRows .revealSlot").first().click();
+assert.equal(await page.locator(".cardOverlay .card-earn").count(), 1, "the full face opens");
+assert.match(
+  await page.locator(".cardOverlay .cardChip").innerText(),
+  /^(SHINY|BASE|WORN) · (1st TRY|2nd TRY|\d+ TRIES)$/,
+  "the face carries its stock and the tries that earned it",
+);
+assert.equal(await page.locator(".cardOverlay .cardMeaning").count(), 1, "and what it means");
+await page.click(".cardOverlay");
+assert.equal(await page.locator(".cardOverlay").count(), 0, "a tap anywhere puts it back");
+
 await page.click("button:has-text('BACK TO DECK')");
 await page.click(".setRow");
 const afterOne = await totals();
@@ -485,6 +509,15 @@ await page.click("button:has-text('VIEW COLLECTION')");
 assert.equal(await page.locator(".collectionRowEmpty").count(), 0, "every word now has a face");
 assert.equal(await page.locator(".collectionRow .card").count(), 10, "one card each, one stock each");
 assert.equal(await page.locator(".collectionRow .cardWord").count(), 10);
+await page.locator(".collectionRow .card").first().click();
+assert.equal(await page.locator(".cardOverlay .card-earn").count(), 1, "a shelf card opens too");
+assert.match(
+  await page.locator(".cardOverlay .cardChip").innerText(),
+  /^(SHINY|BASE|WORN) · ×\d+$/,
+  "no copy on the shelf remembers its tries, so the chip counts copies",
+);
+await page.click(".cardOverlay");
+assert.equal(await page.locator(".cardOverlay").count(), 0);
 const rowSums = async () =>
   Promise.all(
     (await page.locator(".collectionRow").all()).map(async (row) =>
@@ -735,6 +768,14 @@ const lineAfter = async (pg, was) => {
       "kanahero:v1.joker.bags",
       JSON.stringify({ v: raw.v, bags: { ...raw.bags, "earned.worn": ["earned.worn.02"] } }),
     );
+    // and the STATION aside is spent before the run starts: it is a once-line,
+    // it outranks any earned line, and whether it has already fired otherwise
+    // depends on which word the shuffle deals first
+    const seen = JSON.parse(localStorage.getItem("kanahero:v1.joker.seen") ?? "[]");
+    localStorage.setItem(
+      "kanahero:v1.joker.seen",
+      JSON.stringify([...seen, "station-kanji/kuchi"]),
+    );
   });
 
   await pg.goto(URL);
@@ -811,13 +852,21 @@ const lineAfter = async (pg, was) => {
   assert.match(await pg.locator(".resultCount").innerText(), /^0\s*EARNED$/, "and nothing counted");
   assert.equal(await pg.locator(".jokerPanel[data-line]").count(), 0, "he waits for the last card");
 
-  await pg.click(".resultTally"); // a tap anywhere is a skip
+  // a tap anywhere hurries the rest of the hand over: every card still turns,
+  // it just stops taking its time, so the whole of it lands inside a second
   const slots = await pg.locator(".revealSlot").count();
-  assert.equal(await pg.locator(".revealUp").count(), slots, "the skip turns every card over");
+  const tapped = Date.now();
+  await pg.click(".resultTally");
+  await pg.waitForFunction(
+    (n) => document.querySelectorAll(".revealUp").length === n,
+    slots,
+    { timeout: 2000 },
+  );
+  assert.ok(Date.now() - tapped < 2000, "a hurried reveal is over in well under two seconds");
   assert.match(await pg.locator(".resultCount").innerText(), new RegExp(`^${slots}\\s*EARNED$`));
-  assert.equal(await lineOn(pg), "result.01", "and he speaks at once");
+  assert.equal(await lineOn(pg), "result.01", "and he speaks as the last one lands");
   await ctx.close();
-  console.log("S8: mounts face down at zero, and one tap skips to the end");
+  console.log("S8: mounts face down at zero, and one tap hurries the rest over");
 }
 
 await browser.close();

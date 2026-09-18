@@ -13,9 +13,10 @@
 import type { Ref } from "react";
 
 import type { EarnedCard } from "@/lib/joker";
+import { CARD_W } from "@/lib/reveal";
 import type { SetWord, WordSet } from "@/lib/sets";
 
-export type CardSize = "round" | "earn" | "fan" | "grid" | "shelf";
+export type CardSize = "round" | "earn" | "earned" | "shelf";
 
 /** width in cqw for a word of N characters, measured off the CARD sheet */
 const WORD_CQW = [43, 43, 34.6, 24.3, 18.7, 15.9, 13];
@@ -23,16 +24,24 @@ const WORD_CQW = [43, 43, 34.6, 24.3, 18.7, 15.9, 13];
 const SIZE_SCALE: Record<CardSize, number> = {
   earn: 1,
   round: 0.95,
-  fan: 0.78,
-  // the shelf card is the fan card's twin, sized by its column instead of
+  // the shelf card is the earned card's twin, sized by its column instead of
   // fixed — half of the earn face, which is where the 0.78 comes from
   shelf: 0.78,
-  grid: 0.82,
+  earned: 0.78,
 };
 
 function wordSize(size: CardSize, chars: number): string {
+  // S8's card is a fixed 84px and its word is a fixed size with it: two
+  // characters or fewer get the big step, anything longer the small one
+  if (size === "earned") return `${Math.round(CARD_W * (chars > 2 ? 0.22 : 0.3))}px`;
   const cqw = WORD_CQW[Math.min(chars, WORD_CQW.length - 1)] * SIZE_SCALE[size];
   return `${cqw.toFixed(1)}cqw`;
+}
+
+/** S8's romaji is set to the widest that still fits the card on one line */
+function earnedRomajiSize(letters: number): string {
+  const fitted = Math.floor(((CARD_W - 14) / letters / 0.62) * 10) / 10;
+  return `${Math.max(6, Math.min(8.5, fitted))}px`;
 }
 
 /** the kanji prompt's reading: 34px at 150px wide, stepped down so five kana
@@ -54,6 +63,7 @@ export default function Card({
   size,
   card,
   stamp = true,
+  copies,
   /** replaces the footer's kind line while a round is flipped: ATTEMPT n */
   attempt,
   onClick,
@@ -68,6 +78,9 @@ export default function Card({
   card?: EarnedCard;
   /** false: the face without its rarity stamp */
   stamp?: boolean;
+  /** the shelf's full face: no copy on S6d remembers its own tries, so the
+      chip counts copies of that stock instead of the tries that earned one */
+  copies?: number;
   attempt?: number;
   onClick?: () => void;
   className?: string;
@@ -76,7 +89,7 @@ export default function Card({
   const kanji = set.script === "kanji";
   const mark = kanji ? (set.place ?? set.glyph) : set.glyph;
   const kindWord = kanji ? (set.label ?? "PLACE") : "WORD";
-  const compact = size === "fan" || size === "grid" || size === "shelf";
+  const compact = size === "earned" || size === "shelf";
   const classes = [
     "card",
     `card-${size}`,
@@ -92,26 +105,28 @@ export default function Card({
     // ---- earned: the word's first appearance ----
     compact ? (
       <>
-        {stamp && (
-          <div className="cardChip">
-            {card.rarity.toUpperCase()}
-            {size === "fan" ? ` · ${card.tries}` : ""}
-          </div>
-        )}
+        {stamp && <div className="cardChip">{card.rarity.toUpperCase()}</div>}
         <div className="cardMid">
           <span className="cardWord" style={{ fontSize: wordSize(size, word.word.length) }}>
             {word.word}
           </span>
         </div>
-        <div className="cardRomaji">{word.romaji.toUpperCase()}</div>
+        <div
+          className="cardRomaji"
+          style={size === "earned" ? { fontSize: earnedRomajiSize(word.romaji.length) } : undefined}
+        >
+          {word.romaji.toUpperCase()}
+        </div>
       </>
     ) : (
       <>
         <div className="cardHead">
           <span className="cardChip">
-            {stamp
-              ? `${card.rarity.toUpperCase()} · ${card.rarity === "worn" ? `${card.tries} ` : ""}${RARITY_TRY[card.rarity]}`
-              : "COLLECTED"}
+            {!stamp
+              ? "COLLECTED"
+              : copies !== undefined
+                ? `${card.rarity.toUpperCase()} · \u00d7${copies}`
+                : `${card.rarity.toUpperCase()} · ${card.rarity === "worn" ? `${card.tries} ` : ""}${RARITY_TRY[card.rarity]}`}
           </span>
           <span className="cardMark">{mark}</span>
         </div>

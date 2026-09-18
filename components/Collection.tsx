@@ -10,11 +10,17 @@
 // so the row reads as a set to fill rather than a list of zeroes. A word you
 // have never finished a run on shows no face at all: the word's first
 // appearance is still the card you earned (SPEC-v5a §3).
+//
+// A shelf card is tappable and opens the same full face S8 opens — with one
+// difference: no copy here remembers the tries that earned it, so its chip
+// counts the copies of that stock instead.
+
+import { useState } from "react";
 
 import { cardsFor } from "@/lib/joker";
 import { useJokerLine } from "@/lib/joker-lines";
 import { NO_COPIES } from "@/lib/progress";
-import type { WordSet } from "@/lib/sets";
+import type { SetWord, WordSet } from "@/lib/sets";
 import Card from "./Card";
 import Joker from "./Joker";
 
@@ -22,6 +28,12 @@ const STOCKS = ["shiny", "base", "worn"] as const;
 
 export default function Collection({ set, onBack }: { set: WordSet; onBack: () => void }) {
   const cards = cardsFor(set.id);
+  /** the slot a tap opened: one word, in one stock, and how many of it */
+  const [open, setOpen] = useState<{
+    word: SetWord;
+    stock: (typeof STOCKS)[number];
+    copies: number;
+  } | null>(null);
   const empty = set.words.every((w) => !cards[w.word]);
   const line = useJokerLine(empty ? "collection.empty" : "collection", { set });
 
@@ -64,6 +76,7 @@ export default function Collection({ set, onBack }: { set: WordSet; onBack: () =
                         set={set}
                         size="shelf"
                         card={{ rarity: stock, tries: 0 }}
+                        onClick={() => setOpen({ word, stock, copies: row[stock] })}
                       />
                     ) : (
                       // an empty slot, not a card: the stock is named so the
@@ -86,6 +99,18 @@ export default function Collection({ set, onBack }: { set: WordSet; onBack: () =
       </div>
 
       <div className="grow" />
+
+      {open && (
+        <div className="cardOverlay" role="dialog" onClick={() => setOpen(null)}>
+          <Card
+            word={open.word}
+            set={set}
+            size="earn"
+            card={{ rarity: open.stock, tries: 0 }}
+            copies={open.copies}
+          />
+        </div>
+      )}
     </main>
   );
 }

@@ -41,7 +41,8 @@ export default function Round({
   queue: SetWord[];
   /** the run is discarded, not banked — nothing of it was ever written */
   onAbandon: () => void;
-  onFinish: (hand: RoundCard[]) => void;
+  /** the hand, and how many of its cards are a stock the shelf never held */
+  onFinish: (hand: RoundCard[], newStock: number) => void;
 }) {
   const [queue, setQueue] = useState<SetWord[]>(dealt);
   const [phase, setPhase] = useState<"write" | "reveal">("write");
@@ -122,12 +123,13 @@ export default function Round({
     canvasRef.current?.clear();
     setHasInk(false);
     if (next.length === 0) {
-      // the run is over, so the run is kept: one write, every word of it
-      earnRun(
+      // the run is over, so the run is kept: one write, every word of it — and
+      // the write is the only thing that knows which copies are new (S8's note)
+      const newStock = earnRun(
         set.id,
         won.map(({ word, card }) => ({ wordId: word.word, rarity: card.rarity })),
       );
-      onFinish(won);
+      onFinish(won, newStock);
       return;
     }
     setQueue(next);

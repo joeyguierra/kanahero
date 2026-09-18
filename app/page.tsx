@@ -83,6 +83,8 @@ export default function App() {
   const [activeSet, setActiveSet] = useState<WordSet | null>(null);
   const [queue, setQueue] = useState<SetWord[]>([]);
   const [hand, setHand] = useState<RoundCard[]>([]);
+  /** how many of the last run's cards were a stock its shelf never held */
+  const [newStock, setNewStock] = useState(0);
   const [drill, setDrill] = useState<Kana[]>([]);
   const [summary, setSummary] = useState<SessionSummary | null>(null);
   const [openCapture, setOpenCapture] = useState<string | null>(null);
@@ -193,8 +195,9 @@ export default function App() {
         set={activeSet}
         queue={queue}
         onAbandon={() => setPhase("set")}
-        onFinish={(won) => {
+        onFinish={(won, fresh) => {
           setHand(won);
+          setNewStock(fresh);
           setPhase("result");
         }}
       />
@@ -202,7 +205,14 @@ export default function App() {
   }
 
   if (phase === "result" && activeSet) {
-    return <Result set={activeSet} hand={hand} onBackToDeck={() => setPhase("deck")} />;
+    return (
+      <Result
+        set={activeSet}
+        hand={hand}
+        newStock={newStock}
+        onBackToDeck={() => setPhase("deck")}
+      />
+    );
   }
 
   if (phase === "deck") {
