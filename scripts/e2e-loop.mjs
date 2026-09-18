@@ -598,6 +598,18 @@ const lineOn = async (pg) => {
   await pg.waitForSelector(".jokerPanel[data-line]");
   return pg.getAttribute(".jokerPanel", "data-line");
 };
+/** the line he moves ON to, once the panel has caught up with the screen — he
+    picks in an effect, so the old line is still up for a tick after a tap */
+const lineAfter = async (pg, was) => {
+  await pg.waitForFunction(
+    (before) => {
+      const id = document.querySelector(".jokerPanel")?.dataset.line;
+      return id && id !== before;
+    },
+    was,
+  );
+  return pg.getAttribute(".jokerPanel", "data-line");
+};
 
 // 11.1 a browser that has never seen this app gets the introduction, once
 {
@@ -702,6 +714,76 @@ const lineOn = async (pg) => {
   );
   await ctx.close();
   console.log("joker: the 口 aside fires in STATION, says Seven, and never fires in TEST");
+}
+
+// 11.5 he reacts to the card just graded, not the one now in front of him.
+// By the time an `earned.*` line goes up the prompt has already moved on, so
+// `{tries}` is the one token that can silently count the wrong card. The bag
+// is seeded to the single worn line that carries it, to pin the number.
+{
+  const { ctx, pg } = await fresh();
+  // twice: the first line a new browser gets is the introduction, a once-line
+  // that spends nothing, so there is no bag to read the hash off yet
+  await pg.goto(URL);
+  await lineOn(pg);
+  await pg.goto(URL);
+  await lineOn(pg);
+  await pg.evaluate(() => {
+    const raw = JSON.parse(localStorage.getItem("kanahero:v1.joker.bags"));
+    // the shipped corpus hash, so this is a seeded bag and not a stale one
+    localStorage.setItem(
+      "kanahero:v1.joker.bags",
+      JSON.stringify({ v: raw.v, bags: { ...raw.bags, "earned.worn": ["earned.worn.02"] } }),
+    );
+  });
+
+  await pg.goto(URL);
+  await pg.click(".deckRow:has-text('KANJI')");
+  await pg.click("button:has-text('Start session')");
+  await pg.click(".setRow:has-text('STATION')");
+  await pg.click("button:has-text('DEAL')");
+
+  // miss whatever comes up until some word is on its third attempt — the card
+  // itself says which attempt it is, so nothing here has to track the queue
+  let reaction = null;
+  let reached = 0;
+  let showing = await lineOn(pg);
+  for (let i = 0; i < 24 && !reaction; i++) {
+    const box = await pg.locator("canvas.ink").boundingBox();
+    await pg.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.35);
+    await pg.mouse.down();
+    await pg.mouse.move(box.x + box.width * 0.7, box.y + box.height * 0.6, { steps: 5 });
+    await pg.mouse.up();
+    await pg.click("button:has-text('FLIP')");
+    showing = await lineAfter(pg, showing);
+    const attempt = parseInt(
+      (await pg.locator(".roundCard .cardKind").innerText()).replace(/\D/g, ""),
+      10,
+    );
+    if (attempt < 3) {
+      await pg.click("button:has-text('MISSED')");
+      showing = await lineAfter(pg, showing);
+      continue;
+    }
+    reached = attempt;
+    await pg.click("button:has-text('GOT IT')");
+    if (await pg.locator(".resultCount").count()) break;
+    showing = await lineAfter(pg, showing);
+    reaction = {
+      id: showing,
+      text: (await pg.locator(".jokerLine").textContent()).trim(),
+    };
+  }
+  assert.equal(reached, 3, "no word ever reached a third attempt");
+  assert.ok(reaction, "the third attempt never got graded");
+  assert.equal(reaction.id, "earned.worn.02", "a card that took three tries is worn stock");
+  assert.match(
+    reaction.text,
+    /^Three tries\b/,
+    `he counts the card he just graded, not the next prompt — got "${reaction.text}"`,
+  );
+  await ctx.close();
+  console.log("joker: the earned line counts the card just graded, three tries deep");
 }
 
 // --- 12. S8 with motion on: face down, then turned over, and skippable

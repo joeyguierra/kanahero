@@ -184,6 +184,10 @@ function varsOf(ctx: JokerContext): Vars {
     chars: ctx.chars,
     missStreak: ctx.missStreak,
     triesThisWord: ctx.triesThisWord,
+    // `{tries}` is the same number under the name a line uses it by: the
+    // condition asks how many tries this word has taken, the token says it out
+    // loud. One field, so the two can never drift apart.
+    tries: ctx.triesThisWord,
   };
 }
 

@@ -38,9 +38,12 @@ const OUT = process.env.KANAHERO_JOKER_OUT ?? path.join(ROOT, "lib", "joker-corp
 /** the pool key that is not a screen: lines he may say exactly once, ever */
 const ONCE_POOL = "once";
 /** tokens the runtime can fill (SPEC-v5b §5); `n:X` counts anything it wraps */
-const TOKENS = ["bank", "shiny", "earned", "words", "chars"];
+const TOKENS = ["bank", "shiny", "earned", "words", "chars", "tries"];
 /** the voice law: a line is under twelve words, a token counting as one */
 const MAX_WORDS = 11;
+/** bible §9: he aims at 70/30 by LINE coverage; under this is worth saying out loud */
+const JA_COVERAGE = 60;
+const pct = (n, of) => (of === 0 ? 0 : Math.round((n * 100) / of));
 /** counting words he is allowed to type, because they are idiom, not data */
 const NUMBER_WORD_OK = new Set([
   // "one box" is a box, not a count of boxes
@@ -52,14 +55,21 @@ const NUMBER_WORD_OK = new Set([
 ]);
 const NUMBER_WORDS =
   /\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\b|\d/i;
+/** "one" after a determiner is a pronoun standing in for the card in front of
+    him — "Next one.", "that one", "the one" — not a count of anything. It is
+    also how he ends half his reaction lines, so it is answered here as grammar
+    rather than by allow-listing every line that says it. */
+const PRONOUN_ONE = /\b(next|this|that|the|another|other|which|each|every|no|first|second|last)\s+one\b/gi;
 
-/** pool depth by visit frequency (bible §5). Warn-only in this build: every
-    pool but `home` is a pool of one on purpose, awaiting its own pass. */
+/** Pool depth by visit frequency (bible §5, as corrected by §8: `earned.*` and
+    `round.missed` fire once per WORD — ten times a run — so they are top tier,
+    not middle). Warn-only in this build: most pools are a pool of one on
+    purpose, awaiting their own pass. */
 const DEPTH = [
-  [["drill", "drill.prompt", "round.kana", "round.kanji", "reveal.kana", "reveal.kanji"], 30],
-  [["home", "deck.hiragana", "deck.katakana", "deck.kanji", "set", "result",
-    "earned.shiny", "earned.base", "earned.worn"], 15],
-  [["bank", "collection", "abandon", "round.missed"], 6],
+  [["drill", "drill.prompt", "round.kana", "round.kanji", "reveal.kana", "reveal.kanji",
+    "earned.shiny", "earned.base", "earned.worn", "round.missed"], 30],
+  [["home", "deck.hiragana", "deck.katakana", "deck.kanji", "set", "result"], 15],
+  [["bank", "collection", "abandon"], 6],
   [["credits", "collection.empty", "home.wiped"], 2],
 ];
 
@@ -113,6 +123,7 @@ function parseLine(raw, pool, where) {
     else if (tag.startsWith("needs:")) line.needs = tag.slice(6).split(",").map((c) => c.trim());
     else if (tag.startsWith("ja:")) line.ja = tag.slice(3).split(",").map((c) => c.trim());
     else if (tag.startsWith("subj:")) line.subj = tag.slice(5).trim();
+    else if (tag.startsWith("dialect:")) line.dialect = tag.slice(8).trim();
     else if (tag.startsWith("status:")) line.status = tag.slice(7).trim();
     else fail.push(`${line.id}: unknown tag "${tag}"`);
   }
@@ -203,7 +214,8 @@ for (const line of all) {
 
   // 5 — no typed numbers about data
   const hasToken = /\{[^}]+\}/.test(line.text);
-  if (!hasToken && !line.needs && !NUMBER_WORD_OK.has(line.id) && NUMBER_WORDS.test(line.text)) {
+  const counting = line.text.replace(PRONOUN_ONE, "");
+  if (!hasToken && !line.needs && !NUMBER_WORD_OK.has(line.id) && NUMBER_WORDS.test(counting)) {
     fail.push(`${where}: a number with no token and no needs: — "${line.text}"`);
   }
 
@@ -250,6 +262,7 @@ const NUMERIC = {
   runsFinished: [0, 1, 5],
   missStreak: [0, 1, 5],
   triesThisWord: [0, 1, 5],
+  tries: [0, 1, 5],
   words: [1, 5],
   chars: [1, 5],
 };
@@ -301,9 +314,15 @@ for (const [pool, lines] of pools) {
   if (live.length >= 8) {
     const him = live.filter((l) => l.subj === "him").length;
     if (him * 3 > live.length) warn.push(`${pool}: ${him}/${live.length} lines are about him`);
+    // Coverage, not a ratio: the share of lines carrying at least one Japanese
+    // phrase. Bible §9 sets the target at 70/30 and explains why the WORD share
+    // cannot carry it — a line that is a third Japanese by words stops reading
+    // in English, and §3.1 says his Japanese is never load-bearing.
     const ja = live.filter((l) => l.ja).length;
-    if (ja * 5 < live.length || ja * 3 > live.length) {
-      warn.push(`${pool}: ${ja}/${live.length} lines seed Japanese (wants 1 in 3 to 1 in 5)`);
+    if (ja * 100 < live.length * JA_COVERAGE) {
+      warn.push(
+        `${pool}: ${pct(ja, live.length)}% of lines seed Japanese (wants ${JA_COVERAGE}%)`,
+      );
     }
   }
 }
@@ -337,9 +356,14 @@ for (const [pool, lines] of pools) {
 
 console.log(`joker-audit · corpus ${hash}`);
 for (const [pool, lines] of pools) {
-  const keep = lines.filter((l) => l.status === "ship" && !l.silenced).length;
-  const quiet = lines.length - keep;
-  console.log(`  ${pool.padEnd(18)} ${String(keep).padStart(3)}${quiet ? `  (${quiet} not bundled)` : ""}`);
+  const live = lines.filter((l) => l.status === "ship" && !l.silenced);
+  const quiet = lines.length - live.length;
+  const ja = live.filter((l) => l.ja).length;
+  console.log(
+    `  ${pool.padEnd(18)} ${String(live.length).padStart(3)}` +
+      `  ja ${String(pct(ja, live.length)).padStart(3)}%` +
+      `${quiet ? `  (${quiet} not bundled)` : ""}`,
+  );
 }
 if (setLines.length) {
   console.log(`  set blocks:`);
@@ -352,9 +376,18 @@ for (const w of warn) console.log(`  warn      ${w}`);
 for (const f of fail) console.log(`  FAIL      ${f}`);
 
 const setBundled = setLines.filter((l) => l.status === "ship" && !l.silenced).length;
+// The Kansai layer is reported on its own line because it is removable on
+// purpose (bible §9): dialect is in character in a retort and misleading
+// anywhere else, so its size should never have to be guessed at.
+const shipping = [...pools.values()].flat().filter((l) => l.status === "ship" && !l.silenced);
+const kansai = shipping.filter((l) => l.dialect === "kansai").length;
 console.log(
   `${bundled} global + ${setBundled} set lines bundled, ${silenced.length} silenced, ` +
     `${warn.length} warning${warn.length === 1 ? "" : "s"}`,
+);
+console.log(
+  `japanese: ${pct(shipping.filter((l) => l.ja).length, shipping.length)}% of lines ` +
+    `· kansai: ${kansai}`,
 );
 
 if (fail.length) {

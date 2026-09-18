@@ -60,8 +60,13 @@ export default function Round({
   // to the hand, so the hand has not got it yet. Everything else — the queue,
   // the next prompt — has already moved on.
   const [shown, setShown] = useState({ deck: dealt.length, hand: 0 });
-  /** the rarity of the word just graded: his line on the NEXT prompt (§9.2.4) */
-  const [justEarned, setJustEarned] = useState<Rarity | null>(null);
+  /**
+   * The card just graded: his line on the NEXT prompt (§9.2.4). It carries the
+   * try count as well as the rarity because by the time he reacts, `current`
+   * is already the next word — `{tries}` has to count the card he is talking
+   * about, not the one in front of him.
+   */
+  const [justEarned, setJustEarned] = useState<{ rarity: Rarity; tries: number } | null>(null);
   // every prompt he puts up gets its own melt (S7 anim sheet) — including the
   // one a miss brings back round. The flip is not a new prompt: the card is
   // the same card, so this counts presentations rather than renders.
@@ -89,13 +94,19 @@ export default function Round({
     : justMissed
       ? "round.missed"
       : justEarned
-        ? (`earned.${justEarned}` as JokerScreen)
+        ? (`earned.${justEarned.rarity}` as JokerScreen)
         : kanji
           ? "round.kanji"
           : "round.kana";
   const line = useJokerLine(
     screen,
-    { set, word: current, chars: chars.length, triesThisWord: tries, allowOnce: !reveal && !justMissed },
+    {
+      set,
+      word: current,
+      chars: chars.length,
+      triesThisWord: justEarned ? justEarned.tries : tries,
+      allowOnce: !reveal && !justMissed,
+    },
     `${presented}.${phase}`,
   );
 
@@ -139,7 +150,7 @@ export default function Round({
     const rest = queue.slice(1);
     const card = promptRef.current;
     setHand(held);
-    setJustEarned(won.card.rarity);
+    setJustEarned({ rarity: won.card.rarity, tries: n });
 
     // the card leaves for the hand while its slot is already melting in the
     // next prompt behind it — a clone, so the two never touch the same element
