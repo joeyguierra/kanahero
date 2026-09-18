@@ -11,8 +11,9 @@
 // top hides the right edge of the one beneath it. A tap does not rearrange the
 // row — it opens the card's full face over the screen, where it is read.
 //
-// A shiny keeps a standing shine once it is face up — one diagonal swipe every
-// three seconds, staggered per card so no two ever swipe together.
+// A shiny keeps a standing shine — one diagonal swipe every three seconds —
+// but not until the whole hand is over: every shiny in the hand starts its
+// swipe on the same frame, so they cross together rather than in sequence.
 
 import type { EarnedCard } from "@/lib/joker";
 import type { SetWord, WordSet } from "@/lib/sets";
@@ -28,7 +29,9 @@ export default function RevealCard({
   z,
   /** this card's own turn, in ms: a shiny takes longer than the rest */
   flipMs,
-  /** ms before its standing shine starts, once it has landed */
+  /** the reveal is over: every shiny starts its standing shine, together */
+  shining,
+  /** ms after that before the first swipe — the last card's own turn */
   shineDelay,
   onClick,
   ref,
@@ -39,6 +42,7 @@ export default function RevealCard({
   up: boolean;
   z: number;
   flipMs: number;
+  shining?: boolean;
   shineDelay: number;
   onClick?: () => void;
   ref?: React.Ref<HTMLDivElement>;
@@ -46,7 +50,7 @@ export default function RevealCard({
   const shiny = card.rarity === "shiny";
   return (
     <div
-      className={`revealSlot${up ? " revealUp" : ""}`}
+      className={`revealSlot${up ? " revealUp" : ""}${shining ? " revealShining" : ""}`}
       style={{ zIndex: z }}
       onClick={onClick}
       ref={ref}

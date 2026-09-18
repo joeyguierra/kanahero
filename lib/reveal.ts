@@ -56,12 +56,13 @@ export const FAST_FLIP_MS = 140;
 export const FAST_STEP_MS = 70;
 
 // ---- the shiny's standing shine ----
+// Every shiny in the hand swipes together, and none of them starts until the
+// last card of the reveal has finished turning: while cards are still coming
+// over, the turn is the only thing moving on the screen.
 /** one swipe across a shiny face */
 export const SHINE_SWIPE_MS = 700;
 /** and again this often */
 export const SHINE_PERIOD_MS = 3000;
-/** card i waits this much longer, so no two shinies swipe together */
-export const SHINE_STAGGER_MS = 140;
 
 /** reduced motion: no deal, no turn — one fade over the finished screen */
 export const FADE_MS = 160;

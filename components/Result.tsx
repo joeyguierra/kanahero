@@ -16,9 +16,10 @@
 // 80ms apart, and the count reads 0. THE TURN: worn first, then base, then
 // shiny, each a flip in place with the count and the tally ticking up per card;
 // before each shiny he holds, the card lifts and flares, and once it is face up
-// a white swipe crosses it every three seconds. He speaks when the last card is
-// down, and the note appears with him. A tap through any of it hurries the rest
-// of the hand over rather than cutting to the end — see `fastSchedule`.
+// a white swipe crosses it every three seconds — every shiny together, and not
+// until the last card of the hand has finished turning. He speaks when the last
+// card is down, and the note appears with him. A tap through any of it hurries
+// the rest of the hand over rather than cutting to the end — see `fastSchedule`.
 //
 // None of this is load-bearing. The run was written the moment the last word
 // was graded, before this screen existed (SPEC-v5a §1.1, §9.3.9) — leaving
@@ -35,7 +36,6 @@ import {
   FLICK_MS,
   FLIGHT_MS,
   FLIP_MS,
-  SHINE_STAGGER_MS,
   SHINY_FLIP_MS,
   SHINY_LIFT_EXTRA_MS,
   SPEAK_AFTER_MS,
@@ -93,6 +93,14 @@ export default function Result({
 
   const tally = (r: Rarity) => order.slice(0, turned).filter((c) => c.card.rarity === r).length;
   const shiny = tally("shiny");
+  // the shine waits out the last card's own turn: `done` is true the moment
+  // that card STARTS turning, so the delay is what is left of it
+  const last = order[order.length - 1];
+  const lastFlipMs = fast
+    ? FAST_FLIP_MS
+    : last?.card.rarity === "shiny"
+      ? SHINY_FLIP_MS
+      : FLIP_MS;
 
   function stop() {
     anims.current.forEach((a) => a.cancel());
@@ -309,7 +317,8 @@ export default function Result({
                   flipMs={
                     fast ? FAST_FLIP_MS : card.rarity === "shiny" ? SHINY_FLIP_MS : FLIP_MS
                   }
-                  shineDelay={SHINY_FLIP_MS + index * SHINE_STAGGER_MS}
+                  shining={done}
+                  shineDelay={lastFlipMs}
                   onClick={done ? () => setOpen({ word, card }) : undefined}
                   ref={(el) => {
                     slots.current[index] = el;

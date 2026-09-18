@@ -718,6 +718,9 @@ const lineAfter = async (pg, was) => {
     await pg.click("button:has-text('DEAL')");
     const said = [];
     for (let i = 0; i < limit; i++) {
+      // sample the PROMPT's line: FLIP on screen means the write phase is up,
+      // so this can never read the line the reveal before it left behind
+      await pg.waitForSelector("button:has-text('FLIP')");
       await pg.waitForSelector(".jokerPanel[data-line]");
       said.push({
         id: await pg.getAttribute(".jokerPanel", "data-line"),

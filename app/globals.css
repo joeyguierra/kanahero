@@ -2472,9 +2472,9 @@ button:not(:disabled):active {
   transform: rotateY(180deg);
 }
 
-/* One diagonal swipe across a shiny face, every three seconds, once it has
-   landed. Each card waits a little longer than the last, so no two shinies in
-   a hand ever swipe together. */
+/* One diagonal swipe across a shiny face, every three seconds, once the whole
+   hand is over. Every shiny gets the class on the same frame and the same
+   delay, so the swipes cross together rather than one after another. */
 .cardShine {
   position: absolute;
   inset: -30% -60%;
@@ -2491,7 +2491,7 @@ button:not(:disabled):active {
   mix-blend-mode: screen;
 }
 
-.revealUp .cardShine {
+.revealShining .cardShine {
   animation: cardShine 3000ms linear infinite;
 }
 
