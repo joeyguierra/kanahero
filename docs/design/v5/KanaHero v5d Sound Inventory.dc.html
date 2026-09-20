@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>KanaHero v5d — sound inventory, every cue by importance</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;900&amp;family=JetBrains+Mono:wght@400;600;800&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0A0A0B;color:#F2F0EB;font-family:Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#FF2E88;text-decoration:none}a:hover{color:#F2F0EB}
+</style>
+</helmet>
+
+<div style="max-width:1040px;margin:0 auto;padding:56px 32px 96px;display:flex;flex-direction:column;gap:56px">
+
+<!-- HEAD -->
+<div style="display:flex;flex-direction:column;gap:14px">
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#FF2E88;color:#000">V5D</span>
+    <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:rgba(255,255,255,.11);color:#F2F0EB">SOUND INVENTORY</span>
+    <span style="font:400 11px 'JetBrains Mono',monospace;letter-spacing:.06em;color:#8C8C93">reviewed against v5c handoff · e3cd9e3 · 2026-09-19</span>
+  </div>
+  <h1 style="font:900 34px/1.05 Archivo,sans-serif;letter-spacing:-.03em;max-width:820px;text-wrap:pretty">Every sound the app needs, in the order it needs them</h1>
+  <p style="font:400 13px/1.65 'JetBrains Mono',monospace;color:#8C8C93;max-width:860px;letter-spacing:.01em">SPEC-v5d §1 names seven files, all on the reveal and the tick. Reviewing all ten screens gives <b style="color:#F2F0EB">28 cues in 21 more files</b>, five of them reused at a second playback rate. Everything below inherits §0 without exception: default off, nothing sound-only, generate at 0.5 s and trim, anechoic, AAC. Foundation is the old-RPG vocabulary — text blip, cursor, confirm, cancel, item-get, fanfare — every one of it re-voiced as card-table foley. No chimes, no melody, one ring.</p>
+</div>
+
+<!-- MATERIAL MAP -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;gap:11px;align-items:baseline"><span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#2E9DFF;color:#000">MATERIAL MAP</span><b style="font:700 14px Archivo,sans-serif">Five materials. Who touches what decides which one it is.</b></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:#2A2A2E;border:1px solid #2A2A2E">
+    <div style="background:#141416;padding:16px 16px 18px;display:flex;flex-direction:column;gap:8px"><span style="font:600 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93">CARDSTOCK</span><b style="font:700 13px Archivo,sans-serif">Every card</b><span style="font:400 12px/1.5 Archivo,sans-serif;color:#B9B6B1">flip · tick · miss · deal · arrive · lift · skip</span></div>
+    <div style="background:#141416;padding:16px 16px 18px;display:flex;flex-direction:column;gap:8px"><span style="font:600 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93">GRAPHITE ON PAPER</span><b style="font:700 13px Archivo,sans-serif">The player's ink</b><span style="font:400 12px/1.5 Archivo,sans-serif;color:#B9B6B1">down · loop · up · clear · undo</span></div>
+    <div style="background:#141416;padding:16px 16px 18px;display:flex;flex-direction:column;gap:8px"><span style="font:600 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93">BRUSH</span><b style="font:700 13px Archivo,sans-serif">The Joker's ink</b><span style="font:400 12px/1.5 Archivo,sans-serif;color:#B9B6B1">reveal only. He writes with a brush, you write with a pencil — the same word, two instruments.</span></div>
+    <div style="background:#141416;padding:16px 16px 18px;display:flex;flex-direction:column;gap:8px"><span style="font:600 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93">FELT &amp; WOOD</span><b style="font:700 13px Archivo,sans-serif">The table and its chrome</b><span style="font:400 12px/1.5 Archivo,sans-serif;color:#B9B6B1">nav · primary · toggle · modal · talk · end</span></div>
+    <div style="background:#141416;padding:16px 16px 18px;display:flex;flex-direction:column;gap:8px"><span style="font:600 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#FF2E88">METAL</span><b style="font:700 13px Archivo,sans-serif;color:#FF2E88">Shiny, and nothing else</b><span style="font:400 12px/1.5 Archivo,sans-serif;color:#B9B6B1">the only thing in the app that rings, because it is the only thing that glows</span></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 28px;font:400 12px/1.6 'JetBrains Mono',monospace;color:#8C8C93;padding-top:6px">
+    <span><span style="color:#5A5A5F">RPG text blip →</span> joker.talk</span>
+    <span><span style="color:#5A5A5F">cursor move →</span> ui.nav</span>
+    <span><span style="color:#5A5A5F">confirm →</span> ui.primary</span>
+    <span><span style="color:#5A5A5F">cancel →</span> modal.close</span>
+    <span><span style="color:#5A5A5F">item get →</span> hand.tick</span>
+    <span><span style="color:#5A5A5F">damage →</span> hand.miss, gentled</span>
+    <span><span style="color:#5A5A5F">level start →</span> deal.press</span>
+    <span><span style="color:#5A5A5F">fanfare →</span> reveal.end, no melody</span>
+  </div>
+</div>
+
+<!-- TIER 0 -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;gap:11px;align-items:baseline;flex-wrap:wrap"><span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#00E58A;color:#000">TIER 0</span><b style="font:700 14px Archivo,sans-serif">Already specced — the seven in SPEC-v5d §1</b><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">7 files · reveal + tick</span></div>
+  <div style="font:400 12.5px/1.65 'JetBrains Mono',monospace;color:#8C8C93;max-width:860px">hand.tick · flip.worn · flip.base · flip.shiny · reveal.shinyHold · reveal.end · reveal.skip — <b style="color:#F2F0EB">confirmed as written, no changes.</b> Two review notes only: hand.tick lands 420 ms after GOT IT, inside the next melt and possibly under the player's own pencil — at −12 it is rightly the loudest thing in that window, keep it so. And reveal.end now has a twin at the other end of the run (deal.press, below): the same deck squared, once to open and once to close.</div>
+</div>
+
+<!-- TIER 1 -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;gap:11px;align-items:baseline;flex-wrap:wrap"><span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#FF2E88;color:#000">TIER 1</span><b style="font:700 14px Archivo,sans-serif">The loop — fires every word, 9–21× a run. These are what the app sounds like.</b><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">8 cues · 7 files</span></div>
+  <div style="display:flex;flex-direction:column;gap:1px;background:#2A2A2E;border:1px solid #2A2A2E">
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">ink.loop</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">pointer held and moving on the canvas · Round.tsx</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#FF2E88">2 s SEAMLESS LOOP · −26 → −20 dBFS · 1 file</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">Pencil on paper. The one continuous sound in the app and the one that is heard most — this is where the ASMR lives. Gain and <span style="font-family:'JetBrains Mono',monospace;font-size:12px">playbackRate</span> follow pointer speed (silent at rest, full at ~600 px/s), 8 ms fades on down and up. The only cue you cannot trim into being: generate 2 s, find a seamless cut, crossfade. No old-school ancestor — nothing in 1990 had a pen.</p>
+    </div>
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">ink.down</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">pointerdown on the canvas</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#8C8C93">≤40 ms · −22 dBFS · RR3 ±3%</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">The tip touching paper — a single soft graphite tap, the attack the loop lacks. ink.up (the lift, ≤30 ms, −26) is the same generation trimmed from the other end; build it, then A/B against the loop's fade alone and cut it if the fade is enough.</p>
+    </div>
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">ink.reveal</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">FLIP · Round.tsx write→reveal · his model over your ink</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#8C8C93">≤250 ms · −16 dBFS · 1 file (RR3 if M12 animates strokes)</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">One brush stroke on paper — brush, not pencil. The answer is the Joker's and it must not sound like yours. Today FLIP is a one-frame cut (M12 open), so one swish covers it; if the model ever draws itself stroke by stroke, one per stroke, round-robin.</p>
+    </div>
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">joker.talk</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">M1 type-on, 22 ms/char · Joker.tsx · every screen</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#8C8C93">≤25 ms · −24 dBFS · RR4 ±6%</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">The RPG text blip, and the foundation of the whole palette — but <b style="color:#F2F0EB">not one per character.</b> Forty-five characters at 22 ms is a rattle, the same law as §0.2. One dry paper click every third character, skipping spaces and punctuation, four variants cycled with pitch jitter. Paper, not electronics: a typewriter platen heard from the next room, not a beep. Silent whenever the panel is empty — S1 before storage lands, S8 until the last card. Japanese and Latin get the same voice; two voices would be cute and excessive.</p>
+    </div>
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">hand.miss</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">MISSED · Round.tsx missed() · the word goes back with a gap of 2</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#8C8C93">≤180 ms · −16 dBFS · 1 file</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">One card slid back under a deck on felt: dull, no snap, no ring. The exact opposite gesture to hand.tick, which is what M9 is missing visually too. Old-school "damage", gentled to nothing — never a buzzer, never a minor interval. His line is already kind; the sound must not undercut it.</p>
+    </div>
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">ink.clear</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">CLEAR · the canvas wiped</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#8C8C93">≤300 ms · −18 dBFS · 1 file</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">A hand brushing eraser dust off paper, once. <b style="color:#F2F0EB">ink.undo</b> is the same file at rate 1.4 trimmed to ≤120 ms and −20 — one stroke lifted, tighter, smaller. One generation, two cues.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- TIER 2 -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;gap:11px;align-items:baseline;flex-wrap:wrap"><span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#FFB300;color:#000">TIER 2</span><b style="font:700 14px Archivo,sans-serif">Deals and arrivals — once per run, the beats between screens</b><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">5 cues · 5 files</span></div>
+  <div style="display:flex;flex-direction:column;gap:1px;background:#2A2A2E;border:1px solid #2A2A2E">
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">deal.press</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">DEAL · S6b CTA · the run begins</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#8C8C93">≤400 ms · −12 dBFS · 1 file</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">A deck squared and cut once. The old-school "level start", and the bookend to reveal.end — the same deck heard opening and closing a run. Generate at 1 s like reveal.end. The most important single non-loop sound outside S8.</p>
+    </div>
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">prompt.melt</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">M5 · every presentation, 900 ms · PromptMelt.tsx</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#8C8C93">≤700 ms · −24 dBFS · 1 file</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">The card being made: paper fibre settling, grain draining to silence. The one texture in the app and the closest thing to ambience — but it fires 9–21 times a run, so it must be felt, not heard. Ducks to nothing while ink.loop is active. If in testing it reads as noise, the answer is silence, not a louder file.</p>
+    </div>
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">deal.land</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">M4 · S6b mount · 9 backs seat 90 ms apart, 420 ms in the air</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#8C8C93">≤80 ms · −18 dBFS · RR3</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">A card landing flat on felt. Same 90 ms density problem as the reveal, same cure — under 80 ms after trim, three variants cycled. <b style="color:#F2F0EB">Try flip.worn first</b> before generating: same material, similar action. <b style="color:#F2F0EB">deal.throw</b> — the flick off his fist, ≤70 ms, −24 — is optional and probably too much: from t=420 throws and lands interleave 90 ms apart. Build land, test, add throw only if the deal feels weightless without it.</p>
+    </div>
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">reveal.arrive</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">M14 · S8 mount · the earned set set down face-down</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#8C8C93">≤280 ms · −14 dBFS · 1 file</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">One soft stack placed on the table. Must finish inside LEAD_MS (300) or it eats the first flip. The run was just written to disk in this instant — the loudest moment in the app is currently a screen swap; this is its sound until M14 gives it a picture. Schedule it at t=0 in the same audio-clock pass as the flips.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- TIER 3 -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;gap:11px;align-items:baseline;flex-wrap:wrap"><span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:rgba(255,255,255,.11);color:#F2F0EB">TIER 3</span><b style="font:700 14px Archivo,sans-serif">Chrome — by category, never by button</b><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">8 cues · 6 files</span></div>
+  <div style="display:flex;flex-direction:column;gap:1px;background:#2A2A2E;border:1px solid #2A2A2E">
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">ui.nav</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">← back links · deck rows · set rows · VIEW COLLECTION → · CREDITS · BACK TO DECK</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#8C8C93">≤50 ms · −20 dBFS · RR2 ±3%</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">One dry cardstock tap, 300–800 Hz. The cursor sound. It is also the screen transition — there is no separate transition cue. <b style="color:#F2F0EB">ui.select</b> (a deck row going live on S1, CTA turns strike) is ui.nav at rate 1.12: a state change sits a shade above navigation, no new file.</p>
+    </div>
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">ui.primary</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">START SESSION · KEEP WRITING · the bone and strike CTAs without a cue of their own</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#8C8C93">≤120 ms · −14 dBFS · 1 file</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">Felt-covered wood pressed, heavier than nav. The confirm. DEAL and FLIP are excluded — they have deal.press and ink.reveal, because what they confirm is a specific object.</p>
+    </div>
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">ui.toggle</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">DAKUTEN on/off · SOUND on/off</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#8C8C93">≤60 ms · −16 dBFS · 1 file, 2 rates</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">A small wooden switch. ON at rate 1.0, OFF at 0.89. <b style="color:#F2F0EB">The sound toggle switching ON is the one cue that must always play</b> — it is how the player learns the channel exists at all. Fire it inside the same gesture that unlocks the AudioContext.</p>
+    </div>
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">modal.open · modal.close</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">M8 · the abandon dialog · ✕ / Esc / backdrop / KEEP WRITING</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#8C8C93">≤160 · ≤100 ms · −16 · −18 dBFS · 2 files</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">Open: a felt-muffled thump as the blur comes in. Close: lighter and shorter — the cancel. <b style="color:#F2F0EB">LEAVE RUN reuses reveal.skip at −18</b>: cards gathered up all at once is exactly what happens to the hand, and it answers OVL-5 without adding a word the modal already said.</p>
+    </div>
+
+    <div style="background:#141416;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px">
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:800 13px 'JetBrains Mono',monospace;color:#F2F0EB">overlay.lift · overlay.set</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#8C8C93">OVL-1 · tap a card on S8 after the reveal · tap anywhere to close</span><span style="flex:1"></span><span style="font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#8C8C93">≤120 ms each · −18 dBFS · 2 files</span></div>
+      <p style="font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;text-wrap:pretty">One card lifted off the table, then set back down. Do not reverse the lift for the set — reversed foley reads as reversed. Two short generations.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- TIER 4 -->
+<div style="display:flex;flex-direction:column;gap:14px">
+  <div style="display:flex;gap:11px;align-items:baseline;flex-wrap:wrap"><span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#2A2A2E;color:#8C8C93">TIER 4</span><b style="font:700 14px Archivo,sans-serif;color:#8C8C93">Deliberately silent — do not build</b></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 28px;font:400 12.5px/1.6 Archivo,sans-serif;color:#8C8C93">
+    <span><b style="color:#B9B6B1">The count pop on S8 (M11)</b> — the flip already is its sound.</span>
+    <span><b style="color:#B9B6B1">The shiny sweep</b> — flip.shiny's ring is the sweep.</span>
+    <span><b style="color:#B9B6B1">The float and bob of seated cards</b> on S6b.</span>
+    <span><b style="color:#B9B6B1">Panel entrance, S1 hydration, the 120 ms type-on lead-in.</b></span>
+    <span><b style="color:#B9B6B1">Screen transitions</b> — ui.nav is the transition.</span>
+    <span><b style="color:#B9B6B1">Error or success chimes</b> — nothing in this app is an error.</span>
+    <span><b style="color:#B9B6B1">Pronunciation, mora audio</b> — backlog, not SFX (§5.4).</span>
+    <span><b style="color:#B9B6B1">Music.</b> The pencil loop is the score.</span>
+  </div>
+</div>
+
+<!-- MIX -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;gap:11px;align-items:baseline;flex-wrap:wrap"><span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#2E9DFF;color:#000">THE MIX</span><b style="font:700 14px Archivo,sans-serif">One ladder, floor to ceiling. Nothing but shiny goes above −12.</b></div>
+  <div style="display:flex;flex-direction:column;gap:6px;font:400 12px 'JetBrains Mono',monospace">
+    <div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:14px;align-items:center"><span style="color:#FF2E88;font-weight:800">−9</span><div style="display:flex;align-items:center;gap:12px"><div style="height:8px;width:100%;background:#FF2E88"></div><span style="color:#F2F0EB;white-space:nowrap">flip.shiny</span></div></div>
+    <div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:14px;align-items:center"><span style="color:#8C8C93">−12</span><div style="display:flex;align-items:center;gap:12px"><div style="height:8px;width:82%;background:#F2F0EB"></div><span style="color:#F2F0EB;white-space:nowrap">hand.tick · reveal.end · reveal.skip · deal.press</span></div></div>
+    <div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:14px;align-items:center"><span style="color:#8C8C93">−14</span><div style="display:flex;align-items:center;gap:12px"><div style="height:8px;width:72%;background:#B9B6B1"></div><span style="color:#B9B6B1;white-space:nowrap">ui.primary · reveal.arrive</span></div></div>
+    <div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:14px;align-items:center"><span style="color:#8C8C93">−15/−16</span><div style="display:flex;align-items:center;gap:12px"><div style="height:8px;width:64%;background:#B9B6B1"></div><span style="color:#B9B6B1;white-space:nowrap">flip.base · shinyHold · hand.miss · ink.reveal · ui.toggle · modal.open</span></div></div>
+    <div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:14px;align-items:center"><span style="color:#8C8C93">−18</span><div style="display:flex;align-items:center;gap:12px"><div style="height:8px;width:54%;background:#8C8C93"></div><span style="color:#B9B6B1;white-space:nowrap">flip.worn · deal.land · ink.clear · modal.close · overlay.*</span></div></div>
+    <div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:14px;align-items:center"><span style="color:#8C8C93">−20/−22</span><div style="display:flex;align-items:center;gap:12px"><div style="height:8px;width:44%;background:#5A5A5F"></div><span style="color:#B9B6B1;white-space:nowrap">ui.nav · ink.undo · ink.down</span></div></div>
+    <div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:14px;align-items:center"><span style="color:#8C8C93">−24/−26</span><div style="display:flex;align-items:center;gap:12px"><div style="height:8px;width:32%;background:#2A2A2E;border:1px solid #5A5A5F"></div><span style="color:#8C8C93;white-space:nowrap">joker.talk · prompt.melt · ink.loop (floor)</span></div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 28px;font:400 12px/1.6 'JetBrains Mono',monospace;color:#8C8C93;padding-top:6px">
+    <span><span style="color:#5A5A5F">200–500 Hz</span> reveal.end, deal.press — nothing else lives here</span>
+    <span><span style="color:#5A5A5F">300–800 Hz</span> ui.*, modal.*, hand.miss</span>
+    <span><span style="color:#5A5A5F">1–2 kHz</span> joker.talk</span>
+    <span><span style="color:#5A5A5F">1–5 kHz</span> flip.base, hand.tick</span>
+    <span><span style="color:#5A5A5F">2–6 kHz, quiet</span> ink.loop hiss</span>
+    <span><span style="color:#FF2E88">&gt;8 kHz</span> flip.shiny only</span>
+  </div>
+</div>
+
+<!-- COLLISIONS -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;gap:11px;align-items:baseline;flex-wrap:wrap"><span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#FFB300;color:#000">FLAGS</span><b style="font:700 14px Archivo,sans-serif">Six things the screen review turned up that the spec does not yet answer</b></div>
+  <div style="display:flex;flex-direction:column;gap:14px;font:400 13px/1.6 Archivo,sans-serif;color:#B9B6B1;max-width:880px">
+    <p style="text-wrap:pretty"><b style="color:#FFB300;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em">01 · THE GOT IT WINDOW</b><br>t=0 the melt starts and the earned.* line begins typing (120 ms lead-in); the player may already be drawing; t=420 the tick lands. Four sounds in half a second, every single word. Rule: melt and talk stay at −24, ink.loop ducks talk by 6 dB while active, the tick is never ducked.</p>
+    <p style="text-wrap:pretty"><b style="color:#FFB300;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em">02 · HE TALKS ON EVERY PROMPT</b><br>An earned.* or round.* line types on for every word. After the pencil, joker.talk becomes the most repeated sound in the app. Decide: does the type-on click for every line, or only for the first line of a screen, a miss, and a once-line — with round.* lines typing silently? I would start with the second.</p>
+    <p style="text-wrap:pretty"><b style="color:#FFB300;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em">03 · THE TOGGLE HAS NO HOME</b><br>There is no settings screen. Candidates: a SOUND row beside CREDITS at the foot of S1 in the same legend style, or a line in the ✕ dialog. The S1 foot is the honest place — it is where the app already puts the things that are not the game.</p>
+    <p style="text-wrap:pretty"><b style="color:#FFB300;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em">04 · audioSession TYPE</b><br>§4 says 'transient', which fits one-shots. A 2 s pencil loop under 'transient' is a stretch; 'ambient' also respects the ringer switch and mixes with other audio. Check both on device with the loop running — the ringer-switch behaviour is the law, the label is not.</p>
+    <p style="text-wrap:pretty"><b style="color:#FFB300;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em">05 · REDUCED MOTION</b><br>The melt becomes a 160 ms fade → no prompt.melt. The deal becomes a 120 ms fade → one deal.land, not nine. The hand tick loses its ghost → the tick still plays, at the moment the count updates. S8 → reveal.end only, as specced.</p>
+    <p style="text-wrap:pretty"><b style="color:#FFB300;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em">06 · THE BUDGET</b><br>21 new generations at 0.5 s (two at 1 s, one at 2 s for the loop) plus the specced seven. ~30 generations, 4 variants each. Ship weight stays under 200 KB at 96 kbps mono, the loop being the only file over 10 KB. Licensing check (§5.2) covers all of it in one pass.</p>
+  </div>
+</div>
+
+<div style="border-top:1px solid #2A2A2E;padding-top:22px;font:400 12px/1.6 'JetBrains Mono',monospace;color:#5A5A5F;max-width:860px">Next: the §2-format prompts for Tiers 1–3, 450 characters each, anechoic clause on every one. The loop and joker.talk are the two that will take iteration — everything else is the same cardstock family the seven already belong to.</div>
+
+</div>
+</x-dc>
+</body>
+</html>

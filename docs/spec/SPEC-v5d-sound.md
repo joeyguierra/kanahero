@@ -128,20 +128,36 @@ and must not hit.
 
 Generation gets you raw material. The trim is the design.
 
-```sh
-# 1. head-trim to the transient, hard-cap the length, 8 ms fade-out, normalise
-ffmpeg -i raw.mp3 \
-  -af "silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0, \
-       atrim=end=0.095,afade=t=out:st=0.087:d=0.008, \
-       loudnorm=I=-23:TP=-15" \
-  -ac 1 -ar 48000 flip.base.wav
+**This is a script, not a manual step: `scripts/build-sfx.mjs`.** Drop the raw downloads in
+`sfx-src/`, run `npm run sfx`, get `public/sfx/*.m4a`. The §1 table lives in that script's `SOUNDS`
+config, which means the numbers above and the numbers applied are the same numbers. `gen-sw.mjs`
+walks the whole export, so the files are precached with no registration step.
 
-# 2. ship-size pass — AAC, not Opus. See the format note below.
-ffmpeg -i flip.base.wav -c:a aac -b:a 96k -movflags +faststart flip.base.m4a
-```
+Use Audacity for the ear and the eye — audition the four variants each prompt returns, and read
+where the transient actually starts. Use the script for the hands. You will regenerate.
 
-Adjust `atrim=end` and the fade start per the §1 table. Mono, 48 kHz. Seven files at 96 kbps mono
-lands around 30–50 KB total — irrelevant against the stroke SVGs already in `/public`.
+Two things the script does that a hand-trim would get wrong, both found by measurement:
+
+> **⚠️ `loudnorm` is the wrong tool here.** An earlier draft of this file specified
+> `loudnorm=I=-23:TP=-15`. EBU R128 is a ~3-second-window measurement and is meaningless on a 90 ms
+> transient. What matters for a one-shot is how hard it hits, which is **peak**. The script measures
+> `volumedetect` max and applies gain to hit the §1 target.
+
+> **⚠️ AAC moves the peak, by a lot.** A lossy codec *reconstructs* the waveform rather than
+> reproducing it, so the decoded peak is not the peak that went in. Measured: a signal landing at
+> exactly −18.0 dBFS pre-encode came back at **−14.8 dBFS** after AAC 96k — 3.2 dB, worst on sharp
+> transients at low bitrates, i.e. precisely this material. Uncorrected, that quietly flattens the
+> worn → base → shiny ladder the levels exist to create. The script therefore encodes, measures the
+> *encoded* file, corrects and re-encodes, looping up to three times to converge within 0.5 dB, and
+> ships at **128 kbps** mono rather than 96 — about 1 KB more per file, and roughly half the
+> overshoot to correct.
+
+Mono, 48 kHz. Seven files plus variants lands around 30–50 KB total — irrelevant against the stroke
+SVGs already in `/public`.
+
+**`sfx-src/` is committed.** `fetch-strokes.mjs` can re-fetch because KanjiVG is canonical; this
+cannot, because ElevenLabs is stochastic and the same prompt returns a different sound. A lost
+generation is lost for good and `public/sfx/` could never be rebuilt. Source, not artifact.
 
 > **⚠️ Format correction (2026-09-18, same day).** The first draft of this file specified Opus in
 > WebM. That is wrong for this app. Safari has a documented history of breaking Web Audio's
