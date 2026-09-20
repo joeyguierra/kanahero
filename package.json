@@ -10,6 +10,7 @@
     "e2e": "node scripts/e2e-joker.mjs && node scripts/e2e-loop.mjs && node scripts/e2e-bank.mjs && node scripts/e2e-offline.mjs",
     "strokes": "node scripts/fetch-strokes.mjs && node scripts/verify-strokes.mjs",
     "icons": "node scripts/gen-icons.mjs",
+    "sfx": "node scripts/build-sfx.mjs",
     "joker": "node scripts/joker-audit.mjs",
     "predev": "node scripts/joker-audit.mjs"
   },

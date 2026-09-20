@@ -158,6 +158,65 @@ gets turned off. One file played 21 times identically is the failure mode.
 
 ---
 
+## 3b. The engine decision — raw Web Audio, ~100 lines, no dependency
+
+**Reviewed against the tree, 2026-09-18.** The answer is not a library.
+
+### Why no library
+
+`package.json` has **three runtime dependencies: `next`, `react`, `react-dom`.** Everything else is
+a devDependency. That is not an accident — `lib/zip.ts` is a hand-rolled 133-line ZIP writer,
+`scripts/gen-sw.mjs` is a hand-rolled service worker rather than Workbox, and `HandTick.tsx` drives
+the card flight on raw WAAPI. This repo's settled posture is *write the small thing*. Howler is
+~30 KB to do what the platform does in about a hundred lines, and it would be the first runtime
+dependency added since the app was born.
+
+**The three reasons anyone reaches for Howler are each already answered by this codebase:**
+
+| Howler's value | Why it's moot here |
+| :-- | :-- |
+| Multi-format fallback chains | Solved by picking AAC, which works everywhere. One format, no negotiation. |
+| Audio sprites, to cut HTTP requests | `gen-sw.mjs` precaches the **entire export** on install. Runtime request count is already zero. Sprites are a 2013 `<audio>`-element workaround, and MDN's sprite guidance is about that element, not Web Audio. |
+| HTML5 `<audio>` fallback for old browsers | The app already hard-requires `element.animate()`, `matchMedia`, canvas and service workers. Any browser that can run Kana Hero has Web Audio. |
+
+### The shape, following existing patterns
+
+- **`lib/sfx.ts`** — the imperative shell, modelled on `HandTick.tsx`: exported functions, capability
+  check inline, **graceful no-op** when there's no `AudioContext` or sound is off, exactly as
+  `flyToHand` no-ops on `typeof card.animate !== "function"`.
+- **`lib/sfx-schedule.ts`** — pure, modelled on `lib/reveal.ts`: which sound plays at which offset,
+  no DOM, no timers, no audio. This is what e2e asserts against. Playback itself stays untested.
+- **The toggle goes in `lib/progress.ts`** as `sound?: boolean`. Absent means `false`, which *is*
+  the silent-first default — so it needs no `VERSION` bump and no migration, the same trick
+  `script?: Script` already uses.
+- One `AudioContext`, one master `GainNode`, `decodeAudioData` all seven at the **first gesture
+  after sound is switched on** — not at boot. Boot speed is a PWA-on-a-platform concern.
+- A fresh `AudioBufferSourceNode` per play. They are single-use by design; do not pool them.
+
+### The one genuinely interesting call: schedule the reveal, don't fire it
+
+`Result.tsx` drives the flip sequence on `window.setTimeout`. That is correct for visuals — but
+`setTimeout` jitters under React render load, and at a 114 ms interval the flips are not a series of
+clicks, they are a **rhythm**. Jitter is audible there in a way it is not visible.
+
+Web Audio's `source.start(when)` schedules on the audio clock, which does not jitter. And
+`revealSchedule()` **already returns the exact array of offsets** — it was written pure so the
+screen and the e2e could both ask what happens when. That same array is precisely what an audio
+scheduler wants as input.
+
+So, split by nature:
+
+- **`hand.tick`, `reveal.skip`** — direct call at the marker. They're responses to a tap; they fire
+  when the tap fires.
+- **The whole reveal (`flip.*`, `shinyHold`, `end`)** — on S8 mount, walk `revealSchedule(order)`
+  once and schedule every sound ahead against `audioCtx.currentTime`. Keep the handles so `skip()`
+  can `stop()` them all, which it must do anyway alongside its `clearTimeout` loop.
+
+The pure scheduler they wrote for testability turns out to be the correct audio driver. That is the
+whole recommendation.
+
+---
+
 ## 4. Playback notes (for whoever builds the engine)
 
 - **Web Audio, not `<audio>`.** Decode all seven into `AudioBuffer`s once at first user gesture;

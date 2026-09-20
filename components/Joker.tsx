@@ -10,9 +10,12 @@
 // panel finishes the line, and `prefers-reduced-motion` skips the typing
 // altogether.
 //
-// The art is `public/joker-mascot.png` — the official mascot, one square PNG
-// with an alpha channel, precached like everything else in public/. Swapping
-// it later means replacing that file and nothing else.
+// He talks with his mouth: two frames, open and closed. Open is his resting
+// face. While the line is streaming the mark alternates the two; the moment
+// the line is done — typed out, tapped through, or skipped for reduced motion
+// — it snaps back to open and holds. Both frames are 1080² PNGs in
+// public/assets/ with the same alpha bounds, so one crop fits both and the
+// swap is a `src` change on one element: nothing moves but the mouth.
 
 import { useEffect, useRef, useState, type Ref } from "react";
 
@@ -20,15 +23,22 @@ import { useEffect, useRef, useState, type Ref } from "react";
 const TICK = 22;
 /** a beat before he starts, so the line reads as an answer to the screen */
 const LEAD_IN = 120;
+/** ms per mouth frame while he talks — about five flaps a second reads as
+    speech; faster is chatter, slower is chewing */
+const FLAP = 110;
 
-/** the source of truth for the mascot art; nothing else references the file */
-export const JOKER_ART = "/joker-mascot.png";
+/** the resting face; the source of truth for the mascot art, and the frame
+    every screen without a line shows */
+export const JOKER_ART = "/assets/joker-mascot-open.png";
+/** the other frame, only ever shown mid-line */
+export const JOKER_ART_TALK = "/assets/joker-mascot-close.png";
 
 // Where he actually is inside that 1080² PNG, measured off its alpha channel:
 // x 61–1018, y 158–921, so 958 × 764 of art in a square with transparent
-// margins. `size` means the height of the art, the way the canvas measures him
-// (78px, 110px on S1) — so the element is sized to the whole square and the
-// margin is pulled back out, leaving his slot the size it is drawn.
+// margins — both frames, to the pixel. `size` means the height of the art, the
+// way the canvas measures him (78px, 110px on S1) — so the element is sized to
+// the whole square and the margin is pulled back out, leaving his slot the
+// size it is drawn.
 const ART = { box: 1080, x: 61, y: 158, w: 958, h: 764 };
 /** the canvas pulls his shoulder this far into the screen gutter */
 const SHOULDER = 8;
@@ -88,7 +98,9 @@ export default function Joker({
 
   return (
     <div className={`joker joker-${tail} ${className}`.trim()}>
-      <JokerMark size={size} ref={markRef} />
+      {/* the mouth moves with the characters, not the lead-in: he starts
+          talking on the first one and stops on the last */}
+      <JokerMark size={size} ref={markRef} talking={typed.n > 0 && !done} />
       <div
         className="jokerPanel"
         data-line={lineId || undefined}
@@ -114,7 +126,41 @@ export default function Joker({
   );
 }
 
-export function JokerMark({ size = 78, ref }: { size?: number; ref?: Ref<HTMLImageElement> }) {
+/**
+ * The mouth. True while the closed frame is up; only ever true mid-line, and
+ * false again the same render `talking` drops, so the snap back to open never
+ * waits on a timer.
+ */
+function useMouthFlap(talking: boolean): boolean {
+  const [closed, setClosed] = useState(false);
+  useEffect(() => {
+    if (!talking) return;
+    const id = setInterval(() => setClosed((c) => !c), FLAP);
+    return () => {
+      clearInterval(id);
+      setClosed(false);
+    };
+  }, [talking]);
+  return talking && closed;
+}
+
+export function JokerMark({
+  size = 78,
+  ref,
+  /** streams the mouth; off (the default) is the resting face, held */
+  talking = false,
+}: {
+  size?: number;
+  ref?: Ref<HTMLImageElement>;
+  talking?: boolean;
+}) {
+  const closed = useMouthFlap(talking);
+  // the first swap must not wait on a fetch: warm the second frame as soon as
+  // he is on screen, so the flap is a cache hit from the first tick
+  useEffect(() => {
+    new Image().src = JOKER_ART_TALK;
+  }, []);
+
   const scale = size / ART.h; // rendered px per art px
   const box = ART.box * scale;
   return (
@@ -125,7 +171,7 @@ export function JokerMark({ size = 78, ref }: { size?: number; ref?: Ref<HTMLIma
     <img
       className="jokerMark"
       ref={ref}
-      src={JOKER_ART}
+      src={closed ? JOKER_ART_TALK : JOKER_ART}
       alt=""
       width={Math.round(box)}
       height={Math.round(box)}

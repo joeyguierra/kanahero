@@ -38,7 +38,7 @@ const ARC_LIFT = 26;
 const FLICK_DEG = -7;
 /** reduced motion: all nine seat at once, no flight, no float */
 const FADE = 120;
-/** his fist inside the mark's square box, measured off `joker-mascot.png` —
+/** his fist inside the mark's square box, measured off `assets/joker-mascot-open.png` —
     the element is the whole 1080² square, transparent margins included */
 const HAND = { x: 0.36, y: 0.75 };
 

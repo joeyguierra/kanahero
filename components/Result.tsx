@@ -51,7 +51,7 @@ import Card from "./Card";
 import Joker from "./Joker";
 import RevealCard from "./RevealCard";
 
-/** his hand inside the mark's square box, measured off `joker-mascot.png` */
+/** his hand inside the mark's square box, measured off `assets/joker-mascot-open.png` */
 const HAND = { x: 0.72, y: 0.58 };
 
 function reduced(): boolean {
