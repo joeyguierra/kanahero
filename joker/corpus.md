@@ -12,7 +12,7 @@ one when the meaning does. Tokens: `{bank}` `{shiny}` `{earned}` `{words}` `{cha
 <!-- pool approved by cold read 2026-09-17 · the style reference for every other pool -->
 - [home.01] よし. Pick a deck. I feel sharp today. ·· ja:よし ·· subj:him ·· status:ship
 - [home.02] Choose a deck. I will deal. You will try. ·· subj:you ·· status:ship
-- [home.03] Back for more of my handwriting. 当然. ·· when:!firstEver ·· ja:当然 ·· subj:you ·· status:ship
+- [home.03] Back for more of my handwriting. とうぜん. ·· when:!firstEver ·· ja:とうぜん ·· subj:you ·· status:ship
 - [home.04] You again. I knew you would be back. ·· when:!firstEver ·· subj:you ·· status:ship
 - [home.05] My strokes are ready. さあ, bring your pen. ·· ja:さあ ·· subj:him ·· needs:feature.strokeModel ·· status:ship
 - [home.06] I warmed up the deck. どうぞ. ·· ja:どうぞ ·· subj:him ·· status:ship
@@ -21,25 +21,25 @@ one when the meaning does. Tokens: `{bank}` `{shiny}` `{earned}` `{words}` `{cha
 - [home.09] You write, I reveal, you grade yourself. I trust you. たぶん. ·· ja:たぶん ·· subj:you ·· needs:rule.selfGrade ·· status:ship
 - [home.10] First try means a shiny card. No pressure. Some pressure. ·· subj:you ·· needs:rule.rarityByTries ·· status:ship
 - [home.11] Finish the run or keep nothing. The 親 decides. That's me. ·· ja:親 ·· subj:app ·· needs:rule.allOrNothing ·· status:ship
-- [home.12] Miss a word and it comes back later. 大丈夫. ·· ja:大丈夫 ·· subj:you ·· needs:rule.missRequeues ·· status:ship
+- [home.12] Miss a word and it comes back later. だいじょうぶ. ·· ja:だいじょうぶ ·· subj:you ·· needs:rule.missRequeues ·· status:ship
 - [home.13] Nobody grades you here but you. I just watch. Closely. ·· subj:you ·· needs:rule.selfGrade ·· status:ship
 - [home.14] Every run deals the whole set, shuffled. No memorizing my order. ·· subj:app ·· needs:rule.dealsWholeSet ·· status:ship
-- [home.15] No signal needed. 地下 too. Your excuses need work. ·· ja:地下 ·· subj:you ·· needs:feature.offline ·· status:ship
-- [home.16] Can't read a sign? 大丈夫. Photograph it. The bank remembers. ·· ja:大丈夫 ·· subj:you ·· needs:feature.bank ·· status:ship
+- [home.15] No signal needed. Underground too. Excuses? なし. ·· ja:なし ·· subj:you ·· needs:feature.offline ·· status:ship
+- [home.16] Can't read a sign? だいじょうぶ. Photograph it. The bank remembers. ·· ja:だいじょうぶ ·· subj:you ·· needs:feature.bank ·· status:ship
 - [home.17] No timer, no score, no one watching. Except me. ·· subj:you ·· needs:rule.noTimerNoScore ·· status:ship
 - [home.18] I give the sound. The shape comes from you. よろしく. ·· ja:よろしく ·· subj:you ·· needs:rule.promptShowsReading ·· status:ship
 - [home.19] いらっしゃい. Three scripts, one rule: write it before you see it. ·· ja:いらっしゃい ·· subj:app ·· needs:app.threeScripts ·· status:ship
-- [home.20] Hiragana first if you're new. 基本. Everything leans on it. ·· ja:基本 ·· subj:you ·· status:ship
+- [home.20] Hiragana first if you're new. きほん. Everything leans on it. ·· ja:きほん ·· subj:you ·· status:ship
 - [home.21] Katakana spells borrowed words. コーヒー, タクシー, probably your name. ·· ja:コーヒー,タクシー ·· subj:you ·· status:ship
 - [home.22] Kanji carry meaning, not sound. Start with the station signs, 駅. ·· ja:駅 ·· subj:app ·· needs:set.station-kanji ·· status:ship
 - [home.23] Hiragana, katakana, kanji. I'll make you excellent, like me. ·· subj:you ·· needs:app.threeScripts ·· status:ship
 - [home.24] Strokes go top to bottom, left to right. だいたい. Watch me. ·· ja:だいたい ·· subj:app ·· status:ship
-- [home.25] Recognizing is easy. Writing is why you're here. 頑張って. ·· ja:頑張って ·· subj:you ·· status:ship
+- [home.25] Recognizing is easy. Writing is why you're here. がんばって. ·· ja:がんばって ·· subj:you ·· status:ship
 - [home.26] {bank} characters in the bank, unread. まだ. We can fix that. ·· ja:まだ ·· when:bank>0 ·· subj:you ·· needs:feature.bank ·· status:ship
 - [home.27] {shiny} shiny so far. ほう. I am almost impressed. ·· ja:ほう ·· when:shiny>0 ·· subj:you ·· needs:rule.rarityByTries ·· status:ship
 - [home.28] No shiny yet. One word, first try. それだけ. ·· ja:それだけ ·· when:runsFinished>0,shiny=0 ·· subj:you ·· needs:rule.rarityByTries ·· status:ship
 - [home.29] まだ nothing earned. Finish one run and the cards stay. ·· ja:まだ ·· when:!firstEver,runsFinished=0 ·· subj:you ·· needs:rule.allOrNothing ·· status:ship
-- [home.30] お帰り. Your cards are right where you left them. ·· when:runsFinished>0 ·· ja:お帰り ·· subj:you ·· needs:feature.localProgress ·· status:ship
+- [home.30] おかえり. Your cards are right where you left them. ·· when:runsFinished>0 ·· ja:おかえり ·· subj:you ·· needs:feature.localProgress ·· status:ship
 - [home.31] さあ. Same deal as always: I show, you grade, honestly. ·· when:!firstEver ·· ja:さあ ·· subj:you ·· needs:rule.selfGrade ·· status:ship
 - [home.32] はじめまして. I'm the Joker. I deal, you write. Pick a deck. ·· ja:はじめまして ·· when:firstEver ·· once ·· subj:app ·· status:ship
 
@@ -82,7 +82,7 @@ one when the meaning does. Tokens: `{bank}` `{shiny}` `{earned}` `{words}` `{cha
 <!-- pool grown 2026-09-18 — the collection is where card mechanics are explained (bible §8), so the depth lives here -->
 - [collection.01] Every copy you've made, word by word. ほら. ·· ja:ほら ·· subj:you ·· status:ship
 - [collection.02] First try shiny, second base, three or more worn. ·· needs:rule.rarityByTries ·· subj:app ·· status:ship
-- [collection.03] One copy per word, every finished run. 当然. ·· ja:当然 ·· needs:rule.dealsWholeSet,rule.allOrNothing ·· subj:app ·· status:ship
+- [collection.03] One copy per word, every finished run. とうぜん. ·· ja:とうぜん ·· needs:rule.dealsWholeSet,rule.allOrNothing ·· subj:app ·· status:ship
 - [collection.04] Shiny means first try. The rest is honest work. ·· needs:rule.rarityByTries ·· subj:you ·· status:ship
 - [collection.05] Replay a set and the copies stack up. どんどん. ·· ja:どんどん ·· needs:rule.dealsWholeSet ·· subj:you ·· status:ship
 - [collection.06] はい. A card is kept only when its run finishes. ·· ja:はい ·· needs:rule.allOrNothing ·· subj:app ·· status:ship
@@ -97,21 +97,21 @@ one when the meaning does. Tokens: `{bank}` `{shiny}` `{earned}` `{words}` `{cha
 - [round.kana.01] Whole word, one box. Make it fit. ·· status:ship
 
 ## round.kanji
-- [round.kanji.01] The kana's on the card — I want the 漢字. ·· ja:漢字 ·· status:ship
+- [round.kanji.01] The kana's on the card. I want the kanji. さあ. ·· ja:さあ ·· status:ship
 
 ## round.missed
 <!-- pool rewritten 2026-09-18 — a reaction and a cue to keep going; the one mechanic he may state is that the word returns, because the drill needs it -->
-- [round.missed.01] 惜しい. Back in the deck. We'll see it again. ·· ja:惜しい ·· needs:rule.missRequeues ·· subj:you ·· status:ship
+- [round.missed.01] おしい. Back in the deck. We'll see it again. ·· ja:おしい ·· needs:rule.missRequeues ·· subj:you ·· status:ship
 - [round.missed.02] まだ. It comes back around. Next card. ·· ja:まだ ·· needs:rule.missRequeues ·· subj:you ·· status:ship
 - [round.missed.03] なんでやねん. Happens to everyone but me. Next. ·· dialect:kansai ·· ja:なんでやねん ·· subj:him ·· status:ship
 - [round.missed.04] Not this time. The deck remembers. ·· needs:rule.missRequeues ·· subj:you ·· status:ship
-- [round.missed.05] 残念. Back it goes. Next one. ·· ja:残念 ·· needs:rule.missRequeues ·· subj:you ·· status:ship
-- [round.missed.06] Missed. I'll deal it again later. 約束. ·· ja:約束 ·· needs:rule.missRequeues ·· subj:you ·· status:ship
-- [round.missed.07] Not yet. Shake it off. はい次. ·· ja:はい次 ·· subj:you ·· status:ship
+- [round.missed.05] ざんねん. Back it goes. Next one. ·· ja:ざんねん ·· needs:rule.missRequeues ·· subj:you ·· status:ship
+- [round.missed.06] Missed. I'll deal it again later. やくそく. ·· ja:やくそく ·· needs:rule.missRequeues ·· subj:you ·· status:ship
+- [round.missed.07] Not yet. Shake it off. はいつぎ. ·· ja:はいつぎ ·· subj:you ·· status:ship
 - [round.missed.08] おっと. That one got away. It'll be back. ·· ja:おっと ·· needs:rule.missRequeues ·· subj:you ·· status:ship
 
 ## reveal.kanji
-- [reveal.kanji.01] There it is. 正直に. Did your ink match mine? ·· ja:正直に ·· status:ship
+- [reveal.kanji.01] There it is. しょうじきに. Did your ink match mine? ·· ja:しょうじきに ·· status:ship
 
 ## earned.shiny
 <!-- pool rewritten 2026-09-18 — reaction only, no card mechanics on drill screens (bible §8). Truth rule: none of these says kept / yours / earned. -->
@@ -122,9 +122,9 @@ one when the meaning does. Tokens: `{bank}` `{shiny}` `{earned}` `{words}` `{cha
 - [earned.shiny.05] First try. おっと. I nearly reacted. Next. ·· ja:おっと ·· subj:him ·· status:ship
 - [earned.shiny.06] First try. まさか. Suspicious. Next one. ·· ja:まさか ·· subj:you ·· status:ship
 - [earned.shiny.07] First try. My handwriting suits you. Next. ·· subj:him ·· status:ship
-- [earned.shiny.08] First try. 見事. Now do it again. ·· ja:見事 ·· subj:you ·· status:ship
-- [earned.shiny.09] One look and you had it. 完璧. Next. ·· ja:完璧 ·· subj:you ·· needs:rule.rarityByTries ·· status:ship
-- [earned.shiny.10] First try. 上手. I saw that. Keep going. ·· ja:上手 ·· subj:you ·· status:ship
+- [earned.shiny.08] First try. みごと. Now do it again. ·· ja:みごと ·· subj:you ·· status:ship
+- [earned.shiny.09] One look and you had it. かんぺき. Next. ·· ja:かんぺき ·· subj:you ·· needs:rule.rarityByTries ·· status:ship
+- [earned.shiny.10] First try. じょうず. I saw that. Keep going. ·· ja:じょうず ·· subj:you ·· status:ship
 
 ## earned.base
 <!-- pool rewritten 2026-09-18 — reaction only, no card mechanics on drill screens (bible §8). Truth rule: none of these says kept / yours / earned. -->
@@ -132,8 +132,8 @@ one when the meaning does. Tokens: `{bank}` `{shiny}` `{earned}` `{words}` `{cha
 - [earned.base.02] Second try. The first one was a warm-up. ·· subj:you ·· status:ship
 - [earned.base.03] Second try. まあまあ. Next. ·· ja:まあまあ ·· subj:you ·· status:ship
 - [earned.base.04] Second try. はい, I'll pretend I didn't see the first. ·· ja:はい ·· subj:you ·· status:ship
-- [earned.base.05] Second try. That's the one. はい次. ·· ja:はい次 ·· subj:you ·· status:ship
-- [earned.base.06] Two tries. One more than me. 当然. ·· ja:当然 ·· subj:him ·· needs:rule.rarityByTries ·· status:ship
+- [earned.base.05] Second try. That's the one. はいつぎ. ·· ja:はいつぎ ·· subj:you ·· status:ship
+- [earned.base.06] Two tries. One more than me. とうぜん. ·· ja:とうぜん ·· subj:him ·· needs:rule.rarityByTries ·· status:ship
 - [earned.base.07] Second try. よし, we got there. Next one. ·· ja:よし ·· subj:you ·· status:ship
 - [earned.base.08] Second try. Your hand caught up. なるほど. ·· ja:なるほど ·· subj:you ·· status:ship
 
@@ -141,26 +141,28 @@ one when the meaning does. Tokens: `{bank}` `{shiny}` `{earned}` `{words}` `{cha
 <!-- pool rewritten 2026-09-18 — reaction only, no card mechanics on drill screens (bible §8). Truth rule: none of these says kept / yours / earned. -->
 - [earned.worn.01] Took a few. It stuck. やっと. Next one. ·· ja:やっと ·· subj:you ·· status:ship
 - [earned.worn.02] {tries} tries. I enjoyed every miss. Next. ·· subj:you ·· status:ship
-- [earned.worn.03] Took a few. That one fights everyone. 本当に. ·· ja:本当に ·· subj:you ·· status:ship
+- [earned.worn.03] Took a few. That one fights everyone. ほんとうに. ·· ja:ほんとうに ·· subj:you ·· status:ship
 - [earned.worn.04] ゆっくり. Got there. That still counts as there. ·· ja:ゆっくり ·· subj:you ·· status:ship
-- [earned.worn.05] Took a while. 余裕. I was never worried. Next. ·· ja:余裕 ·· subj:him ·· status:ship
-- [earned.worn.06] {tries} tries. 根性. I respect that a little. ·· ja:根性 ·· subj:you ·· status:ship
-- [earned.worn.07] Took a few. Your hand knows it now. はい次. ·· ja:はい次 ·· subj:you ·· status:ship
-- [earned.worn.08] Many tries. 大丈夫? Next one. ·· ja:大丈夫 ·· subj:you ·· status:ship
+- [earned.worn.05] Took a while. よゆう. I was never worried. Next. ·· ja:よゆう ·· subj:him ·· status:ship
+- [earned.worn.06] {tries} tries. こんじょう. I respect that a little. ·· ja:こんじょう ·· subj:you ·· status:ship
+- [earned.worn.07] Took a few. Your hand knows it now. はいつぎ. ·· ja:はいつぎ ·· subj:you ·· status:ship
+- [earned.worn.08] Many tries. だいじょうぶ? Next one. ·· ja:だいじょうぶ ·· subj:you ·· status:ship
 
 ## credits
 - [credits.01] Other people's work, named. That's the deal. ·· status:ship
 
 ## set
-- [set.01] {words} words, face down. さあ, deal when you're ready. ·· ja:さあ ·· needs:rule.dealsWholeSet ·· status:ship
+<!-- S6b carries the MEANING switch (SPEC-v5e); his line answers it -->
+- [set.01] {words} words, face down. さあ, deal when you're ready. ·· when:meaning ·· ja:さあ ·· needs:rule.dealsWholeSet ·· status:ship
+- [set.02] No meanings. Just the sound and your memory. すき. ·· when:!meaning ·· ja:すき ·· subj:you ·· needs:feature.meaningToggle ·· status:ship
 
 ## reveal.kana
 - [reveal.kana.01] {chars} characters, one line. Did they all land? ·· when:chars>1 ·· status:ship
 - [reveal.kana.02] One character, one box. Did it land? ·· when:chars=1 ·· status:ship
 
 ## result
-- [result.01] {earned} cards earned, {shiny} shiny. お疲れ. Deal again whenever. ·· ja:お疲れ ·· when:shiny>0 ·· status:ship
-- [result.02] {earned} cards earned. お疲れ. Deal again whenever. ·· ja:お疲れ ·· when:shiny=0 ·· status:ship
+- [result.01] {earned} cards earned, {shiny} shiny. おつかれ. Deal again whenever. ·· ja:おつかれ ·· when:shiny>0 ·· status:ship
+- [result.02] {earned} cards earned. おつかれ. Deal again whenever. ·· ja:おつかれ ·· when:shiny=0 ·· status:ship
 
 ## once (global)
 - [once.wholeWord] Whole word, one box. Make it fit. ·· once ·· when:script!=kanji ·· status:ship

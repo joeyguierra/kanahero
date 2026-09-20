@@ -34,11 +34,15 @@ export interface RoundCard {
 export default function Round({
   set,
   queue: dealt,
+  meaning,
   onAbandon,
   onFinish,
 }: {
   set: WordSet;
   queue: SetWord[];
+  /** S6b's MEANING switch as it stood at DEAL — held for the whole run, and
+      not shown here (SPEC-v5e §2) */
+  meaning: boolean;
   /** the run is discarded, not banked — nothing of it was ever written */
   onAbandon: () => void;
   /** the hand, and how many of its cards are a stock the shelf never held */
@@ -105,6 +109,7 @@ export default function Round({
       set,
       word: current,
       chars: chars.length,
+      meaning,
       triesThisWord: justEarned ? justEarned.tries : tries,
       allowOnce: !reveal && !justMissed,
     },
@@ -216,6 +221,7 @@ export default function Round({
           set={set}
           size="round"
           attempt={reveal ? tries : undefined}
+          meaning={meaning}
           className="roundCard"
           ref={promptRef}
         />

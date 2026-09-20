@@ -1594,6 +1594,71 @@ button:not(:disabled):active {
   letter-spacing: -0.03em;
 }
 
+/* the MEANING switch (SPEC-v5e §1): the shelf's panel stock, label left, the
+   deck screen's two-segment toggle right — grown to a thumb's height, since
+   it is not inside a button here and has to be its own target */
+.setMeaning {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--seam);
+  background: var(--plate);
+  padding: 8px 8px 8px 13px;
+}
+
+.setMeaningLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.setMeaningLegend {
+  font-size: 9px;
+}
+
+.setMeaningHint {
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--print);
+  white-space: nowrap;
+}
+
+.setMeaningHintOff {
+  color: var(--strike);
+}
+
+.toggleTap .toggleOpt {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 56px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.toggleTap .toggleOn {
+  background: var(--bone);
+  color: var(--chassis);
+}
+
+/* OFF, chosen, is the strike colour: the set is dealt without a safety net */
+.toggleTap .toggleStrike.toggleOn {
+  background: var(--strike);
+  color: #000;
+}
+
+.setMeaning + .setGrid {
+  margin-top: 14px;
+}
+
 .setGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1915,6 +1980,27 @@ button:not(:disabled):active {
 
 .card-earn .cardMeaning {
   font-size: 18px;
+}
+
+/* the prompt with the switch off (SPEC-v5e §2): the meaning's line, kept at
+   the meaning's height, saying only that it is off */
+.cardMeaningOff {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 14px;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  color: var(--carbon);
+  white-space: nowrap;
+}
+
+.cardMeaningDash {
+  display: inline-block;
+  width: 14px;
+  height: 1px;
+  background: var(--carbon);
 }
 
 .cardKind {

@@ -131,6 +131,27 @@ channel and the only place it teaches outside the drill loop.
 5. **Vocabulary is his, not a syllabus.** Dealer words, ego words, table words. A curriculum here
    would resurrect the banned flashcard idea through the back door.
 
+> **AMENDED 2026-09-19 — rule 3 narrowed: his Japanese is written in kana.** Creator call, and the
+> reason to make it law is the app's own premise: a learner who has finished the hiragana deck can
+> now read every word he seeds. The seeding channel pays the drill instead of floating above it.
+> Register cost is nil — his lexicon is expressions (ほら, さすが, どうぞ, なるほど, まさか), and the
+> kanji words he does use (だいじょうぶ, とうぜん, ざんねん, おつかれ) are how texts and children's books
+> write them anyway. **Three exceptions, all for truth, none for taste:**
+> 1. **The card is written as it is written.** A line *about* a word or component on the table
+>    (曜, 口, 駅) writes it in kanji — writing ようび for 曜 would lie about the screen. Tag
+>    `kanji:card`; the audit allows it only when the character is in the active set or is a set glyph.
+> 2. **俺 and 親 / 子 stay kanji** as named rare-tier exceptions (`kanji:glyph`). Both payoffs *are* the
+>    glyph: 親 is the home ghost, and the 俺 reveal is a video beat. In kana they are just pronouns.
+> 3. **Ambiguity resolves by rewrite, never by kanji.** If a kana reading is ambiguous *and* the word
+>    carried information (かんじ / 感じ), the line is rewritten — informational Japanese must not need
+>    decoding (§9). Expressions are never ambiguous enough to matter.
+>
+> Scope: the seeding in English mode. §10's Japanese mode is not decided by this; note it there.
+> Migration done same day: 28 shipped lines transliterated, ids kept (wording, not meaning);
+> `home.15` and `round.kanji.01` rewritten (地下 and 漢字 were nouns, not expressions); `home.11` (親)
+> and `home.22` (駅) kept under exceptions 2 and 1. The lexicon tables below keep kanji for *reference*
+> — the reading column is what ships.
+
 ### His starter lexicon
 | word | reading | why it is his |
 | :-- | :-- | :-- |

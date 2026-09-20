@@ -34,6 +34,9 @@ export interface Progress {
   joker: JokerProgress;
   /** one-shot: a v2 blob was wiped by the v3 migration and he owes a line */
   wiped: boolean;
+  /** S6b's MEANING switch, remembered per set — only the sets switched OFF are
+      listed, so a set with no entry is ON, which is the default */
+  meaningOff: string[];
 }
 
 const KEY = "kanahero:v1";
@@ -50,6 +53,8 @@ interface Stored {
   // counts per rarity. The shapes do not convert — v3 wipes (v5a §2).
   joker?: JokerProgress;
   wiped?: boolean;
+  // added with the meaning toggle (design v5 Meaning Toggle); absent before it
+  meaningOff?: string[];
 }
 
 export const NO_COPIES: RarityCounts = { shiny: 0, base: 0, worn: 0 };
@@ -105,6 +110,7 @@ export function loadProgress(): Progress {
     script: "hiragana",
     joker: {},
     wiped: false,
+    meaningOff: [],
   };
   if (typeof window === "undefined") return fallback;
   try {
@@ -122,6 +128,9 @@ export function loadProgress(): Progress {
       script: data.script === "katakana" ? "katakana" : "hiragana",
       joker: stale ? {} : readJoker(data.joker),
       wiped: stale ? heldCards(data.joker) : data.wiped === true,
+      meaningOff: Array.isArray(data.meaningOff)
+        ? data.meaningOff.filter((s): s is string => typeof s === "string")
+        : [],
     };
     if (stale) saveProgress(loaded);
     return loaded;
@@ -138,6 +147,7 @@ function toStored(p: Progress): Stored {
     script: p.script,
     joker: p.joker,
     wiped: p.wiped,
+    meaningOff: p.meaningOff,
   };
 }
 
@@ -159,6 +169,7 @@ const SERVER: Progress = {
   script: "hiragana",
   joker: {},
   wiped: false,
+  meaningOff: [],
 };
 let cache: Progress | null = null;
 const listeners = new Set<() => void>();
@@ -183,6 +194,12 @@ export function getServerProgress(): Progress {
 export function progressBlob(): string {
   if (typeof window === "undefined") return "{}";
   return window.localStorage.getItem(KEY) ?? JSON.stringify(toStored(getProgress()));
+}
+
+/** flip the switch for one set; the choice holds until it is flipped back */
+export function setMeaningOn(setId: string, on: boolean): void {
+  const off = getProgress().meaningOff.filter((id) => id !== setId);
+  updateProgress({ meaningOff: on ? off : [...off, setId] });
 }
 
 /** update, persist, notify — the only write path */

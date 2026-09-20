@@ -13,6 +13,7 @@ import {
   getProgress,
   hasStoredProgress,
   getServerProgress,
+  setMeaningOn,
   subscribeProgress,
   updateProgress,
 } from "@/lib/progress";
@@ -83,6 +84,9 @@ export default function App() {
   const [activeSet, setActiveSet] = useState<WordSet | null>(null);
   const [queue, setQueue] = useState<SetWord[]>([]);
   const [hand, setHand] = useState<RoundCard[]>([]);
+  /** S6b's MEANING switch as it stood at DEAL: the run reads this, never the
+      stored choice, so flipping the switch later cannot reach a run in play */
+  const [runMeaning, setRunMeaning] = useState(true);
   /** how many of the last run's cards were a stock its shelf never held */
   const [newStock, setNewStock] = useState(0);
   const [drill, setDrill] = useState<Kana[]>([]);
@@ -169,13 +173,17 @@ export default function App() {
   // ---- the word-set screens ----
 
   if (phase === "set" && activeSet) {
+    const meaning = !progress.meaningOff.includes(activeSet.id);
     return (
       <SetScreen
         set={activeSet}
         deckName={deckLabel}
+        meaning={meaning}
+        onMeaning={(on) => setMeaningOn(activeSet.id, on)}
         onBack={() => setPhase("deck")}
         onCollection={() => setPhase("collection")}
         onDeal={() => {
+          setRunMeaning(meaning);
           setQueue(deal(activeSet, newSeed()));
           setHand([]);
           setPhase("round");
@@ -194,6 +202,7 @@ export default function App() {
         key={activeSet.id + queue.length}
         set={activeSet}
         queue={queue}
+        meaning={runMeaning}
         onAbandon={() => setPhase("set")}
         onFinish={(won, fresh) => {
           setHand(won);

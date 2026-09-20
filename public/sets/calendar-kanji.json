@@ -1,0 +1,44 @@
+{
+  "id": "calendar-kanji",
+  "name": "CALENDAR",
+  "glyph": "暦",
+  "place": "暦",
+  "label": "TIME",
+  "blurb": "TODAY, TOMORROW, WEEKDAYS",
+  "script": "kanji",
+  "origin": "platform",
+  "words": [
+    { "word": "今日",   "reading": "きょう",     "romaji": "kyou",       "meaning": "today",                "kind": "day" },
+    { "word": "昨日",   "reading": "きのう",     "romaji": "kinou",      "meaning": "yesterday",            "kind": "day" },
+    { "word": "明日",   "reading": "あした",     "romaji": "ashita",     "meaning": "tomorrow",             "kind": "day" },
+    { "word": "一昨日", "reading": "おととい",   "romaji": "ototoi",     "meaning": "day before yesterday", "kind": "day" },
+    { "word": "明後日", "reading": "あさって",   "romaji": "asatte",     "meaning": "day after tomorrow",   "kind": "day" },
+    { "word": "月曜日", "reading": "げつようび", "romaji": "getsuyoubi", "meaning": "monday",               "kind": "weekday" },
+    { "word": "火曜日", "reading": "かようび",   "romaji": "kayoubi",    "meaning": "tuesday",              "kind": "weekday" },
+    { "word": "水曜日", "reading": "すいようび", "romaji": "suiyoubi",   "meaning": "wednesday",            "kind": "weekday" },
+    { "word": "木曜日", "reading": "もくようび", "romaji": "mokuyoubi",  "meaning": "thursday",             "kind": "weekday" },
+    { "word": "金曜日", "reading": "きんようび", "romaji": "kin'youbi",  "meaning": "friday",               "kind": "weekday" },
+    { "word": "土曜日", "reading": "どようび",   "romaji": "doyoubi",    "meaning": "saturday",             "kind": "weekday" },
+    { "word": "日曜日", "reading": "にちようび", "romaji": "nichiyoubi", "meaning": "sunday",               "kind": "weekday" },
+    { "word": "先週",   "reading": "せんしゅう", "romaji": "senshuu",    "meaning": "last week",            "kind": "week" },
+    { "word": "今週",   "reading": "こんしゅう", "romaji": "konshuu",    "meaning": "this week",            "kind": "week" },
+    { "word": "来週",   "reading": "らいしゅう", "romaji": "raishuu",    "meaning": "next week",            "kind": "week" },
+    { "word": "先月",   "reading": "せんげつ",   "romaji": "sengetsu",   "meaning": "last month",           "kind": "month" },
+    { "word": "今月",   "reading": "こんげつ",   "romaji": "kongetsu",   "meaning": "this month",           "kind": "month" },
+    { "word": "来月",   "reading": "らいげつ",   "romaji": "raigetsu",   "meaning": "next month",           "kind": "month" },
+    { "word": "去年",   "reading": "きょねん",   "romaji": "kyonen",     "meaning": "last year",            "kind": "year" },
+    { "word": "今年",   "reading": "ことし",     "romaji": "kotoshi",    "meaning": "this year",            "kind": "year" },
+    { "word": "来年",   "reading": "らいねん",   "romaji": "rainen",     "meaning": "next year",            "kind": "year" }
+  ],
+  "joker": {
+    "once": [
+      {
+        "id": "calendar-kanji/you",
+        "text": "{n:曜} of these share 曜. Eighteen strokes. You'll stop counting.",
+        "trigger": { "wordIncludes": "曜" },
+        "ja": ["曜"],
+        "status": "draft"
+      }
+    ]
+  }
+}

@@ -66,6 +66,9 @@ export default function Card({
   copies,
   /** replaces the footer's kind line while a round is flipped: ATTEMPT n */
   attempt,
+  /** false: the prompt face without its English line (SPEC-v5e §2). The
+      earned faces always carry it — a word you have written has its meaning. */
+  meaning = true,
   onClick,
   className = "",
   /** S7 melts the prompt card in through it */
@@ -82,6 +85,7 @@ export default function Card({
       chip counts copies of that stock instead of the tries that earned one */
   copies?: number;
   attempt?: number;
+  meaning?: boolean;
   onClick?: () => void;
   className?: string;
   ref?: Ref<HTMLDivElement>;
@@ -178,7 +182,16 @@ export default function Card({
       </div>
       <div className="cardFoot">
         <span className="cardRule" />
-        <span className="cardMeaning">{word.meaning.toUpperCase()}</span>
+        {meaning ? (
+          <span className="cardMeaning">{word.meaning.toUpperCase()}</span>
+        ) : (
+          // the same height as the line it replaces, so the card's silhouette
+          // is the same run to run whichever way the switch stands
+          <span className="cardMeaningOff">
+            <span className="cardMeaningDash" aria-hidden />
+            MEANING OFF
+          </span>
+        )}
         <span className="cardKind">
           {attempt !== undefined
             ? `ATTEMPT ${attempt}`

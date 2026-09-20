@@ -355,6 +355,69 @@ const totals = async () =>
 const sum = (xs) => xs.reduce((a, b) => a + b, 0);
 assert.deepEqual(await totals(), [0, 0, 0], "a set with no finished run owns nothing");
 
+// 10.1b the MEANING switch (SPEC-v5e): one run-level choice, made here, held
+// for the run, remembered per set
+/** his line once it has moved on from `was` — a flip is a new beat */
+const lineFlipped = async (was) => {
+  await page.waitForFunction(
+    (before) => {
+      const id = document.querySelector(".jokerPanel")?.dataset.line;
+      return id && id !== before;
+    },
+    was,
+  );
+  return page.getAttribute(".jokerPanel", "data-line");
+};
+const chosen = async () => page.locator(".setMeaning .toggleOn").innerText();
+assert.equal(await chosen(), "ON", "meaning defaults on");
+assert.equal(await said(), "set.01", "and he deals the words as usual");
+await page.click(".setMeaning .toggleOpt:has-text('OFF')");
+assert.equal(await chosen(), "OFF");
+assert.equal(await lineFlipped("set.01"), "set.02", "his line answers the choice");
+assert.equal(await page.locator(".setMeaningHint").innerText(), "Kana + romaji only");
+await page.click("button:has-text('DEAL')");
+await page.waitForSelector(".roundCard");
+assert.equal(await page.locator(".setMeaning").count(), 0, "locked at DEAL: no switch on S7");
+assert.equal(await page.locator(".roundCard .cardMeaning").count(), 0, "the prompt carries no English");
+assert.equal(await page.locator(".roundCard .cardMeaningOff").innerText(), "MEANING OFF");
+assert.equal(await page.locator(".roundCard .cardKind").innerText(), "WORD · NO KANA YET", "the class tag stays");
+{
+  // the flipped card is still the prompt face, and still bare
+  const box = await page.locator("canvas.ink").boundingBox();
+  await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.35);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width * 0.7, box.y + box.height * 0.6, { steps: 5 });
+  await page.mouse.up();
+  await page.click("button:has-text('FLIP')");
+  await page.waitForSelector(".wordReveal svg path");
+  assert.equal(await page.locator(".roundCard .cardMeaning").count(), 0, "the reveal is bare too");
+  assert.equal(await page.locator(".roundCard .cardKind").innerText(), "ATTEMPT 1");
+  await page.click("button:has-text('GOT IT')");
+}
+await page.click(".quit");
+await page.click("button:has-text('LEAVE RUN')");
+await page.waitForSelector("button:has-text('DEAL')");
+assert.equal(await chosen(), "OFF", "the choice survives the run");
+await openDeck("KATAKANA");
+await page.click(".setRow");
+await page.waitForSelector("button:has-text('DEAL')");
+assert.equal(await chosen(), "ON", "and it is per set: another set is still on");
+await openDeck("HIRAGANA");
+await page.click(".setRow");
+await page.waitForSelector("button:has-text('DEAL')");
+assert.equal(await chosen(), "OFF", "remembered when the set is opened again");
+await page.click(".setMeaning .toggleOpt:has-text('ON')");
+assert.equal(await lineFlipped("set.02"), "set.01");
+await page.click("button:has-text('DEAL')");
+await page.waitForSelector(".roundCard");
+assert.equal(await page.locator(".roundCard .cardMeaningOff").count(), 0);
+assert.notEqual(await page.locator(".roundCard .cardMeaning").innerText(), "", "ON deals the meaning back");
+await page.click(".quit");
+await page.click("button:has-text('LEAVE RUN')");
+await page.waitForSelector("button:has-text('DEAL')");
+assert.deepEqual(await totals(), [0, 0, 0], "and none of that earned anything");
+console.log("S6b: the meaning switch — defaults on, answered by him, locked at DEAL, remembered per set");
+
 // 10.2 the collection, before any run has finished
 await page.click("button:has-text('VIEW COLLECTION')");
 await page.waitForSelector(".collectionRow");

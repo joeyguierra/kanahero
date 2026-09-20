@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<title>KanaHero S6b — meaning toggle</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&amp;family=JetBrains+Mono:wght@400;600;800&amp;family=Noto+Sans+JP:wght@400;700;900&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#151517;color:#F2F0EB;font-family:Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#FF2E88;text-decoration:none}a:hover{color:#F2F0EB}
+</style>
+</helmet>
+
+<section style="padding:44px 48px 40px">
+  <div style="display:flex;align-items:baseline;gap:11px;margin-bottom:8px">
+    <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#FF2E88;color:#000">S6b</span>
+    <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#2E9DFF;color:#000;white-space:nowrap">MEANING · ON / OFF</span>
+    <b style="font:700 14px Archivo,sans-serif">Set — one run-level switch, decided before the deal</b>
+  </div>
+  <div style="font:400 12px/1.6 'JetBrains Mono',monospace;color:#8C8C93;max-width:940px;letter-spacing:.02em;margin-bottom:32px">
+    SAME VOCABULARY AS DAKUTEN ON THE DECK SCREEN. THE SWITCH SITS IN THE SET HEAD, HOLDS FOR THE WHOLE RUN, DEFAULTS ON. THE JOKER'S LINE ANSWERS THE CHOICE. TAP IT ON THE PHONE TO FLIP.
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:38px;align-items:flex-start">
+    <div style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S6b</span>Station — cold · {{ stateLabel }}
+      </div>
+
+      <div data-screen-label="S6b Set Station meaning toggle" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;padding:44px 28px 36px;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <span style="font:400 11px 'JetBrains Mono',monospace;letter-spacing:.16em;color:#8C8C93;white-space:nowrap">← KANJI</span>
+          <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93;white-space:nowrap">駅 STATION</span>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center;min-width:0;margin-top:22px">
+          <img src="assets/joker.png" alt="" style="flex:none;object-fit:contain;width:110.3px;height:110.3px;margin:-16.1px -6.2px -16.1px -14.2px;filter:drop-shadow(0 12px 22px rgba(255,46,136,.28))">
+          <div style="position:relative;flex:1;min-width:0;border:1px solid #2A2A2E;background:#141416;padding:10px 13px 11px">
+            <span style="position:absolute;width:10px;height:10px;background:#141416;transform:rotate(45deg);left:-6px;top:50%;margin-top:-5px;border-left:1px solid #2A2A2E;border-bottom:1px solid #2A2A2E"></span>
+            <div style="font:400 8px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#FF2E88;margin-bottom:4px">JOKER</div>
+            <p style="font:400 13px/1.45 Archivo,sans-serif;color:#F2F0EB;min-height:2.9em">{{ jokerLine }}</p>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:24px">
+          <span style="font:900 28px Archivo,sans-serif;letter-spacing:-.03em">THE SET</span>
+          <span style="font:600 16px 'JetBrains Mono',monospace;color:#F2F0EB;line-height:1">9 WORDS</span>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:8px 8px 8px 13px;border:1px solid #2A2A2E;background:#141416">
+          <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0">
+            <span style="font:400 9px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93;white-space:nowrap">MEANING</span>
+            <span style="font:400 10px/1.3 Archivo,sans-serif;color:{{ hintInk }};white-space:nowrap">{{ hint }}</span>
+          </div>
+          <div onClick="{{ flip }}" style="flex:none;display:flex;border:1px solid #2A2A2E;cursor:pointer;user-select:none">
+            <span style="font:800 9px 'JetBrains Mono',monospace;letter-spacing:.14em;min-height:44px;min-width:56px;display:flex;align-items:center;justify-content:center;background:{{ onBg }};color:{{ onInk }}">ON</span>
+            <span style="font:800 9px 'JetBrains Mono',monospace;letter-spacing:.14em;min-height:44px;min-width:56px;display:flex;align-items:center;justify-content:center;background:{{ offBg }};color:{{ offInk }}">OFF</span>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px">
+          <sc-for list="{{ cards }}" as="c" hint-placeholder-count="9">
+            <div style="position:relative;aspect-ratio:5/7;width:100%;display:flex;align-items:center;justify-content:center;border:1px solid #FF2E88;background:#0A0A0B repeating-linear-gradient(45deg,rgba(255,46,136,.26) 0 6px,transparent 6px 12px)">
+              <span style="font:900 16px 'Noto Sans JP',sans-serif;color:#FF2E88">駅</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="flex:1;min-height:12px"></div>
+
+        <div style="border:1px solid #2A2A2E;background:#141416;padding:14px 17px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+            <span style="font:400 11px 'JetBrains Mono',monospace;letter-spacing:.1em;color:#5A5A5F;white-space:nowrap">0 SHINY</span>
+            <span style="font:400 11px 'JetBrains Mono',monospace;letter-spacing:.1em;color:#5A5A5F;white-space:nowrap">0 BASE</span>
+            <span style="font:400 11px 'JetBrains Mono',monospace;letter-spacing:.1em;color:#5A5A5F;white-space:nowrap">0 WORN</span>
+          </div>
+          <div style="display:block;width:100%;margin-top:13px;padding-top:12px;border-top:1px solid #2A2A2E;font:400 10px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#B9B6B1;text-align:left">VIEW COLLECTION →</div>
+        </div>
+
+        <div style="margin-top:10px;height:62px;flex:none;background:#FF2E88;color:#000;font-size:21px;font-weight:900;letter-spacing:.02em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px))">DEAL</div>
+      </div>
+    </div>
+
+    <div style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S7</span>Round — prompt, meaning off
+      </div>
+
+      <div data-screen-label="S7 Round prompt meaning off" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;font-family:Archivo,sans-serif;position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;padding:54px 28px 36px;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+        <div style="position:absolute;top:0;bottom:0;right:0;width:13px;background:repeating-linear-gradient(45deg,#FF2E88 0 7px,transparent 7px 14px);opacity:.18;border-left:1px solid #2A2A2E;pointer-events:none"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="background:#FF2E88;color:#000;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;letter-spacing:.16em;padding:4px 7px;white-space:nowrap">駅 STATION</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8C8C93;white-space:nowrap">DECK 9 · HAND 3</span>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:#8C8C93;padding:12px;margin:-12px;white-space:nowrap">✕</div>
+        </div>
+
+        <div style="display:flex;align-items:stretch;gap:12px;margin-top:20px">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;gap:10px">
+            <img src="assets/joker.png" alt="The Joker" style="width:96px;height:78px;object-fit:contain;margin-left:-8px;filter:drop-shadow(0 12px 22px rgba(255,46,136,.28))">
+            <div style="position:relative;border:1px solid #2A2A2E;background:#141416;padding:10px 12px 11px">
+              <div style="position:absolute;left:24px;top:-6px;width:10px;height:10px;background:#141416;border-left:1px solid #2A2A2E;border-top:1px solid #2A2A2E;transform:rotate(45deg)"></div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.2em;color:#FF2E88;margin-bottom:4px">JOKER</div>
+              <div style="font-size:12px;line-height:1.45;color:#F2F0EB">かいさつ. You know this one. Write it.</div>
+            </div>
+          </div>
+
+          <div style="width:150px;height:210px;flex:none;background:#141416;border:1px solid #2A2A2E;clip-path:polygon(0 0,100% 0,100% 100%,14px 100%,0 calc(100% - 14px));padding:12px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(242,240,235,.035) 0 7px,transparent 7px 14px);pointer-events:none"></div>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.18em;color:#5A5A5F;white-space:nowrap">PROMPT</span>
+              <span style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:13px;line-height:1;color:#FF2E88">駅</span>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+              <div style="font-family:'Noto Sans JP',sans-serif;font-weight:700;font-size:34px;line-height:1;color:#F2F0EB;white-space:nowrap">かいさつ</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;color:#8C8C93;white-space:nowrap">KAISATSU</div>
+            </div>
+            <div>
+              <div style="height:1px;background:#2A2A2E;margin-bottom:8px"></div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="display:inline-block;width:14px;height:1px;background:#5A5A5F"></span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.18em;color:#5A5A5F;white-space:nowrap">MEANING OFF</span>
+              </div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.14em;color:#5A5A5F;margin-top:4px;white-space:nowrap">PLACE · NO KANJI YET</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="width:334px;height:334px;background:#F2F0EB;margin-top:18px;position:relative;box-shadow:inset 0 0 0 1px #2A2A2E">
+          <div style="position:absolute;left:50%;top:6%;bottom:6%;width:0;border-left:1px dashed rgba(10,10,11,.16)"></div>
+          <div style="position:absolute;top:50%;left:6%;right:6%;height:0;border-top:1px dashed rgba(10,10,11,.16)"></div>
+          <div style="position:absolute;left:10px;top:8px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(10,10,11,.4)">DRAW</div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="display:flex;gap:10px;margin-top:16px">
+          <div style="flex:1;border:1px solid #2A2A2E;background:#141416;color:#8C8C93;text-align:center;padding:16px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em">CLEAR</div>
+          <div style="flex:1;border:1px solid #2A2A2E;background:#141416;color:#8C8C93;text-align:center;padding:16px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em">UNDO</div>
+        </div>
+        <div style="background:#FF2E88;color:#000;text-align:center;padding:19px;font-size:20px;font-weight:900;margin-top:10px;clip-path:polygon(0 0,100% 0,100% 100%,16px 100%,0 calc(100% - 16px))">FLIP</div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-width:300px;max-width:440px;border:1px solid #2A2A2E;background:#141416;padding:20px 22px;font:400 12.5px/1.65 Archivo,sans-serif;color:#B9B6B1">
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">S7 · MEANING OFF</h4>
+      <p style="margin:0 0 14px">The card keeps its full silhouette — same size, same rule, same class tag — so nothing shifts between runs. Where "TICKET GATE" sat, a dash and <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">MEANING OFF</span> in the faint mono. The Joker's line drops the English hint too: he says the kana, not the meaning.</p>
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">PLACEMENT</h4>
+      <p style="margin:0 0 14px">One row between the set head and the grid, in the same panel stock as the shelf. Label left, two-segment switch right — identical to DAKUTEN on the deck screen, so the player already knows what it does. Nothing else on the screen moves when it flips.</p>
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">BEHAVIOUR</h4>
+      <p style="margin:0 0 14px">Run-level. Set here, read by every S7 prompt card in the run: ON shows the English line and its class tag on the card; OFF leaves the card with kana and romaji only. Locked once DEAL is tapped — the switch does not appear on S7. Defaults ON; remembered per set.</p>
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">JOKER</h4>
+      <p style="margin:0 0 14px"><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">set.meaning.on</span> — "Nine words, face down. さあ, deal when you're ready."<br><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">set.meaning.off</span> — "No meanings. Just the sound and your memory. 好き."</p>
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">LATER</h4>
+      <p style="margin:0">Rarity ceiling and the S7 peek-as-assist are parked. This switch is the only thing shipping now.</p>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;meaningOn&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Run&quot;}}">
+class Component extends DCLogic {
+  state = { on: null };
+  renderVals() {
+    const on = this.state.on ?? (this.props.meaningOn ?? true);
+    return {
+      on,
+      flip: () => this.setState({ on: !on }),
+      stateLabel: on ? "meaning on" : "meaning off",
+      jokerLine: on ? "Nine words, face down. さあ, deal when you're ready." : "No meanings. Just the sound and your memory. 好き.",
+      hint: on ? "English on every card" : "Kana + romaji only",
+      hintInk: on ? "#B9B6B1" : "#FF2E88",
+      onBg: on ? "#F2F0EB" : "transparent", onInk: on ? "#0A0A0B" : "#5A5A5F",
+      offBg: on ? "transparent" : "#FF2E88", offInk: on ? "#5A5A5F" : "#000",
+      cards: Array.from({ length: 9 }, (_, i) => ({ i }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -45,6 +45,10 @@
       "holds": true,
       "proof": "lib/progress.ts — kanahero:v1 in localStorage"
     },
+    "feature.meaningToggle": {
+      "holds": true,
+      "proof": "SPEC-v5e §2–3 · components/SetScreen.tsx (the switch) · components/Card.tsx (the prompt face without its meaning)"
+    },
     "app.threeScripts": {
       "holds": true,
       "proof": "lib/sets.ts SetScript"

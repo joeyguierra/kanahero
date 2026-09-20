@@ -118,6 +118,10 @@ export interface JokerContext {
   /** the word on screen — set asides trigger off it */
   word?: SetWord;
   chars?: number;
+  /** true when the card shows its English meaning — S6b's switch, held for the
+      run. His set line answers the choice; a reveal line about a meaning
+      needs it on (SPEC-v5e §3). */
+  meaning?: boolean;
   missStreak?: number;
   triesThisWord?: number;
   /**
@@ -182,6 +186,7 @@ function varsOf(ctx: JokerContext): Vars {
     setId: ctx.set?.id,
     words: ctx.set?.words.length,
     chars: ctx.chars,
+    meaning: ctx.meaning,
     missStreak: ctx.missStreak,
     triesThisWord: ctx.triesThisWord,
     // `{tries}` is the same number under the name a line uses it by: the

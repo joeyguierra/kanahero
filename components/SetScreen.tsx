@@ -4,6 +4,11 @@
 // time, so there is no earned half of the grid and nothing to reveal here
 // (SPEC-v5a §1–3). What you own is a shelf of copies, counted under the grid
 // and laid out one word per row on S6d.
+//
+// The MEANING switch sits between the set head and the grid (SPEC-v5e): one
+// run-level choice, made here, remembered per set, locked at DEAL. ON deals
+// prompt cards with their English line; OFF deals kana and romaji only. His
+// line answers the choice. Nothing else on the screen moves when it flips.
 
 import { useEffect, useRef } from "react";
 
@@ -67,6 +72,8 @@ function float(el: HTMLElement, i: number): Animation {
 export default function SetScreen({
   set,
   deckName,
+  meaning,
+  onMeaning,
   onBack,
   onDeal,
   onCollection,
@@ -74,12 +81,16 @@ export default function SetScreen({
   set: WordSet;
   /** the deck this set belongs to, for the back link */
   deckName: string;
+  /** the MEANING switch, as remembered for this set */
+  meaning: boolean;
+  onMeaning: (on: boolean) => void;
   onBack: () => void;
   onDeal: () => void;
   onCollection: () => void;
 }) {
   const totals = setTotals(set);
-  const line = useJokerLine("set", { set, ...totals });
+  // a flip is a new beat: his line answers the switch as it stands
+  const line = useJokerLine("set", { set, ...totals, meaning }, meaning);
   const jokerRef = useRef<HTMLImageElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -185,6 +196,35 @@ export default function SetScreen({
       <div className="setHead">
         <span className="setHeadTitle">THE SET</span>
         <span className="panelCount">{set.words.length} WORDS</span>
+      </div>
+
+      <div className="setMeaning">
+        <div className="setMeaningLabel">
+          <span className="legend setMeaningLegend">MEANING</span>
+          <span className={`setMeaningHint${meaning ? "" : " setMeaningHintOff"}`}>
+            {meaning ? "English on every card" : "Kana + romaji only"}
+          </span>
+        </div>
+        <span className="toggle toggleTap" role="radiogroup" aria-label="meaning">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={meaning}
+            className={`toggleOpt${meaning ? " toggleOn" : ""}`}
+            onClick={() => onMeaning(true)}
+          >
+            ON
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={!meaning}
+            className={`toggleOpt toggleStrike${meaning ? "" : " toggleOn"}`}
+            onClick={() => onMeaning(false)}
+          >
+            OFF
+          </button>
+        </span>
       </div>
 
       <div className="setGrid">
