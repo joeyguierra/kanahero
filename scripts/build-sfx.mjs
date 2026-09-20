@@ -21,17 +21,28 @@
 // returns a different sound. sfx-src/ is therefore source code, not a build
 // artifact, and `npm run sfx` must be reproducible from it alone.
 //
-// Naming: `<name>.<ext>` or `<name>.<n>.<ext>` for round-robin variants. The
+// Naming: `<name>.<ext>`, or `<name>.<n>.<ext>` for round-robin variants. The
 // config is looked up by `<name>`, so hand.tick.1 / .2 / .3 all get identical
-// treatment and stay a set.
+// treatment and stay a set. Hyphens are accepted everywhere a dot is and
+// normalised away, because that is how the files come off the ElevenLabs
+// download (hand-tick.mp3), and renaming seven downloads by hand every
+// regeneration is exactly the manual step this script exists to delete. The
+// OUTPUT is always canonical: hand-tick.mp3 -> hand.tick.m4a.
+//
+// TUNING: the numbers below are DEFAULTS. `sfx-src/sfx.config.json`, written by
+// the sound lab (`npm run sfx:lab`), overrides them per sound — that file is the
+// record of what was decided by ear, and it is committed. Tune in the lab, bake
+// here; never hand-edit a trim into existence twice.
 //
 // Requires ffmpeg + ffprobe on PATH (`brew install ffmpeg`), or ffmpeg-static
 // as a devDependency — set FFMPEG / FFPROBE to override.
 
 import { execFile } from "node:child_process";
-import { mkdir, readdir, stat } from "node:fs/promises";
+import { mkdir, readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
+
+import { DEFAULTS } from "./sfx-defaults.mjs";
 
 const run = promisify(execFile);
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
@@ -40,6 +51,7 @@ const FFPROBE = process.env.FFPROBE || "ffprobe";
 const ROOT = path.join(import.meta.dirname, "..");
 const SRC = path.join(ROOT, "sfx-src");
 const DEST = path.join(ROOT, "public", "sfx");
+const CONFIG = path.join(SRC, "sfx.config.json");
 
 /** ms of fade at the tail — below this a hard cut clicks */
 const FADE_MS = 8;
@@ -58,34 +70,31 @@ const PEAK_TOLERANCE = 0.5;
     three means something is genuinely odd with that source. */
 const MAX_PASSES = 3;
 
-// The design table (SPEC-v5d-sound.md §1).
-//
-//   ms   hard cap on length. The reveal's flips fire as little as 114ms apart
-//        at 21 cards (min(160, 2400/n) in lib/reveal.ts), so anything longer
-//        than ~100ms smears into the next one and the roll turns to mush.
-//   peak target peak in dBFS. The ladder is deliberate: worn is the quietest
-//        thing in the app and shiny the loudest, because response scales with
-//        significance.
-//   head OPTIONAL. Explicit head-trim in ms, when the automatic silence strip
-//        is wrong. Paper and felt have soft attacks and the detector can eat
-//        the front of them — open the file in Audacity, read where the
-//        transient actually starts, put the number here, and it is settled
-//        forever. Absent = strip leading silence automatically.
-const SOUNDS = {
-  "hand.tick": { ms: 180, peak: -12 },
-  "flip.worn": { ms: 75, peak: -18 },
-  "flip.base": { ms: 95, peak: -15 },
-  "flip.shiny": { ms: 280, peak: -9 },
-  "reveal.shinyHold": { ms: 420, peak: -15 },
-  "reveal.end": { ms: 700, peak: -12 },
-  "reveal.skip": { ms: 250, peak: -12 },
-};
 
 const AUDIO_EXT = new Set([".mp3", ".wav", ".m4a", ".aac", ".flac", ".ogg", ".opus"]);
 
-/** "flip.worn.2.mp3" -> "flip.worn"; "flip.worn.mp3" -> "flip.worn" */
+/** the lab's decisions, laid over the defaults. Only the keys it names move. */
+const tuned = await readFile(CONFIG, "utf8")
+  .then((t) => JSON.parse(t))
+  .catch(() => ({}));
+
+const SOUNDS = {};
+for (const [key, base] of Object.entries(DEFAULTS)) SOUNDS[key] = { ...base, ...(tuned[key] ?? {}) };
+// a sound the lab knows about but the defaults do not still bakes
+for (const [key, extra] of Object.entries(tuned)) if (!SOUNDS[key]) SOUNDS[key] = { ...extra };
+
+/** did this value come from the lab rather than the table? */
+const isTuned = (key) => Object.prototype.hasOwnProperty.call(tuned, key);
+
+/** the canonical, dotted stem: "flip-worn-2.mp3" and "flip.worn.2.mp3" both
+    become "flip.worn.2", and "flip-worn.mp3" becomes "flip.worn" */
+function stem(file) {
+  return file.slice(0, file.lastIndexOf(".")).replace(/-/g, ".");
+}
+
+/** the SOUNDS key for a file: the stem with any round-robin index removed */
 function configKey(file) {
-  const bare = file.slice(0, file.lastIndexOf("."));
+  const bare = stem(file);
   const trailing = bare.slice(bare.lastIndexOf(".") + 1);
   return /^\d+$/.test(trailing) ? bare.slice(0, bare.lastIndexOf(".")) : bare;
 }
@@ -123,7 +132,11 @@ async function durationMs(file) {
   return Math.round(Number(stdout.trim()) * 1000);
 }
 
-function trimChain({ ms, head }) {
+function trimChain({ ms, head, loop }) {
+  // A bed is used whole: no head strip (its start is a loop point, not a
+  // transient), no cap, and above all no fade — an 8ms fade at the end of a
+  // loop is a hole punched in it once per cycle.
+  if (loop) return "anull";
   const seconds = ms / 1000;
   const fade = Math.max(0, seconds - FADE_MS / 1000);
   // head first (so the transient sits at sample 0 — perceived latency runs from
@@ -168,7 +181,7 @@ for (const file of files) {
   }
 
   const input = path.join(SRC, file);
-  const name = file.slice(0, file.lastIndexOf("."));
+  const name = stem(file);
   const output = path.join(DEST, `${name}.m4a`);
   const chain = trimChain(config);
 
@@ -197,7 +210,7 @@ for (const file of files) {
   }
 
   const [{ size }, ms] = await Promise.all([stat(output), durationMs(output)]);
-  rows.push({ name, ms, cap: config.ms, peak, target: config.peak, size, passes });
+  rows.push({ name, ms, cap: config.ms, peak, target: config.peak, size, passes, tuned: isTuned(key), loop: !!config.loop });
 }
 
 const pad = (s, n) => String(s).padEnd(n);
@@ -208,20 +221,27 @@ console.log(`  ${pad("file", 22)}${pad("ms", 12)}${pad("peak", 20)}${pad("passes
 for (const r of rows) {
   // hitting the cap exactly means it was truncated, which is the intended
   // behaviour — a shorter file just means the source was shorter
-  const at = r.ms >= r.cap ? ` (cap)` : "";
+  const at = r.loop ? " (loop)" : r.ms >= r.cap ? " (cap)" : "";
   const off = Math.abs(r.peak - r.target) > PEAK_TOLERANCE ? " ⚠" : "";
   const peak = `${r.peak} / ${r.target} dB${off}`;
   console.log(
-    `  ${pad(r.name, 22)}${pad(r.ms + at, 12)}${pad(peak, 20)}${pad(r.passes, 8)}${r.size.toLocaleString()}`,
+    `  ${pad(r.name + (r.tuned ? " *" : ""), 22)}${pad(r.ms + at, 12)}${pad(peak, 20)}${pad(r.passes, 8)}${r.size.toLocaleString()}`,
   );
 }
 console.log(`\n  total ${(total / 1024).toFixed(1)} KB`);
+if (rows.some((r) => r.tuned)) console.log("  * = tuned in the lab (sfx-src/sfx.config.json)");
 if (rows.some((r) => Math.abs(r.peak - r.target) > PEAK_TOLERANCE)) {
   console.log("  ⚠ = peak did not converge in " + MAX_PASSES + " passes; listen before shipping");
 }
 
 const have = new Set(rows.map((r) => configKey(`${r.name}.x`)));
+// "foil" was renamed to "shiny" in SPEC-v5a §7 and verified gone in v5c; a
+// source file that still says foil quietly reintroduces the old word
+const foil = unknown.filter((f) => /foil/i.test(f));
 const missing = Object.keys(SOUNDS).filter((k) => !have.has(k));
 if (missing.length) console.log(`\n  not yet generated: ${missing.join(", ")}`);
 if (unknown.length) console.log(`\n  ⚠ no config, skipped: ${unknown.join(", ")}`);
+if (foil.length) {
+  console.log("    ↳ \"foil\" was renamed to \"shiny\" (SPEC-v5a §7) — rename to flip-shiny");
+}
 console.log();

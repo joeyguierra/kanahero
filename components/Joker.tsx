@@ -16,8 +16,14 @@
 // — it snaps back to open and holds. Both frames are 1080² PNGs in
 // public/assets/ with the same alpha bounds, so one crop fits both and the
 // swap is a `src` change on one element: nothing moves but the mouth.
+//
+// And he has a voice (lib/joker-voice.ts): one blip as each character lands,
+// which is silent until sound is switched on and silent under reduced motion,
+// where nothing types. Tapping the line through cuts the voice with the typing.
 
 import { useEffect, useRef, useState, type Ref } from "react";
+
+import { voice } from "@/lib/joker-voice";
 
 /** ms per character — one steady rate, start to finish, no breath anywhere */
 const TICK = 22;
@@ -84,7 +90,11 @@ export default function Joker({
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     let i = 0;
     const start = () => {
+      // one voice per line, so every line starts on a blip (the voice keeps
+      // its own count, and only of the characters that sound)
+      const v = voice();
       ticker.current = setInterval(() => {
+        v.say(chars[i]);
         i++;
         setTyped({ line, n: i });
         if (i >= chars.length) stop();

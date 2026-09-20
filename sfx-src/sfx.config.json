@@ -1,0 +1,24 @@
+{
+  "flip.base": {
+    "ms": 90,
+    "peak": -15,
+    "head": 200
+  },
+  "flip.worn": {
+    "ms": 90,
+    "peak": -18
+  },
+  "hand.tick": {
+    "ms": 100,
+    "peak": -12
+  },
+  "reveal.end": {
+    "ms": 530,
+    "peak": -12
+  },
+  "reveal.skip": {
+    "ms": 545,
+    "peak": -12,
+    "head": 17
+  }
+}

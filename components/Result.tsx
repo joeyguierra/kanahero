@@ -27,6 +27,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useJokerLine } from "@/lib/joker-lines";
+import { play, schedule } from "@/lib/sfx";
+import { hurryCues, revealCues } from "@/lib/sfx-schedule";
 import type { Rarity } from "@/lib/progress";
 import {
   COLS,
@@ -90,6 +92,8 @@ export default function Result({
   const slots = useRef<(HTMLDivElement | null)[]>([]);
   const anims = useRef<Animation[]>([]);
   const timers = useRef<number[]>([]);
+  /** the cues laid out against the audio clock, and how to cut them */
+  const cues = useRef<() => void>(() => {});
 
   const tally = (r: Rarity) => order.slice(0, turned).filter((c) => c.card.rarity === r).length;
   const shiny = tally("shiny");
@@ -107,6 +111,8 @@ export default function Result({
     anims.current = [];
     timers.current.forEach(clearTimeout);
     timers.current = [];
+    cues.current();
+    cues.current = () => {};
   }
 
   /** the hand lands at once, wherever it was: nothing in the air, nothing mid-turn */
@@ -122,10 +128,10 @@ export default function Result({
    * it just stops taking its time. A second one snaps what is left flat.
    */
   function hurry() {
-    // sfx: reveal.skip
     stop();
     land();
     if (fast) {
+      // the spread already thudded down on the first tap; the snap is silent
       setSnapped(true);
       setTurned(order.length);
       setSpoken(true);
@@ -133,6 +139,9 @@ export default function Result({
     }
     setFast(true);
     const from = turned;
+    // the spread landing at once, and the knock when the riffle is through —
+    // the riffle itself is silent, its 70 ms step is under a flip's own length
+    cues.current = schedule(hurryCues(order, from));
     fastSchedule(from, order.length).forEach((at, i) => {
       timers.current.push(window.setTimeout(() => setTurned(from + i + 1), at));
     });
@@ -159,8 +168,16 @@ export default function Result({
       });
       setTurned(order.length);
       setSpoken(true);
+      // the one cue that survives reduced motion (SPEC-v5d §4): the run is
+      // over. Seven flips at once would be a click, not a reveal.
+      play("reveal.end");
       return;
     }
+
+    // Every flip and the knock at the end, laid out once against the audio
+    // clock rather than fired from the timers below: at 114 ms apart the flips
+    // are a rhythm, and setTimeout's jitter is audible where it is not visible
+    cues.current = schedule(revealCues(order));
 
     // ---- beat one: the deal ----
     // his hand, in page coordinates — measured off the mark's box, which is
@@ -213,7 +230,9 @@ export default function Result({
     order.forEach((card, i) => {
       const { at: start, dur } = turns[i];
       at(start, () => {
-        // sfx: reveal.shinyHold is the beat before this one; reveal.flip <rarity>
+        // its flip is already on the audio clock (revealCues) — and there is
+        // no cue in the hold before a shiny: flip.shiny's ring IS the sweep,
+        // and the silence in the gap is the anticipation (SPEC-v5d §1)
         const el = slots.current[i];
         if (el && card.card.rarity === "shiny") {
           // it lifts out of the row and flares as it comes over
@@ -249,7 +268,7 @@ export default function Result({
       });
     });
 
-    // sfx: reveal.end — he speaks once the last card is down
+    // he speaks once the last card is down; the knock is on the same clock
     at(turnEnd(order), () => setSpoken(true));
 
     return stop;

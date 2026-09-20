@@ -22,8 +22,9 @@
 // LOG's razor geometry); the sound follows the same split. Objects are foley,
 // interface and character are synthesized.
 //
-// Nothing here runs until lib/audio.ts is enabled, and the panel does not type
-// at all under `prefers-reduced-motion` — so that path is silent for free.
+// Nothing here runs until lib/audio.ts opens the voice channel, and the panel
+// does not type at all under `prefers-reduced-motion` — so that path is silent
+// for free.
 
 import { audio } from "./audio";
 
@@ -48,11 +49,12 @@ export const VOICE = {
   /** takes the glass off a square wave */
   lowpassHz: 2600,
   /** At TICK 22ms, blipping every character is a 45Hz buzz, not speech. Every
-      3rd gives 66ms, which is classic RPG cadence — and it also keeps us from
-      firing Web Audio on all ~45 renders per second the typing loop costs. */
-  everyNth: 3,
+      7th gives ~150ms — sparser than the classic RPG every-third, a word-ish
+      rate rather than a syllable-ish one (creator call, 2026-09-20) — and it
+      keeps Web Audio well clear of the ~45 renders a second the typing costs. */
+  everyNth: 6,
   /** the quietest thing in the app, under flip.worn's −18 */
-  gainDb: -22,
+  gainDb: -28,
 };
 
 /** below this a hard attack clicks; above it the blip loses its edge */
@@ -79,7 +81,7 @@ export function voice(): { say: (ch: string) => void } {
       const nth = voiced++;
       if (nth % VOICE.everyNth !== 0) return;
 
-      const a = audio();
+      const a = audio("voice");
       if (!a) return;
       const { ctx, out } = a;
 

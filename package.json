@@ -11,6 +11,7 @@
     "strokes": "node scripts/fetch-strokes.mjs && node scripts/verify-strokes.mjs",
     "icons": "node scripts/gen-icons.mjs",
     "sfx": "node scripts/build-sfx.mjs",
+    "sfx:lab": "node scripts/sfx-lab.mjs",
     "joker": "node scripts/joker-audit.mjs",
     "predev": "node scripts/joker-audit.mjs"
   },

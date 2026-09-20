@@ -17,6 +17,7 @@ import { useEffect, useRef, useState } from "react";
 import { earnRun, miss, rarityFor, type EarnedCard } from "@/lib/joker";
 import type { Rarity } from "@/lib/progress";
 import { useJokerLine, type JokerScreen } from "@/lib/joker-lines";
+import { play } from "@/lib/sfx";
 import type { SetWord, WordSet } from "@/lib/sets";
 import AbandonDialog from "./AbandonDialog";
 import Card from "./Card";
@@ -164,7 +165,9 @@ export default function Round({
     flight.current?.();
     if (card && handRef.current) {
       flight.current = flyToHand(card, handRef.current, mark, () => {
-        // sfx: hand.tick
+        // the card joins the hand: it fires when the card lands, not when
+        // the tap does, because the landing is the thing it sounds like
+        play("hand.tick");
         flight.current = null;
         setShown({ deck: rest.length, hand: held.length });
         popCount(handRef.current);

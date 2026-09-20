@@ -66,6 +66,20 @@ await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
 const cached = await page.evaluate(async (name) => (await (await caches.open(name)).keys()).length, cacheName);
 assert.ok(cached > 500, `the whole export is precached, got ${cached} entries`);
 console.log(`1. service worker installed and controlling: ${cached} URLs in ${cacheName}`);
+// the six one-shots (SPEC-v5d §6) are static files under public/, so the
+// walk in gen-sw.mjs carries them like everything else — checked by name
+// because a count cannot tell a missing sound from a missing stroke
+const sfx = ["hand.tick", "flip.worn", "flip.base", "flip.shiny", "reveal.end", "reveal.skip"];
+const sfxCached = await page.evaluate(
+  async ([name, names]) => {
+    const cache = await caches.open(name);
+    const hits = await Promise.all(names.map((n) => cache.match(`/sfx/${n}.m4a`)));
+    return names.filter((_, i) => hits[i]);
+  },
+  [cacheName, sfx],
+);
+assert.deepEqual(sfxCached, sfx, "all six sfx files are in the precache");
+console.log(`   and the six sfx files with it`);
 
 // --- 2. offline cold reload ---
 await context.setOffline(true);

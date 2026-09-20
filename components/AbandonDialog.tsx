@@ -6,8 +6,9 @@
 // The round stays mounted behind the dialog — ink, queue and hand untouched —
 // so cancelling costs nothing at all.
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useJokerLine } from "@/lib/joker-lines";
+import { useDialogKeys } from "./dialogKeys";
 import Joker from "./Joker";
 
 export default function AbandonDialog({
@@ -20,33 +21,7 @@ export default function AbandonDialog({
   const panel = useRef<HTMLDivElement>(null);
   const keep = useRef<HTMLButtonElement>(null);
   const line = useJokerLine("abandon");
-
-  useEffect(() => {
-    keep.current?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        onCancel();
-        return;
-      }
-      // a modal keeps its own focus: tab cycles inside the dialog or nothing
-      if (e.key !== "Tab") return;
-      const stops = panel.current?.querySelectorAll<HTMLButtonElement>("button");
-      if (!stops?.length) return;
-      const first = stops[0];
-      const last = stops[stops.length - 1];
-      const at = document.activeElement;
-      if (e.shiftKey && (at === first || !panel.current?.contains(at))) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && at === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onCancel]);
+  useDialogKeys(panel, keep, onCancel);
 
   return (
     <div className="dialogScrim" onClick={onCancel}>

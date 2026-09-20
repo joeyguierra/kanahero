@@ -16,9 +16,13 @@ import {
   setMeaningOn,
   subscribeProgress,
   updateProgress,
+  type AudioPrefs,
 } from "@/lib/progress";
 import { getBank, getServerBank, subscribeBank } from "@/lib/bank";
 import { shuffle } from "@/lib/session";
+import { audio, canSound, setAudioPrefs } from "@/lib/audio";
+import { voice } from "@/lib/joker-voice";
+import { play, preload } from "@/lib/sfx";
 import { allTotals, deal, newSeed, runsFinished } from "@/lib/joker";
 import { useJokerLine, type JokerScreen } from "@/lib/joker-lines";
 import { loadPlatformSets, type SetWord, type WordSet } from "@/lib/sets";
@@ -32,6 +36,7 @@ import Collection from "@/components/Collection";
 import Round, { type RoundCard } from "@/components/Round";
 import Result from "@/components/Result";
 import Credits from "@/components/Credits";
+import Settings from "@/components/Settings";
 
 type Phase =
   | "home"
@@ -96,6 +101,33 @@ export default function App() {
   const progress = useSyncExternalStore(subscribeProgress, getProgress, getServerProgress);
   const bank = useSyncExternalStore(subscribeBank, getBank, getServerBank);
   const loaded = progress !== getServerProgress();
+
+  /** the settings dialog, over S1 */
+  const [settings, setSettings] = useState(false);
+
+  // the audio gate follows the stored switches — on every load, and on every
+  // flip. The context itself is only ever built inside a tap in the dialog
+  // (below), because that is the one moment a browser lets it start.
+  useEffect(() => {
+    setAudioPrefs(progress.audio);
+  }, [progress.audio]);
+
+  /**
+   * One switch in the settings dialog. A flip that opens a channel builds and
+   * unlocks the AudioContext inside this same gesture, decodes the one-shots,
+   * and sounds that channel once — so the tap that turns a thing on is heard
+   * to. Silencing sounds nothing, obviously.
+   */
+  function changeAudio(patch: Partial<AudioPrefs>) {
+    const was = progress.audio;
+    const next = { ...was, ...patch };
+    updateProgress({ audio: next });
+    setAudioPrefs(next);
+    if (!audio()) return;
+    void preload();
+    if (next.voice && !was.voice && canSound("voice")) voice().say("・");
+    else if (next.sfx && !was.sfx && canSound("sfx")) play("hand.tick");
+  }
 
   // S1's line. The hook sits above every phase's early return, so the screen
   // he is not on passes null and spends nothing (SPEC-v5b §5).
@@ -403,7 +435,7 @@ export default function App() {
   // ---- S1 ----
 
   return (
-    <main className="frame">
+    <main className={`frame${settings ? " frameBehindDialog" : ""}`}>
       <div className="livery" aria-hidden>
         <span className="ghost ghostHome">{GHOST[selection ?? "none"]}</span>
       </div>
@@ -465,9 +497,18 @@ export default function App() {
       >
         {selection === "bank" ? "OPEN BANK" : "START SESSION"}
       </button>
-      <button type="button" className="attribution" onClick={() => setPhase("credits")}>
-        CREDITS
-      </button>
+      <div className="homeFoot">
+        <button type="button" className="attribution" onClick={() => setPhase("credits")}>
+          CREDITS
+        </button>
+        <button type="button" className="attribution" onClick={() => setSettings(true)}>
+          SETTINGS
+        </button>
+      </div>
+
+      {settings && (
+        <Settings audio={progress.audio} onAudio={changeAudio} onClose={() => setSettings(false)} />
+      )}
     </main>
   );
 }

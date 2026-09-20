@@ -37,6 +37,28 @@ export interface Progress {
   /** S6b's MEANING switch, remembered per set — only the sets switched OFF are
       listed, so a set with no entry is ON, which is the default */
   meaningOff: string[];
+  /** the sound pass (SPEC-v5d §0.1), from the settings dialog off S1 */
+  audio: AudioPrefs;
+}
+
+/** Two channels, both ON by default (creator call, 2026-09-20 — it overrides
+    SPEC-v5d §0.1's silent-first default; the toggles stay). SILENT MODE is not
+    a third flag: it is the state where both are off. Turning it on turns them
+    off, turning it off turns them on, and switching both off by hand is the
+    same thing as switching it on — so the dialog can never disagree with
+    itself. */
+export interface AudioPrefs {
+  /** his blip as the line types (lib/joker-voice.ts) */
+  voice: boolean;
+  /** the card-table one-shots (lib/sfx.ts) */
+  sfx: boolean;
+}
+
+export const AUDIO_DEFAULT: AudioPrefs = { voice: true, sfx: true };
+
+/** silent mode, as the dialog shows it */
+export function isSilent(a: AudioPrefs): boolean {
+  return !a.voice && !a.sfx;
 }
 
 const KEY = "kanahero:v1";
@@ -55,6 +77,18 @@ interface Stored {
   wiped?: boolean;
   // added with the meaning toggle (design v5 Meaning Toggle); absent before it
   meaningOff?: string[];
+  // added with the sound pass (v5d); absent reads as the default, so no
+  // version bump
+  audio?: Partial<AudioPrefs>;
+}
+
+/** the stored switches, each one a boolean or the default */
+function readAudio(a: Partial<AudioPrefs> | undefined): AudioPrefs {
+  const flag = (v: unknown, dflt: boolean) => (typeof v === "boolean" ? v : dflt);
+  return {
+    voice: flag(a?.voice, AUDIO_DEFAULT.voice),
+    sfx: flag(a?.sfx, AUDIO_DEFAULT.sfx),
+  };
 }
 
 export const NO_COPIES: RarityCounts = { shiny: 0, base: 0, worn: 0 };
@@ -111,6 +145,7 @@ export function loadProgress(): Progress {
     joker: {},
     wiped: false,
     meaningOff: [],
+    audio: AUDIO_DEFAULT,
   };
   if (typeof window === "undefined") return fallback;
   try {
@@ -131,6 +166,7 @@ export function loadProgress(): Progress {
       meaningOff: Array.isArray(data.meaningOff)
         ? data.meaningOff.filter((s): s is string => typeof s === "string")
         : [],
+      audio: readAudio(data.audio),
     };
     if (stale) saveProgress(loaded);
     return loaded;
@@ -148,6 +184,7 @@ function toStored(p: Progress): Stored {
     joker: p.joker,
     wiped: p.wiped,
     meaningOff: p.meaningOff,
+    audio: p.audio,
   };
 }
 
@@ -170,6 +207,7 @@ const SERVER: Progress = {
   joker: {},
   wiped: false,
   meaningOff: [],
+  audio: AUDIO_DEFAULT,
 };
 let cache: Progress | null = null;
 const listeners = new Set<() => void>();
