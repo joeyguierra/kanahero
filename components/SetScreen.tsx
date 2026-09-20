@@ -10,7 +10,7 @@
 // prompt cards with their English line; OFF deals kana and romaji only. His
 // line answers the choice. Nothing else on the screen moves when it flips.
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { setTotals } from "@/lib/joker";
 import { useJokerLine } from "@/lib/joker-lines";
@@ -89,20 +89,29 @@ export default function SetScreen({
   onCollection: () => void;
 }) {
   const totals = setTotals(set);
-  // a flip is a new beat: his line answers the switch as it stands
-  const line = useJokerLine("set", { set, ...totals, meaning }, meaning);
+  /** the last back has landed: he deals first and talks after, never both */
+  const [dealt, setDealt] = useState(false);
+  // Null until the deal is done — the same gate S8 puts on the reveal — so the
+  // panel is laid out and empty while the cards are in the air. A flip is a
+  // new beat: his line answers the switch as it stands.
+  const line = useJokerLine(dealt ? "set" : null, { set, ...totals, meaning }, meaning);
   const jokerRef = useRef<HTMLImageElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     const joker = jokerRef.current;
     const cards = cardRefs.current.filter((el): el is HTMLDivElement => el !== null);
-    if (!joker || cards.length === 0) return;
-
+    // no deal to wait for: nothing to throw, or nothing that can fly. The
+    // backs are seated as they are and he speaks now.
+    if (!joker || cards.length === 0) {
+      setDealt(true);
+      return;
+    }
     // the slots hold the backs at opacity 0 so there is no seated frame before
     // the deal starts; anything that cannot animate them seats them instead
     if (typeof cards[0].animate !== "function") {
       cards.forEach((el) => (el.style.opacity = "1"));
+      setDealt(true);
       return;
     }
 
@@ -123,9 +132,13 @@ export default function SetScreen({
       // a card in flight sits above every card already seated
       el.style.zIndex = String(2 + i);
 
+      const last = i === cards.length - 1;
+
       if (reduced) {
-        anims.push(el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: FADE, fill: "both" }));
+        const fade = el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: FADE, fill: "both" });
+        anims.push(fade);
         el.style.zIndex = "1";
+        if (last) fade.onfinish = () => setDealt(true);
         return;
       }
 
@@ -174,6 +187,8 @@ export default function SetScreen({
         el.style.zIndex = "1";
         el.style.opacity = "1";
         anims.push(float(el, i));
+        // the ninth card down is the cue: his line waits on it
+        if (last) setDealt(true);
       };
     });
 
