@@ -12,7 +12,8 @@
 //
 //   tier 0 the reveal and the tick (SPEC-v5d §1)
 //        1 the loop — fires every word, 9-21x a run. What the app sounds like.
-//        2 deals and arrivals · 3 chrome — not yet specced here.
+//        2 deals and arrivals — the beats between screens (SPEC-v5d §2c)
+//        3 chrome — not yet specced here.
 //   ms   hard cap on length. The reveal's flips fire as little as 114ms apart
 //        at 21 cards (min(160, 2400/n) in lib/reveal.ts), so anything whose
 //        tail is still loud at that point smears into the next one.
@@ -67,6 +68,32 @@ export const DEFAULTS = {
   // it. ink.undo is this file at playbackRate 1.4 at runtime: a half-pull
   // rather than a full swap. No second bake.
   "ink.clear": { tier: 1, ms: 300, peak: -18, gap: null },
+
+  // ---- tier 2 · deals and arrivals ----------------------------------------
+  // A deck squared and cut, as the run opens. The bookend to reveal.end: the
+  // same deck heard opening and closing, which is why the two must be audibly
+  // related and must not be the same recording.
+  "deal.press": { tier: 2, ms: 400, peak: -12, gap: null },
+  // M5, the card being MADE — synthetic, not foley (rewritten 2026-09-20): the
+  // card is an image arriving, not an object being placed. Fires 9-21x a run,
+  // so it must be FELT, not heard, and it ducks to nothing while the ink bed is
+  // active. If it ever reads as noise the answer is silence, not a louder file.
+  // It must never be pitched: noise is the hand, pitch is reward and character,
+  // and a chime here would steal from flip.shiny and the Joker at once.
+  "prompt.melt": { tier: 2, ms: 700, peak: -24, gap: null },
+  // M4: nine backs seat 90ms apart — TIGHTER than the reveal's 114ms, so this
+  // is the densest cue in the app. Try flip.worn before generating anything:
+  // same material, near-identical action, and a file you already have.
+  "deal.land": { tier: 2, ms: 80, peak: -18, gap: 90 },
+  // M14, S8 mount: the earned set set down face-down. Must finish INSIDE
+  // LEAD_MS (300, lib/reveal.ts) or it eats the first flip — hence 240, not the
+  // inventory's 280, which left 20ms of margin. Schedule it at t=0 in the same
+  // audio-clock pass as the flips.
+  "reveal.arrive": { tier: 2, ms: 240, peak: -14, gap: null },
+  // deal.throw is deliberately NOT here — see SPEC-v5d §2c. Held until the deal
+  // has been heard without it; from t=420 throws and lands interleave 90ms
+  // apart and it is probably one sound too many. Its prompt is written and
+  // waiting; add the entry only if the deal feels weightless.
 };
 
 /** what an unrecognised file gets, so anything can still be auditioned */
@@ -76,4 +103,5 @@ export const GENERIC = { tier: null, ms: 300, peak: -15, gap: null };
 export const TIERS = [
   { id: 0, name: "Reveal + tick", note: "SPEC-v5d §1 — the run ends here" },
   { id: 1, name: "The loop", note: "every word, 9–21× a run — what the app sounds like" },
+  { id: 2, name: "Deals + arrivals", note: "once per run — the beats between screens" },
 ];

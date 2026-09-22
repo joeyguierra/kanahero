@@ -3,6 +3,12 @@
 Drop the downloads here, run `npm run sfx`, and `public/sfx/*.m4a` is rebuilt.
 Prompts and the design table: `docs/spec/SPEC-v5d-sound.md`.
 
+Then open `/sfx` — the sound board. Every cue in the v5d inventory on a button,
+each one also fireable inside the timing of the screen it belongs to, and a
+status line per file so you can see what is still missing. RESCAN picks up a
+fresh bake without a reload. (`npm run sfx:lab` is the other rig: that one
+decides the trim, this one decides whether the cue is right.)
+
 ## These files are SOURCE, not a build artifact — commit them
 
 `scripts/fetch-strokes.mjs` can re-fetch its data because KanjiVG is canonical

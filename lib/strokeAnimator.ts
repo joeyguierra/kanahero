@@ -39,6 +39,10 @@ export interface StrokePlayer {
   /** hide all strokes, then draw them in order; resolves when done.
       onStroke fires with the 1-based stroke number as each begins. */
   play(onStroke?: (n: number) => void): Promise<void>;
+  /** draw the rest at `factor` times the pace, from now: the stroke in
+      flight speeds up, the pause after it is cut short, and every stroke
+      still to come runs at the new pace. Sticks until the player is cancelled. */
+  hurry(factor: number): void;
   /** show the finished character without animating */
   finish(): void;
   /** stop and detach; safe to call more than once */
@@ -64,6 +68,10 @@ export function createStrokePlayer(svg: SVGSVGElement): StrokePlayer {
 
   let cancelled = false;
   let running: Animation[] = [];
+  /** the pace, as a multiple of the pen's own */
+  let rate = 1;
+  /** cuts the pen-lift pause short, while one is pending */
+  let wake: (() => void) | null = null;
 
   // Hide by parking the dash fully off the path. Offsets deliberately overshoot
   // by 1 unit on each side: a dash boundary sitting exactly on a path endpoint
@@ -85,24 +93,35 @@ export function createStrokePlayer(svg: SVGSVGElement): StrokePlayer {
     }
   }
 
-  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  const sleep = (ms: number) =>
+    new Promise<void>((resolve) => {
+      const done = () => {
+        clearTimeout(timer);
+        wake = null;
+        resolve();
+      };
+      const timer = setTimeout(done, ms);
+      wake = done;
+    });
 
   async function play(onStroke?: (n: number) => void) {
     cancelled = false;
     hideAll();
     for (let i = 0; i < strokes.length; i++) {
-      if (i > 0) await sleep(GAP_MS);
+      if (i > 0) await sleep(GAP_MS / rate);
       if (cancelled) return;
       const stroke = strokes[i];
       onStroke?.(i + 1);
       const duration = Math.max(MIN_MS, (stroke.len / SPEED) * 1000);
       // one pen stroke: every copy runs on the same clock
-      running = stroke.paths.map((path) =>
-        path.animate(
+      running = stroke.paths.map((path) => {
+        const a = path.animate(
           [{ strokeDashoffset: hidden(stroke.len) }, { strokeDashoffset: "1" }],
           { duration, easing: "ease-in-out", fill: "none" },
-        ),
-      );
+        );
+        a.playbackRate = rate;
+        return a;
+      });
       try {
         await Promise.all(running.map((a) => a.finished));
       } catch {
@@ -114,6 +133,7 @@ export function createStrokePlayer(svg: SVGSVGElement): StrokePlayer {
 
   function stop() {
     cancelled = true;
+    wake?.();
     for (const a of running) a.cancel();
     running = [];
   }
@@ -122,6 +142,11 @@ export function createStrokePlayer(svg: SVGSVGElement): StrokePlayer {
     strokeCount: strokes.length,
     hide: hideAll,
     play,
+    hurry(factor: number) {
+      rate = factor;
+      for (const a of running) a.playbackRate = rate;
+      wake?.();
+    },
     finish() {
       stop();
       showAll();

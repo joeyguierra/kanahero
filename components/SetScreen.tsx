@@ -14,6 +14,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { setTotals } from "@/lib/joker";
 import { useJokerLine } from "@/lib/joker-lines";
+import { play, schedule } from "@/lib/sfx";
+import { dealCues } from "@/lib/sfx-schedule";
 import type { WordSet } from "@/lib/sets";
 import { CardBack } from "./Card";
 import Joker from "./Joker";
@@ -24,20 +26,37 @@ import Joker from "./Joker";
 // face up. This is the third animation on the board: the two-animation budget
 // in globals.css is the v3 number, and the v5a anim sheets supersede it.
 
+// Exported because the sound follows the picture and must not carry a second
+// copy of these numbers: lib/sfx-schedule's dealCues() is handed the clock the
+// animation is actually running on (SPEC-v5d §2c, deal.land).
 /** ms between two releases */
-const DEAL_INTERVAL = 90;
-/** ms a card spends in the air */
-const FLIGHT = 420;
+export const DEAL_INTERVAL = 90;
+/** ms the flight animation runs for */
+export const FLIGHT = 420;
 /** degrees the card leaves his hand at */
 const TOSS_TILT = 28;
 /** the card passes its slot by a hair and snaps back */
 const FLIGHT_EASE = "cubic-bezier(.2,.9,.25,1.12)";
+/**
+ * Where in that duration the card is actually down — which is what the sound
+ * follows, not FLIGHT.
+ *
+ * A WAAPI `easing` on the effect warps the whole iteration, not one keyframe
+ * segment (this is where it parts company with CSS), and FLIGHT_EASE is
+ * violently front-loaded: progress first reaches 1 at x = 0.468, and the rest
+ * of the duration is the overshoot going past the slot and settling. Measured
+ * on the running screen: the first back is within a pixel of its slot at
+ * ~192 ms and exactly on it at ~197 ms, of a 420 ms flight.
+ */
+const LAND_AT = 0.468;
+/** ms from a card's release to the card being down — the cue's own number */
+export const LAND = Math.round(FLIGHT * LAND_AT);
 /** the mid-flight keyframe carries the arc: it rises off the straight line */
 const ARC_LIFT = 26;
 /** his wrist, per card: one flick and back before the next one leaves */
 const FLICK_DEG = -7;
 /** reduced motion: all nine seat at once, no flight, no float */
-const FADE = 120;
+export const FADE = 120;
 /** his fist inside the mark's square box, measured off `assets/joker-mascot-open.png` —
     the element is the whole 1080² square, transparent margins included */
 const HAND = { x: 0.36, y: 0.75 };
@@ -102,7 +121,9 @@ export default function SetScreen({
     const joker = jokerRef.current;
     const cards = cardRefs.current.filter((el): el is HTMLDivElement => el !== null);
     // no deal to wait for: nothing to throw, or nothing that can fly. The
-    // backs are seated as they are and he speaks now.
+    // backs are seated as they are and he speaks now — and one land is the
+    // sound of a hand that arrived all at once, the same reading reduced
+    // motion gets below.
     if (!joker || cards.length === 0) {
       setDealt(true);
       return;
@@ -111,12 +132,20 @@ export default function SetScreen({
     // the deal starts; anything that cannot animate them seats them instead
     if (typeof cards[0].animate !== "function") {
       cards.forEach((el) => (el.style.opacity = "1"));
+      play("deal.land");
       setDealt(true);
       return;
     }
 
     const anims: Animation[] = [];
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+    // One land per back as it seats, laid out once against the audio clock:
+    // 90 ms apart is the tightest cue in the app, and setTimeout's jitter
+    // under the mount of a nine-card grid is audible where it is invisible.
+    const cues = schedule(
+      dealCues({ count: cards.length, gap: DEAL_INTERVAL, land: LAND, reduced, fade: FADE }),
+    );
     // his hand, in page coordinates — measured off the mark's box, which is
     // the whole 1080² square, art margins included
     const jr = joker.getBoundingClientRect();
@@ -192,7 +221,11 @@ export default function SetScreen({
       };
     });
 
-    return () => anims.forEach((a) => a.cancel());
+    return () => {
+      anims.forEach((a) => a.cancel());
+      // leaving mid-deal takes the rest of the hand's sound with it
+      cues();
+    };
   }, [set]);
 
   return (
@@ -274,7 +307,18 @@ export default function SetScreen({
           VIEW COLLECTION →
         </button>
       </div>
-      <button type="button" className="btnStrike actionBar" onClick={onDeal}>
+      <button
+        type="button"
+        className="btnStrike actionBar"
+        onClick={() => {
+          // the deck squared and cut, as the run opens — the bookend to
+          // reveal.end. It answers the tap, so it plays on the tap; the screen
+          // it belongs to is already unmounting while it sounds, which is fine:
+          // the node lives on the audio graph, not on this component.
+          play("deal.press");
+          onDeal();
+        }}
+      >
         DEAL
       </button>
     </main>

@@ -274,6 +274,103 @@ see §5b. That was decided and shipped; the inventory entry is superseded.
 
 ---
 
+## 2c. Tier 2 — deals and arrivals
+
+**Added 2026-09-20.** Once per run each, the beats between screens. **Four files** — the fifth cue
+is held (below).
+
+| File | Site | Trim to | Peak | Fires |
+| :-- | :-- | :-- | :-- | :-- |
+| `deal.press` | DEAL, the S6b CTA | ≤400 ms | −12 dBFS | once, opening the run |
+| `prompt.melt` | M5, every presentation | ≤700 ms | −24 dBFS | **9–21× a run** |
+| `deal.land` | M4, S6b mount | **≤80 ms** | −18 dBFS | ×9, **90 ms apart** |
+| `reveal.arrive` | M14, S8 mount | **≤240 ms** | −14 dBFS | once |
+
+### The bookend got better
+
+`deal.press` and `reveal.end` are the same deck heard opening and closing a run. The first draft
+made them a *cut* and a *tap* — too close together to read as two different moments. **A shuffle to
+open and a square-up to close** is the pair people actually recognise: you shuffle before you deal,
+you square up when you are done. Same object, clearly different gestures, and the run now has
+audible bookends rather than two similar knocks.
+
+### Two numbers that changed from the inventory
+
+**`deal.land` is the densest cue in the app.** Nine backs seat **90 ms apart** — tighter than the
+reveal's 114 ms, which §0.2 already calls the hardest constraint in this document. Same cure: ≤80 ms
+after trim, three variants cycled.
+
+**`reveal.arrive` is 240 ms, not 280.** `LEAD_MS` is 300 (`lib/reveal.ts`), so 280 left 20 ms of
+margin against the first flip — and `arrive` is at −14 while `flip.worn` is at −18, so it would
+still be ringing underneath it. Schedule it at t=0 in the same audio-clock pass as the flips.
+
+### Before generating `deal.land`, try `flip.worn`
+
+Same material, near-identical action, a file that already exists and is already tuned. If it works,
+that is one fewer generation, one fewer thing in the precache, and one more way the app sounds like
+one place. Only generate if it plainly does not.
+
+### The prompts
+
+`prompt_influence: 0.6` unless noted. All under the 450-character cap, all carrying the anechoic
+clause and the no-hiss ban the ink family taught us (§2b).
+
+**`deal.press`** — the end of a shuffle · `duration_seconds: 1` · `prompt_influence: 0.5`
+*(Rewritten 2026-09-20: was "squared once and then cut". A shuffle is the better opening gesture —
+see the bookend note below.)*
+> The last half-second of a riffle shuffle: the cascade snapping closed and the deck settling
+> square. A fast dry run of cardstock zipping together, then one soft papery knock as it lands
+> flat. Close-mic'd dry foley, anechoic. No long spray, no fan, no bridge flourish, no hiss, no
+> sibilance, no room tone, no music, no reverb. One isolated one-shot, silence after.
+
+> **⚠️ The trim runs from the HEAD, and you want the tail.** If a generation gives you a whole
+> shuffle rather than its last moment, do not re-roll — **use the head-trim slider in the lab** to
+> jump into the cascade, then read the number off and let it into `sfx.config.json`. That knob
+> exists for exactly this. Raising `prompt_influence` to 0.7 also pushes the model toward the
+> fragment rather than the full action.
+>
+> **Level watch:** −12 is the loudest tier below shiny, and a shuffle is a busy, broadband sound.
+> If it sits too far forward against `deal.land` and the melt, take it to −14 in the lab. This is a
+> gesture that opens a run, not a reward.
+
+**`prompt.melt`** — must be felt, not heard
+> Fine paper settling and drifting down to stillness. A soft low hush that drains away to nothing —
+> no impact at the start, no event inside it. Close-mic'd, anechoic, warm and muffled. No scratch,
+> no grit, no hiss, no sibilance, nothing bright, no room tone, no music, no reverb. One isolated
+> one-shot fading to silence.
+
+**`deal.land`** — RR3
+> One playing card landing flat on green felt. A single soft low muffled slap, dull and cushioned,
+> gone instantly. No snap, no ring, no scrape, no slide, no hiss, nothing bright. Close-mic'd dry
+> foley, anechoic, no room tone, no music, no reverb, no tail. One isolated one-shot, extremely
+> short, silence after.
+
+**`reveal.arrive`**
+> A small stack of playing cards placed down softly on a table, once. One low cushioned settle with
+> a faint papery body, gentle and final, no impact. No snap, no ring, no slide, no shuffle, nothing
+> bright. Close-mic'd dry foley, anechoic, no room tone, no music, no reverb. One isolated one-shot,
+> short, silence after.
+
+### ⏸ `deal.throw` — written, held
+
+Not in `sfx-defaults.mjs`, deliberately. From t=420 the throws and the lands interleave 90 ms apart,
+and it is probably one sound too many. **Build the deal, hear it, and add this only if it feels
+weightless without it** — then add `"deal.throw": { tier: 2, ms: 70, peak: -24, gap: 90 }`.
+
+> One playing card flicked off the top of a deck into the air. A short dry papery flick with a faint
+> whisper of air and no landing. No snap, no ring, no whoosh, nothing bright. Close-mic'd dry foley,
+> anechoic, no room tone, no music, no reverb, no tail. One isolated one-shot, extremely short,
+> silence after.
+
+### The rule `prompt.melt` lives under
+
+It is the closest thing to ambience in the app and it fires 9–21 times a run at −24, the same level
+as the ink bed. **It ducks to nothing while the bed is active** — the player is writing, and two
+textures at the same level is how a mix turns to mud. If it ever reads as noise, the answer is
+silence, not a louder file.
+
+---
+
 ## 3. Post-processing (this is where the sounds actually get made)
 
 Generation gets you raw material. The trim is the design.
@@ -392,6 +489,31 @@ So, split by nature:
 
 The pure scheduler they wrote for testability turns out to be the correct audio driver. That is the
 whole recommendation.
+
+### Two ways a scheduled cue lands late — both found on S6b's deal, 2026-09-21
+
+The deal sounded a beat behind the picture: the first back was down and the first `deal.land` had
+not arrived. Two causes, both of them general.
+
+**1. An animation's duration is not when the thing it draws arrives.** A WAAPI `easing` on the
+effect warps the *whole iteration*, not one keyframe segment — this is where it parts company with
+CSS — and S6b's flight ease, `cubic-bezier(.2,.9,.25,1.12)`, is violently front-loaded: progress
+first reaches 1 at **0.468** of the duration, and the remaining 53 % is the overshoot going past
+the slot and settling. The card is down at **197 ms** of a 420 ms flight. Cueing on the duration
+put every land **223 ms** late. So the screen exports the moment the card is *down* (`LAND`), not
+the length of the animation, and `dealCues()` takes that. Measured on the running screen, not
+inferred: the first back is within a pixel of its slot at ~192 ms, exactly on it at ~197 ms.
+
+**2. The first cue of a session pays for the context.** Nothing decodes until something sounds, and
+S6b's deal is almost always the session's first one-shot — so it was arming eight decodes inside a
+200 ms window, and reading `currentTime` off a context created in the same breath, whose clock has
+not started (~29 ms of wall time passes before its zero). Both are fixed by warming a screen early:
+`app/page.tsx` preloads on S6 (the deck), which is a tap the player has already made. A cue that
+still falls in the past is dropped, never bunched — one late thud is worse than none.
+
+Related, and the reason `schedule()` now subtracts it: a source started at audio time *T* is heard
+at *T* + the hardware's output latency — 5 ms of buffer on a laptop, a fifth of a second over
+Bluetooth. The whole list shifts together, so the rhythm inside it is untouched.
 
 ---
 

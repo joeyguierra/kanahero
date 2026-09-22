@@ -18,6 +18,11 @@ inside a panel button. Nothing else on the screen moves when it flips.
   English line. OFF: the card keeps its full silhouette — same size, same rule, same class tag
   (`PLACE · NO KANJI YET`, `ATTEMPT n`) — and where the English sat, a dash and `MEANING OFF` in
   the faint mono, at the same height. Kana and romaji only.
+- **The peek on the way out.** With the switch OFF, grading a card (GOT IT or MISSED) puts the
+  word's English on the prompt card for one second — in the meaning's own line, where the stub
+  sat, so nothing else moves — and only then does the card leave and the next prompt melt in.
+  Both grade buttons are dead for that second, so one tap is one card. With the switch ON there
+  is no pause: the meaning was already there. (`components/Round.tsx`, `MEANING_PEEK_MS`.)
 - **Locked at DEAL.** The switch does not appear on S7. The run reads the choice as it stood at
   DEAL (`app/page.tsx` holds it in run state), so a later flip cannot reach a run in play.
 - **Prompt face only.** The earned faces — S7b's reveal card is still the prompt face and stays

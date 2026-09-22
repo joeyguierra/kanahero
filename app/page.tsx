@@ -112,6 +112,17 @@ export default function App() {
     setAudioPrefs(progress.audio);
   }, [progress.audio]);
 
+  // S6b's deal is nearly always the session's first one-shot, and it is the
+  // tightest cue in the app: nine lands 90 ms apart, the first of them under
+  // 200 ms after the screen mounts. Decoding the files inside that window
+  // costs the first land outright, and a context built in the same breath
+  // starts its clock late enough to put the rest behind the picture. So the
+  // screen before it warms both — the tap that opened the deck is the gesture
+  // the context needs, and nothing sounds here.
+  useEffect(() => {
+    if (phase === "deck" && canSound("sfx")) void preload();
+  }, [phase]);
+
   /**
    * One switch in the settings dialog. A flip that opens a channel builds and
    * unlocks the AudioContext inside this same gesture, decodes the one-shots,

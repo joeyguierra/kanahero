@@ -9,12 +9,20 @@
 // is five. Small kana render at 0.7x, bottom-left in their cell.
 //
 // The user's ink is never touched. The comparison is the grading.
+//
+// A tap through it, the way S8's reveal takes one: the first tap hurries the
+// rest of the word over at FAST times the pen's pace — every stroke still
+// draws, in order, it just stops taking its time — and a second tap snaps
+// the whole word finished. The taps land on the reveal layer itself, which
+// covers the frozen canvas exactly.
 
 import { useEffect, useRef } from "react";
 import { createStrokePlayer, type StrokePlayer } from "@/lib/strokeAnimator";
 import { isSmallKana, scopeSvgIds, strokeSvgPath } from "@/lib/strokes";
 
 const SMALL_SCALE = 0.7;
+/** the pen's pace, multiplied, after the first tap */
+const FAST = 3;
 
 export default function WordReveal({
   word,
@@ -27,10 +35,34 @@ export default function WordReveal({
   const holder = useRef<HTMLDivElement>(null);
   const players = useRef<StrokePlayer[]>([]);
   const chars = [...word];
+  /** taps so far on this word: one hurries, two finishes */
+  const taps = useRef(0);
+  /** the word is on screen whole, by drawing, by snap, or by reduced motion */
+  const done = useRef(false);
+
+  const finish = () => {
+    if (done.current) return;
+    done.current = true;
+    onDone?.();
+  };
+
+  const tap = () => {
+    if (done.current) return;
+    taps.current += 1;
+    if (taps.current === 1) {
+      // players still on the wire pick the pace up when they mount (below)
+      players.current.forEach((p) => p.hurry(FAST));
+      return;
+    }
+    players.current.forEach((p) => p.finish());
+    finish();
+  };
 
   useEffect(() => {
     let dead = false;
     players.current = [];
+    taps.current = 0;
+    done.current = false;
 
     (async () => {
       const cells = Array.from(
@@ -63,6 +95,8 @@ export default function WordReveal({
         // hide it the moment it mounts: a cell that has not had its turn must
         // be blank, not a finished character waiting to be animated over
         player.hide();
+        // a tap that landed while the files were loading still counts
+        if (taps.current >= 1) player.hurry(FAST);
         ready.push(player);
       });
       players.current = ready;
@@ -70,17 +104,17 @@ export default function WordReveal({
       const reduced =
         typeof window !== "undefined" &&
         window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-      if (reduced) {
+      if (reduced || taps.current >= 2) {
         ready.forEach((p) => p.finish());
-        onDone?.();
+        finish();
         return;
       }
       // left to right, one character at a time, at the drill's own speed
       for (const player of ready) {
-        if (dead) return;
+        if (dead || done.current) return;
         await player.play();
       }
-      if (!dead) onDone?.();
+      if (!dead) finish();
     })();
 
     return () => {
@@ -91,7 +125,7 @@ export default function WordReveal({
   }, [word]);
 
   return (
-    <div className="wordReveal" ref={holder} aria-hidden>
+    <div className="wordReveal" ref={holder} aria-hidden onClick={tap}>
       {chars.map((char, i) => (
         <div
           className="wordRevealCell"

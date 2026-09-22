@@ -145,7 +145,10 @@
   const FADE_MS = 8;
   const FLOOR = Math.pow(10, -50/20);
 
-  const GAPS = { "flip.worn":114, "flip.base":114, "flip.shiny":320 };
+  // The gap a cue has to clear is a fact about the cue, and DEFAULTS carries it
+  // for every sound (scripts/sfx-defaults.mjs) — a second copy here went stale
+  // the moment tier 1 and 2 were written, which is why deal.land arrived
+  // claiming NO COLLISION when it is the tightest cue in the app at 90 ms.
   const NOTES = {
     "hand.tick":"once per GOT IT — nothing to collide with",
     "flip.worn":"up to 21×, as little as 114 ms apart",
@@ -153,11 +156,27 @@
     "flip.shiny":"rare, 320 ms apart — the only thing that rings",
     "reveal.end":"once, after the last card",
     "reveal.skip":"once, on tap",
+    "deal.land":"nine backs, 90 ms apart — the densest cue in the app",
   };
+
+  /** the line under a card. A cue with no hand-written note used to print the
+      string "undefined" here; now it describes itself from its own gap. */
+  function noteFor(r){
+    if(!r.known) return "<b>Not in DEFAULTS.</b> It will still bake once it is in the config.";
+    const line = NOTES[r.key] || (r.gap ? `fires as little as ${r.gap} ms apart` : "once in its moment — nothing to collide with");
+    return /[.!?]$/.test(line) ? line : line + ".";
+  }
 
   const $ = (id)=>document.getElementById(id);
   const recs = new Map();
   let defaults = {}, saved = {};
+  // DECLARED, not implied: this block is strict, so `tiers = ...` inside load()
+  // threw ReferenceError before it could assign — which killed the whole load
+  // and left the page reading "No audio in sfx-src/ yet" with a full folder.
+  let tiers = [];
+  // which tier tab is showing. It was already being written to localStorage on
+  // every click and never read back; now it is.
+  let tab = (()=>{ try{ return localStorage.getItem("sfx.tab") || "all"; }catch{ return "all"; } })();
 
   let ctx=null;
   const audio=()=>{ if(!ctx) ctx=new (window.AudioContext||window.webkitAudioContext)(); if(ctx.state==="suspended") ctx.resume(); return ctx; };
@@ -267,7 +286,7 @@
           <button class="p5" type="button">RESET</button>
         </div>
         <p class="note${r.gap&&b!==null&&b<20&&b!==Infinity?" warn":""}">${
-          r.known?NOTES[r.key]:"<b>Not in DEFAULTS.</b> It will still bake once it is in the config."
+          noteFor(r)
         }${r.gap?" The dashed line is where the next one fires; it wants to be <b>20 dB down</b> by then.":""}</p>
       </div>`;
 
@@ -373,7 +392,7 @@
       const name=stem(file), key=keyOf(name);
       const d=defaults[key], cfg=saved[key]||{};
       const el=document.createElement("div"); $("cards").append(el);
-      const r={ file,name,key,el,buf, known:!!d, tier:d?.tier ?? null, gap:GAPS[key]||null, info:analyse(buf),
+      const r={ file,name,key,el,buf, known:!!d, tier:d?.tier ?? null, gap:d?.gap ?? null, info:analyse(buf),
         cap: cfg.ms ?? d?.ms ?? 300,
         target: cfg.peak ?? d?.peak ?? -15,
         head: cfg.head ?? null,

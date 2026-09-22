@@ -1,4 +1,4 @@
-// The six one-shots — the imperative shell over lib/audio.ts (SPEC-v5d §3b).
+// The baked one-shots — the imperative shell over lib/audio.ts (SPEC-v5d §3b).
 //
 // Shape follows HandTick.tsx and lib/audio.ts: exported functions, capability
 // checks inline, a graceful no-op whenever sound is off or the platform has no
@@ -19,7 +19,9 @@ import { audio } from "./audio";
 import type { Cue, SfxName } from "./sfx-schedule";
 
 /** the baked files, by name — add `/sfx/<name>.2.m4a` here when a variant is
-    baked and it joins the round-robin with no other change */
+    baked and it joins the round-robin with no other change. deal.land is the
+    one that most wants variants: it fires nine times in 1.1 s on S6b, tighter
+    than anything in the reveal. */
 const FILES: Record<SfxName, string[]> = {
   "hand.tick": ["/sfx/hand.tick.m4a"],
   "flip.worn": ["/sfx/flip.worn.m4a"],
@@ -27,6 +29,8 @@ const FILES: Record<SfxName, string[]> = {
   "flip.shiny": ["/sfx/flip.shiny.m4a"],
   "reveal.end": ["/sfx/reveal.end.m4a"],
   "reveal.skip": ["/sfx/reveal.skip.m4a"],
+  "deal.press": ["/sfx/deal.press.m4a"],
+  "deal.land": ["/sfx/deal.land.m4a"],
 };
 
 /** ± this much playbackRate on every play, so nothing repeats exactly */
@@ -120,13 +124,20 @@ export function schedule(cues: Cue[]): () => void {
   if (!a) return () => {};
   const { ctx } = a;
   const origin = ctx.currentTime;
+  // A source started at audio time T is heard at T plus whatever the hardware
+  // takes to get it out — 5 ms of buffer on a laptop, a fifth of a second on
+  // Bluetooth. A cue laid on the picture's clock arrives that much after the
+  // picture, so take it off the top. The whole list shifts together, so the
+  // rhythm inside it is untouched, and a cue that would fall in the past is
+  // dropped exactly as before rather than bunching up with the next.
+  const latency = ctx.outputLatency || ctx.baseLatency || 0;
   const nodes: { node: AudioBufferSourceNode; when: number }[] = [];
   let cancelled = false;
 
   const arm = () => {
     if (cancelled) return;
     for (const cue of cues) {
-      const when = origin + cue.at / 1000;
+      const when = origin + cue.at / 1000 - latency;
       if (when < ctx.currentTime) continue;
       const s = source(next(cue.name));
       if (!s) continue;

@@ -2396,6 +2396,31 @@ button:not(:disabled):active {
   will-change: transform, opacity, filter;
 }
 
+/* meaning OFF: the graded card gives its English up for a second on its way
+   out (SPEC-v5e §2). It takes the line the MEANING OFF stub was holding, so
+   nothing moves — it only comes up. */
+.roundCardPeek .cardMeaning {
+  animation: meaningPeek 220ms ease-out both;
+}
+
+@keyframes meaningPeek {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* the second still belongs to it — only the rise goes */
+  .roundCardPeek .cardMeaning {
+    animation: none;
+  }
+}
+
 /* the melt's filter chain: a definition, not a picture */
 .meltFilter {
   position: absolute;
@@ -2440,7 +2465,9 @@ button:not(:disabled):active {
   display: flex;
   align-items: center;
   z-index: 2;
-  pointer-events: none;
+  /* it takes the tap through the reveal (one hurries, two finishes): the
+     canvas under it is frozen, so nothing else wanted the pointer here */
+  pointer-events: auto;
   /* the model is the strike; the ink underneath is the user's own */
   --stroke: rgba(255, 46, 136, 0.9);
   --shadow: rgba(255, 46, 136, 0.14);
@@ -2774,4 +2801,580 @@ a.creditName {
 
 .jokerDrill .jokerLine {
   font-size: 12px;
+}
+
+/* ============================================================
+   /sfx — the sound board. INTERNAL, not linked from the app.
+   Laid out wide and dense like the inventory it mirrors, not
+   like a screen: it is read on a desktop and tapped on a phone.
+   ============================================================ */
+
+.board {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  /* the log is pinned to the foot and is as tall as a third of the viewport;
+     the last section has to clear it or it cannot be read at all */
+  padding: 40px var(--gutter) calc(30vh + 48px);
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.boardHead {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.boardTags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.boardTag {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.11);
+  color: var(--bone);
+}
+
+.boardTagStrike {
+  background: var(--strike);
+  color: var(--chassis);
+}
+
+.boardTagBlue {
+  background: var(--blueprint);
+  color: var(--chassis);
+}
+
+.boardTagGhost {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--seam);
+  color: var(--rail);
+}
+
+.boardHead h1 {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.boardHead p,
+.boardNote {
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--rail);
+  max-width: 76ch;
+}
+
+.boardHead code {
+  color: var(--bone);
+}
+
+.boardActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.boardMissing {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--caution);
+  letter-spacing: 0.04em;
+}
+
+/* ---- the rigs ---- */
+
+.boardRigs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--seam);
+  border: 1px solid var(--seam);
+}
+
+.rig {
+  background: var(--plate);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rigHead {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rigTag {
+  color: var(--bone);
+  font-weight: 800;
+}
+
+.rigBlurb {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--print);
+  text-wrap: pretty;
+}
+
+.rigRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.rigRowTight {
+  gap: 6px;
+}
+
+.rigBtn {
+  height: 38px;
+  padding: 0 14px;
+  flex: none;
+}
+
+.rigChip {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 6px 9px;
+  border: 1px solid var(--seam);
+  background: transparent;
+  color: var(--rail);
+}
+
+.rigChipOn {
+  border-color: var(--strike);
+  color: var(--strike);
+}
+
+/* the ink pad: the real canvas, bone, at a size a finger can write in */
+.rigCanvas {
+  position: relative;
+  height: 200px;
+  background: var(--bone);
+  box-shadow: inset 0 0 0 1px var(--seam);
+}
+
+.rigMeter {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 64px;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.rigMeterLabel,
+.rigMeterValue {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--rail);
+}
+
+.rigMeterValue {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.rigMeterTrack {
+  height: 4px;
+  background: var(--seam);
+}
+
+.rigMeterFill {
+  height: 100%;
+  background: var(--strike);
+  transition: width 60ms linear;
+}
+
+.rigPanel {
+  padding: 4px 0;
+}
+
+.rigTimeline {
+  list-style: none;
+  max-height: 160px;
+  overflow: auto;
+  border: 1px solid var(--seam);
+  padding: 8px 10px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.7;
+  color: var(--rail);
+}
+
+.rigTimeline li {
+  display: flex;
+  gap: 12px;
+}
+
+.rigTimelineAt {
+  color: var(--carbon);
+  white-space: pre;
+  font-variant-numeric: tabular-nums;
+}
+
+.rigTimelineName {
+  color: var(--print);
+}
+
+.rigChrome {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rigDecks {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--seam);
+  border: 1px solid var(--seam);
+}
+
+.rigDeck {
+  background: var(--chassis);
+  color: var(--print);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  padding: 11px 12px;
+  text-align: left;
+}
+
+.rigDeckOn {
+  color: var(--strike);
+  background: var(--plate);
+}
+
+.rigCard {
+  width: 84px;
+  height: 118px;
+  border: 1px solid var(--seam);
+  background: var(--plate);
+  color: var(--rail);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  padding: 8px;
+  transition: transform 140ms ease;
+}
+
+.rigCardUp {
+  transform: translateY(-10px);
+  border-color: var(--bone);
+  color: var(--bone);
+}
+
+/* ---- the table ---- */
+
+.boardTier {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.boardTierHead {
+  display: flex;
+  gap: 11px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.boardTierHead b {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cueList {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--seam);
+  border: 1px solid var(--seam);
+}
+
+.cue {
+  background: var(--plate);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.cueTop {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.cueDot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  align-self: center;
+  background: var(--carbon);
+}
+
+.cue-ready .cueDot {
+  background: var(--live);
+}
+
+.cue-missing .cueDot {
+  background: var(--caution);
+}
+
+.cue-synth .cueDot {
+  background: var(--blueprint);
+}
+
+.cueName {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--bone);
+}
+
+.cueFrom,
+.cueSpec,
+.cueWhere,
+.cueState {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--rail);
+}
+
+.cueFrom {
+  color: var(--carbon);
+}
+
+.cueSpec {
+  letter-spacing: 0.08em;
+  text-align: right;
+}
+
+.cueGrow {
+  flex: 1;
+}
+
+.cueNote {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--print);
+  max-width: 88ch;
+  text-wrap: pretty;
+}
+
+.cueAmend {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--caution);
+  max-width: 88ch;
+}
+
+.cueActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.cue-missing .cueState {
+  color: var(--caution);
+}
+
+.cue-ready .cueState {
+  color: var(--live);
+}
+
+/* what the file measured, against what the spec asked for */
+.cueReal {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--live);
+  border: 1px solid transparent;
+  padding: 2px 6px;
+}
+
+.cueRealOff {
+  color: var(--caution);
+  border-color: var(--caution);
+}
+
+.cueHeld {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  padding: 3px 6px;
+  color: var(--chassis);
+  background: var(--caution);
+}
+
+.cueBtn {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 7px 11px;
+  border: 1px solid var(--seam);
+  background: var(--chassis);
+  color: var(--bone);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.cueBtn:hover {
+  border-color: var(--bone);
+}
+
+.cueBtnGhost {
+  color: var(--rail);
+}
+
+/* ---- tier 4 and the ladder ---- */
+
+.boardSilent {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 8px 28px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--rail);
+}
+
+.boardSilent b {
+  color: var(--print);
+}
+
+.ladder {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+}
+
+.ladderRow {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+}
+
+.ladderRow .ladderBar {
+  height: 8px;
+  background: var(--print);
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+}
+
+.ladderRow .ladderBarHot {
+  background: var(--strike);
+}
+
+.ladderDb {
+  color: var(--rail);
+  text-align: right;
+}
+
+.ladderDbHot {
+  color: var(--strike);
+  font-weight: 800;
+}
+
+.ladderCues {
+  grid-column: 2;
+  grid-row: 1;
+  color: var(--print);
+  padding-left: 12px;
+  justify-self: end;
+  background: var(--chassis);
+}
+
+/* ---- the log: pinned, because a miss is the thing you came to see ---- */
+
+.boardLog {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  max-height: 26vh;
+  overflow: auto;
+  background: rgba(10, 10, 11, 0.94);
+  border-top: 1px solid var(--seam);
+  backdrop-filter: blur(6px);
+  padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom));
+  z-index: 40;
+}
+
+.boardLogHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 1040px;
+  margin: 0 auto 6px;
+}
+
+.boardLog ol {
+  list-style: none;
+  max-width: 1040px;
+  margin: 0 auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.boardLog li {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.logHit .logMark {
+  color: var(--live);
+}
+
+.logMiss .logMark,
+.logWhy {
+  color: var(--caution);
+}
+
+.logName {
+  color: var(--bone);
+  min-width: 15ch;
+}
+
+.logAt,
+.logAs,
+.logIdle {
+  color: var(--carbon);
+}
+
+.logAt {
+  font-variant-numeric: tabular-nums;
 }

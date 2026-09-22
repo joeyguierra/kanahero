@@ -1,4 +1,9 @@
 {
+  "deal.land": {
+    "ms": 90,
+    "peak": -18,
+    "head": 190
+  },
   "flip.base": {
     "ms": 90,
     "peak": -15,

@@ -392,7 +392,18 @@ assert.equal(await page.locator(".roundCard .cardKind").innerText(), "WORD · NO
   await page.waitForSelector(".wordReveal svg path");
   assert.equal(await page.locator(".roundCard .cardMeaning").count(), 0, "the reveal is bare too");
   assert.equal(await page.locator(".roundCard .cardKind").innerText(), "ATTEMPT 1");
+  // the peek: the card gives its English up for a second as it leaves, then
+  // the next prompt comes in bare again (SPEC-v5e §2)
+  const word = await page.locator(".roundCard .cardPromptRomaji").innerText();
   await page.click("button:has-text('GOT IT')");
+  await page.waitForSelector(".roundCardPeek .cardMeaning"); // it shows on the way out
+  await page.waitForSelector(".roundCardPeek", { state: "detached" });
+  assert.equal(await page.locator(".roundCard .cardMeaningOff").innerText(), "MEANING OFF");
+  assert.notEqual(
+    await page.locator(".roundCard .cardPromptRomaji").innerText(),
+    word,
+    "and only then does the next prompt come up",
+  );
 }
 await page.click(".quit");
 await page.click("button:has-text('LEAVE RUN')");

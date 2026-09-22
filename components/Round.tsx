@@ -27,6 +27,10 @@ import { MeltFilter, meltIn } from "./PromptMelt";
 import WordReveal from "./WordReveal";
 import WritingCanvas, { type WritingCanvasHandle } from "./WritingCanvas";
 
+/** meaning OFF: the card gives its English up for this long as it leaves,
+    between the grade and the next prompt (SPEC-v5e §2) */
+const MEANING_PEEK_MS = 1000;
+
 export interface RoundCard {
   word: SetWord;
   card: EarnedCard;
@@ -42,7 +46,7 @@ export default function Round({
   set: WordSet;
   queue: SetWord[];
   /** S6b's MEANING switch as it stood at DEAL — held for the whole run, and
-      not shown here (SPEC-v5e §2) */
+      not shown here except in the peek the graded card gets (SPEC-v5e §2) */
   meaning: boolean;
   /** the run is discarded, not banked — nothing of it was ever written */
   onAbandon: () => void;
@@ -62,6 +66,12 @@ export default function Round({
   const handRef = useRef<HTMLSpanElement>(null);
   /** the flight in the air, if any — cancelling lands it (§9.2) */
   const flight = useRef<(() => void) | null>(null);
+  /** the peek in progress, if any — it owes the grade it is holding back */
+  const peekTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // meaning OFF: the graded card shows its English for a beat before it goes,
+  // so a word you got still tells you what it was. The switch is untouched —
+  // this is the card leaving, not the prompt (SPEC-v5e §2).
+  const [peeking, setPeeking] = useState(false);
   // The header counts lag the run by one flight: the card is still on its way
   // to the hand, so the hand has not got it yet. Everything else — the queue,
   // the next prompt — has already moved on.
@@ -123,7 +133,28 @@ export default function Round({
     return meltIn(card, jokerRef.current);
   }, [presented]);
 
-  useEffect(() => () => flight.current?.(), []);
+  useEffect(
+    () => () => {
+      flight.current?.();
+      if (peekTimer.current) clearTimeout(peekTimer.current);
+    },
+    [],
+  );
+
+  /** grade now when the meaning is already on the card, otherwise after the
+      peek has had its second */
+  function grade(done: () => void) {
+    if (meaning) {
+      done();
+      return;
+    }
+    setPeeking(true);
+    peekTimer.current = setTimeout(() => {
+      peekTimer.current = null;
+      setPeeking(false);
+      done();
+    }, MEANING_PEEK_MS);
+  }
 
   function nextPrompt(next: SetWord[], won: RoundCard[]) {
     canvasRef.current?.clear();
@@ -224,8 +255,8 @@ export default function Round({
           set={set}
           size="round"
           attempt={reveal ? tries : undefined}
-          meaning={meaning}
-          className="roundCard"
+          meaning={meaning || peeking}
+          className={`roundCard${peeking ? " roundCardPeek" : ""}`}
           ref={promptRef}
         />
       </div>
@@ -251,10 +282,20 @@ export default function Round({
         <div className="sessionActions">
           <div className="legend legendSpaced">DID YOU WRITE IT?</div>
           <div className="actionRow">
-            <button type="button" className="btnGrade btnLive" onClick={gotIt}>
+            <button
+              type="button"
+              className="btnGrade btnLive"
+              onClick={() => grade(gotIt)}
+              disabled={peeking}
+            >
               GOT IT
             </button>
-            <button type="button" className="btnGrade btnCaution" onClick={missed}>
+            <button
+              type="button"
+              className="btnGrade btnCaution"
+              onClick={() => grade(missed)}
+              disabled={peeking}
+            >
               MISSED
             </button>
           </div>

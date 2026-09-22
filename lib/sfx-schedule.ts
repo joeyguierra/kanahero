@@ -11,14 +11,16 @@
 import type { Rarity } from "./progress";
 import { FAST_FLIP_MS, FAST_STEP_MS, SPEAK_AFTER_MS, turnEnd, turnSchedule } from "./reveal";
 
-/** the six baked files in public/sfx/ (SPEC-v5d §1) */
+/** the baked files in public/sfx/ — SPEC-v5d §1's six, and tier 2's deal */
 export type SfxName =
   | "hand.tick"
   | "flip.worn"
   | "flip.base"
   | "flip.shiny"
   | "reveal.end"
-  | "reveal.skip";
+  | "reveal.skip"
+  | "deal.press"
+  | "deal.land";
 
 /** one sound, this many ms from the moment the schedule is handed over */
 export interface Cue {
@@ -43,6 +45,45 @@ export function revealCues(order: { card: { rarity: Rarity } }[]): Cue[] {
     at,
   }));
   return [...flips, { name: "reveal.end", at: turnEnd(order) }];
+}
+
+/**
+ * S6b's deal (M4): one land as each back seats. The screen owns the clock —
+ * these are its own animation numbers, passed in — because the deal is a
+ * picture first and a sound second, and two copies of 90 would drift.
+ *
+ * The land is the moment the card is DOWN, which the screen measures off its
+ * own easing (SetScreen's LAND), not the moment its animation stops running.
+ *
+ * Scheduled, not fired, for the same reason the reveal is: nine lands 90 ms
+ * apart is tighter than anything in S8, and setTimeout's jitter under the
+ * mount of a nine-card grid is audible where it is invisible.
+ *
+ * deal.press is NOT here. It answers the tap that ends this screen, so it
+ * plays on the tap (`play`), not against a clock.
+ *
+ * Reduced motion seats the nine behind one 120 ms fade, so it is one land as
+ * that fade finishes — nine at once would be a click, not a deal (§4).
+ */
+export function dealCues(opts: {
+  count: number;
+  /** ms between two releases */
+  gap: number;
+  /** ms from a card's release to the card being down. NOT the length of the
+      flight animation: its easing seats the card well inside its duration and
+      spends the rest settling, and the sound answers the seat (SetScreen's
+      LAND) — a cue on the duration is a fifth of a second late, every card. */
+  land: number;
+  reduced?: boolean;
+  /** the reduced-motion fade, in ms */
+  fade?: number;
+}): Cue[] {
+  if (opts.count <= 0) return [];
+  if (opts.reduced) return [{ name: "deal.land", at: opts.fade ?? 0 }];
+  return Array.from({ length: opts.count }, (_, i) => ({
+    name: "deal.land" as const,
+    at: i * opts.gap + opts.land,
+  }));
 }
 
 /**
