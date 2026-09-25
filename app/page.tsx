@@ -331,8 +331,12 @@ export default function App() {
           runDrill(kanaSet(deckId as Script, base));
         }}
         onOpenSet={(set) => {
-          // a set is chosen — the same act as choosing a deck, same cue
-          play("drawer.open");
+          // SILENT, deliberately (2026-09-25). This was drawer.open, the same
+          // act as choosing a deck — but S6b mounts in this same handler and
+          // opens on nine deal.lands, the first under 200 ms in, and a 260 ms
+          // drawer at −16 sat right on top of them. Same lesson as deal.press
+          // (§2c): a cue fired on a tap that navigates is heard on the next
+          // screen, and this next screen already has its sound.
           setActiveSet(set);
           setPhase("set");
         }}

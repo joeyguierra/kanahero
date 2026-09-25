@@ -448,7 +448,7 @@ export function ChromeRig({ board }: { board: Board }) {
     <Rig
       id="rig-chrome"
       title="THE CHROME"
-      blurb="By category, never by button. Every control here is the real thing off S1: the back link is ui.nav — which is also the screen transition, so in the app it hangs off go() in the state machine rather than off any button — a deck row going live is drawer.open, the CTA is ui.primary, and the sound switch is the one cue in the app that must sound even when sound was off a moment ago. Re-tapping the live row is silent, exactly as S1 is: choosing the deck you already chose is not a choice."
+      blurb="By category, never by button. Every control here is the real thing off S1: the back link is ui.nav — which is also the screen transition, so in the app it hangs off go() in the state machine rather than off any button — a deck row going live is drawer.open, the CTA is ui.primary, and the sound switch is the one cue in the app that must sound even when sound was off a moment ago. Re-tapping the live row is silent, exactly as S1 is: choosing the deck you already chose is not a choice. A SET row is silent too — that tap mounts S6b, and the deal is its sound."
     >
       <div className="rigChrome">
         <button type="button" className="backLink" onClick={() => board.fire("ui.nav")}>

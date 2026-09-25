@@ -366,7 +366,7 @@ export const CUES: Cue[] = [
     capMs: 260,
     peakDb: -16,
     gapMs: 250,
-    where: "a deck row or the bank strip going live on S1 · a set row on S2/S3",
+    where: "a deck row or the bank strip going live on S1 — NOT a set row: that tap mounts S6b, whose deal.lands it masked (2026-09-25)",
     note: "The decks live in the table's drawer — the detail that makes wood belong in a card-table palette at all. Capped at the OPENING, because a real drawer runs 400–800 ms with a swing and browsing three decks must not be three slow doors. Louder than ui.nav on purpose: choosing is a bigger act than navigating.",
     amended: "REPLACED ui.select (ui.nav @ 1.12) on 2026-09-21. Choosing a deck or a set is not a shade above navigation, it is a different act, and it earned its own file.",
     rig: "chrome",

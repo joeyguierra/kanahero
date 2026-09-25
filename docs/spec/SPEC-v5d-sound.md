@@ -481,7 +481,7 @@ then a bug.
 | Cue | The kind | Baked |
 | :-- | :-- | :-- |
 | `ui.nav` | **Moving between screens.** Nothing is chosen, nothing is confirmed. | 150 ms · −22 |
-| `drawer.open` | **A deck or a set is chosen.** The thing under the finger goes live. | 260 ms · −16 |
+| `drawer.open` | **A deck is chosen on S1.** The thing under the finger goes live. *Not a set — below.* | 260 ms · −16 |
 | `ui.primary` | **A confirm.** A latch closing on a choice already made. | 725 ms · −14 |
 | `ui.toggle` | **A switch.** One file, ON at 1.0 and OFF at `TOGGLE_OFF` (0.89). | 60 ms · −16 |
 
@@ -506,6 +506,7 @@ and a session quit. The leaf components stay sound-free, which is the point — 
 | :-- | :-- |
 | DEAL → S7 | **silence**, deliberately (§2c) |
 | S7 → S8 | `reveal.arrive`, when it is baked |
+| A set row → S6b | **silence** — S6b's deal is the sound, and `drawer.open` masked it |
 | A drill starting | `ui.primary` on the CTA that started it |
 | LEAVE RUN → S6b | `modal.leave` (`reveal.skip` at −6 dB), when the modal cues land |
 | SETTINGS opening | `modal.open`, when it is baked |
@@ -517,10 +518,17 @@ should say so. Tapping HIRAGANA fires `drawer.open`; tapping START SESSION fires
 Browse three decks and hit go, and you hear three drawers and one latch. That reads correctly
 because it *is* what happened.
 
-- **`drawer.open`** — `choose()` on S1 (a deck row or the bank strip) and the `onOpenSet` handler
-  (a set row on S2/S3). **Guarded on the row actually changing**: its 250 ms `gap` is a fact about
-  the cue, not something the player enforces by tapping slowly, and re-choosing what is already
-  chosen is not a choice.
+- **`drawer.open`** — `choose()` on S1 only (a deck row or the bank strip). **Guarded on the row
+  actually changing**: its 250 ms `gap` is a fact about the cue, not something the player enforces
+  by tapping slowly, and re-choosing what is already chosen is not a choice.
+
+  > **⚠️ A set row is NOT `drawer.open`, though it is the same act.** It was, for a day. But a set
+  > row's tap mounts S6b in the same handler, and S6b opens on nine `deal.land`s — the first under
+  > 200 ms in — so a 260 ms drawer at −16 sat right on top of the lands and they went missing.
+  > Removed 2026-09-25. It is the `deal.press` lesson (§2c) one screen earlier: **a tap that
+  > navigates has its sound on the next screen, and if that screen already has one, the tap is
+  > silent.** S1's rows are different only because S1 stays on screen — the row goes live, nothing
+  > mounts.
 - **`ui.primary`** — `commit()` (START SESSION / OPEN BANK), the CHARACTERS panel, and
   `Replay missed` / `Again` on the session summary. That is the general rule *"any bone or strike
   CTA without a cue of its own"*, and the exclusions matter:
