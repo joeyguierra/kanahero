@@ -10,7 +10,9 @@
 // difference is that the read is async, so the first snapshot is `ready:
 // false` and a real one replaces it.
 
+import { idbStore } from "./idb";
 import { progressBlob } from "./progress";
+import { allReceipts } from "./receipts";
 import { zipStore, type ZipEntry } from "./zip";
 
 const DB_NAME = "kanahero-bank";
@@ -48,49 +50,18 @@ export interface BankState {
 
 // ---- database ----
 
-let dbPromise: Promise<IDBDatabase> | null = null;
+const db = idbStore({
+  name: DB_NAME,
+  version: DB_VERSION,
+  store: STORE,
+  upgrade(d) {
+    if (!d.objectStoreNames.contains(STORE)) {
+      d.createObjectStore(STORE, { keyPath: "id" }).createIndex("takenAt", "takenAt");
+    }
+  },
+});
 
-function openDB(): Promise<IDBDatabase> {
-  if (!dbPromise) {
-    dbPromise = new Promise((resolve, reject) => {
-      if (typeof indexedDB === "undefined") {
-        reject(new Error("indexeddb unavailable"));
-        return;
-      }
-      const req = indexedDB.open(DB_NAME, DB_VERSION);
-      req.onupgradeneeded = () => {
-        const db = req.result;
-        if (!db.objectStoreNames.contains(STORE)) {
-          db.createObjectStore(STORE, { keyPath: "id" }).createIndex("takenAt", "takenAt");
-        }
-      };
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-      req.onblocked = () => reject(new Error("indexeddb blocked"));
-    });
-    // a rejected promise must not be cached, or one bad open poisons the tab
-    dbPromise.catch(() => {
-      dbPromise = null;
-    });
-  }
-  return dbPromise;
-}
-
-/** Resolves on transaction *complete*, not request success — a quota failure
-    surfaces when the transaction aborts, which is after the request "worked". */
-async function tx<T>(
-  mode: IDBTransactionMode,
-  run: (store: IDBObjectStore) => IDBRequest<T>,
-): Promise<T> {
-  const db = await openDB();
-  return new Promise<T>((resolve, reject) => {
-    const t = db.transaction(STORE, mode);
-    const req = run(t.objectStore(STORE));
-    t.oncomplete = () => resolve(req.result);
-    t.onerror = () => reject(t.error ?? req.error);
-    t.onabort = () => reject(t.error ?? req.error ?? new Error("transaction aborted"));
-  });
-}
+const tx = db.tx;
 
 // ---- store ----
 
@@ -317,12 +288,13 @@ export interface ManifestEntry {
 
 export type ExportResult = "shared" | "downloaded" | "empty";
 
-/** One ZIP: `captures/<id>.jpg`, a manifest, and the progress blob. Never mutates the bank —
-    it is a copy, repeatable and idempotent, and it is also the input format
-    the later conversion build reads. */
+/** One ZIP: `captures/<id>.jpg`, a manifest, the progress blob and the
+    receipts. Never mutates the bank — it is a copy, repeatable and idempotent,
+    and it is also the input format the later conversion build reads. */
 export async function exportBank(): Promise<ExportResult> {
   const captures = [...cache.captures].sort((a, b) => a.takenAt - b.takenAt);
-  if (captures.length === 0) return "empty";
+  const receipts = await allReceipts();
+  if (captures.length === 0 && receipts.length === 0) return "empty";
 
   const now = new Date();
   const entries: ZipEntry[] = [];
@@ -348,9 +320,10 @@ export async function exportBank(): Promise<ExportResult> {
       JSON.stringify(
         {
           format: "kanahero-bank",
-          version: 1,
+          version: 2,
           exportedAt: now.toISOString(),
           captures: manifest,
+          receipts: receipts.length,
         },
         null,
         2,
@@ -363,6 +336,19 @@ export async function exportBank(): Promise<ExportResult> {
   entries.push({
     name: "progress.json",
     data: new TextEncoder().encode(progressBlob()),
+  });
+
+  // The receipts leave with the cards: the ink that earned every copy, strokes
+  // inline, oldest first (SPEC-v6 §6).
+  entries.push({
+    name: "receipts.json",
+    data: new TextEncoder().encode(
+      JSON.stringify(
+        { format: "kanahero-receipts", version: 1, exportedAt: now.toISOString(), receipts },
+        null,
+        2,
+      ),
+    ),
   });
 
   const zip = zipStore(entries, now);

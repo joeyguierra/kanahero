@@ -287,3 +287,35 @@ hold, the held face, the opening flash (§5.1, 5.2, 5.4, 5.5) → 5 the stack on
 date chip, legacy card (§5.3) → 6 the played hold (§5.2) → 7 export (§6) → 8 Joker key + pool
 (§7) → 9 e2e + report. Commit per step; step 4 before step 5 so the held face is proven on run
 state before it reads storage.
+
+## 11. As built (2026-09-25) — the decisions the build forced
+
+Built on the working tree with the v5d sound work still uncommitted in it, so nothing here is
+committed; the diff is the record. Everything above stands; this is what the tree does where the
+spec left a choice.
+
+- **Guides, not cell dividers.** The held face carries the board's own dashed centre cross,
+  scaled with the ink, and no cell lines — the ink was written against the cross. The mock's
+  divider between 出 and 口 was the two-character case coinciding with the centre.
+- **Model at 0.55 over full ink**, as `--stroke` on `.receiptBox .wordReveal`; the flip is
+  untouched. The bone body has no border on any stock — checked on worn and base at 390 px, it
+  reads on both, so the two artboards the mock lacked were not needed.
+- **The ink is the canvas's own weight**, 3.5–9 px scaled by the fit, so at the card it is
+  roughly 2–4.5 px and heavier than the mock drew it. Nothing was tuned against the mock.
+- **`lib/ink.ts` owns the drawing**; `WritingCanvas` keeps flat strokes and draws through it.
+  `snapshot()` quantises: 0.1 px, whole ms from the first point of the attempt.
+- **`lib/idb.ts`** is the lifted open/tx pair; `bank.ts` is otherwise untouched but for §6.
+- **The held face is mounted only while wanted** (held, or the opening flash), so a stack of
+  copies fetches stroke SVGs for one card at a time.
+- **The chip is one prop, `chip`**, a suffix after the stock: the date, `×k`, or absent for
+  the tries. `copies` is gone.
+- **Hold is `pointerdown` + 150 ms**, pointer capture on landing, `touch-action: pan-x` so the
+  track's native swipe cancels it; Enter/Space toggle for keyboards and for e2e.
+- **The opening flash is lazy initial state**, not an effect (React's set-state-in-effect rule),
+  and skipped under reduced motion.
+- **His new pool sits in the two-line depth tier** (`joker-audit.mjs` `DEPTH`), and its line
+  `needs:feature.receipts`, a fact added to `joker/facts.json`.
+- **Verification as measured:** lint, build, `e2e-bank`, `e2e-joker`, `e2e-offline` clean;
+  `e2e-loop` passes every §9 step and fails only 10.8, which predates this build — the word
+  `foil` in a comment in `scripts/build-sfx.mjs` (v5d). With that check skipped the rest of the
+  loop, the Joker bag steps included, passes.

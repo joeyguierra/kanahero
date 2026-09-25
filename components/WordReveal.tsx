@@ -26,9 +26,13 @@ const FAST = 3;
 
 export default function WordReveal({
   word,
+  animate = true,
   onDone,
 }: {
   word: string;
+  /** false: every character mounts finished — the model laid over a receipt
+      is the comparison, not a performance (SPEC-v6 §5.2) */
+  animate?: boolean;
   /** fires when the last character has finished drawing */
   onDone?: () => void;
 }) {
@@ -104,7 +108,7 @@ export default function WordReveal({
       const reduced =
         typeof window !== "undefined" &&
         window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-      if (reduced || taps.current >= 2) {
+      if (reduced || !animate || taps.current >= 2) {
         ready.forEach((p) => p.finish());
         finish();
         return;

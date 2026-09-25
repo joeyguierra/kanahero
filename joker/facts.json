@@ -37,6 +37,10 @@
       "holds": true,
       "proof": "README · e2e-bank"
     },
+    "feature.receipts": {
+      "holds": true,
+      "proof": "SPEC-v6 · lib/receipts.ts keepRun() · e2e-loop 10.9"
+    },
     "feature.strokeModel": {
       "holds": true,
       "proof": "lib/strokes.ts — every reveal is the bundled stroke SVG"

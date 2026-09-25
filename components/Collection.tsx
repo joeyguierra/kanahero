@@ -11,23 +11,41 @@
 // have never finished a run on shows no face at all: the word's first
 // appearance is still the card you earned (SPEC-v5a §3).
 //
-// A shelf card is tappable and opens the same full face S8 opens — with one
-// difference: no copy here remembers the tries that earned it, so its chip
-// counts the copies of that stock instead.
+// A shelf card opens the stack (SPEC-v6 §5.3): one card per copy of that
+// stock, newest first, each with the date it was earned and — held — the ink
+// that earned it. Copies with no receipt (every copy from before v6, and any
+// whose write failed) are one legacy card at the end, counted on its chip.
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 import { cardsFor } from "@/lib/joker";
-import { useJokerLine } from "@/lib/joker-lines";
-import { NO_COPIES } from "@/lib/progress";
+import { useJokerLine, type JokerScreen } from "@/lib/joker-lines";
+import { NO_COPIES, type Rarity } from "@/lib/progress";
+import { getReceipts, getServerReceipts, receiptCount, receiptsFor, subscribeReceipts } from "@/lib/receipts";
 import type { SetWord, WordSet } from "@/lib/sets";
 import Card from "./Card";
+import CardView, { type ViewCard } from "./CardView";
 import Joker from "./Joker";
 
 const STOCKS = ["shiny", "base", "worn"] as const;
 
+/** the stack a slot opens: receipts newest first, then the legacy card */
+function stackFor(setId: string, word: SetWord, stock: Rarity, copies: number): ViewCard[] {
+  const receipts = receiptsFor(setId, word.word, stock);
+  const cards: ViewCard[] = receipts.map((r) => ({
+    word,
+    card: { rarity: stock, tries: r.tries },
+    ink: { box: r.box, strokes: r.strokes },
+    earnedAt: r.earnedAt,
+  }));
+  const legacy = copies - receipts.length;
+  if (legacy > 0) cards.push({ word, card: { rarity: stock, tries: 0 }, legacy });
+  return cards;
+}
+
 export default function Collection({ set, onBack }: { set: WordSet; onBack: () => void }) {
   const cards = cardsFor(set.id);
+  const receipts = useSyncExternalStore(subscribeReceipts, getReceipts, getServerReceipts);
   /** the slot a tap opened: one word, in one stock, and how many of it */
   const [open, setOpen] = useState<{
     word: SetWord;
@@ -35,7 +53,16 @@ export default function Collection({ set, onBack }: { set: WordSet; onBack: () =
     copies: number;
   } | null>(null);
   const empty = set.words.every((w) => !cards[w.word]);
-  const line = useJokerLine(empty ? "collection.empty" : "collection", { set });
+  // his line waits for the receipts to land: a shelf whose every copy
+  // predates v6 gets its own pool, and he must not draw twice for one visit
+  const screen: JokerScreen | null = !receipts.ready
+    ? null
+    : empty
+      ? "collection.empty"
+      : receiptCount(set.id) === 0
+        ? "collection.unreceipted"
+        : "collection";
+  const line = useJokerLine(screen, { set });
 
   return (
     <main className="frame">
@@ -101,15 +128,11 @@ export default function Collection({ set, onBack }: { set: WordSet; onBack: () =
       <div className="grow" />
 
       {open && (
-        <div className="cardOverlay" role="dialog" onClick={() => setOpen(null)}>
-          <Card
-            word={open.word}
-            set={set}
-            size="earn"
-            card={{ rarity: open.stock, tries: 0 }}
-            copies={open.copies}
-          />
-        </div>
+        <CardView
+          set={set}
+          cards={stackFor(set.id, open.word, open.stock, open.copies)}
+          onClose={() => setOpen(null)}
+        />
       )}
     </main>
   );

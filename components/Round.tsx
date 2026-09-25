@@ -14,8 +14,10 @@
 // Tries are counted here, in the run's own state, and die with it.
 
 import { useEffect, useRef, useState } from "react";
+import type { InkSnapshot } from "@/lib/ink";
 import { earnRun, miss, rarityFor, type EarnedCard } from "@/lib/joker";
 import type { Rarity } from "@/lib/progress";
+import { keepRun, newReceiptId, type Receipt } from "@/lib/receipts";
 import { useJokerLine, type JokerScreen } from "@/lib/joker-lines";
 import { play } from "@/lib/sfx";
 import type { SetWord, WordSet } from "@/lib/sets";
@@ -34,17 +36,22 @@ const MEANING_PEEK_MS = 1000;
 export interface RoundCard {
   word: SetWord;
   card: EarnedCard;
+  /** the ink graded GOT IT — the receipt, provisional as the card is (SPEC-v6 §2) */
+  ink?: InkSnapshot;
 }
 
 export default function Round({
   set,
   queue: dealt,
+  seed,
   meaning,
   onAbandon,
   onFinish,
 }: {
   set: WordSet;
   queue: SetWord[];
+  /** the seed the queue was dealt from — the receipts carry it (SPEC-v6 §3.1) */
+  seed: number;
   /** S6b's MEANING switch as it stood at DEAL — held for the whole run, and
       not shown here except in the peek the graded card gets (SPEC-v5e §2) */
   meaning: boolean;
@@ -172,6 +179,26 @@ export default function Round({
         set.id,
         won.map(({ word, card }) => ({ wordId: word.word, rarity: card.rarity })),
       );
+      // then the receipts, after the counts: one write, all or nothing, and
+      // the run goes on to S8 whatever it answers — a copy without its
+      // receipt is still a copy (SPEC-v6 §2.5)
+      const earnedAt = Date.now();
+      const receipts: Receipt[] = [];
+      for (const { word, card, ink } of won) {
+        if (!ink) continue;
+        receipts.push({
+          id: newReceiptId(earnedAt),
+          setId: set.id,
+          wordId: word.word,
+          rarity: card.rarity,
+          tries: card.tries,
+          earnedAt,
+          seed,
+          box: ink.box,
+          strokes: ink.strokes,
+        });
+      }
+      void keepRun(receipts);
       onFinish(won, newStock);
       return;
     }
@@ -190,7 +217,13 @@ export default function Round({
   // already on its way. Rarity is not shown here — S8 turns it over.
   function gotIt() {
     const n = tried[current.word] || 1;
-    const won: RoundCard = { word: current, card: { rarity: rarityFor(n), tries: n } };
+    // the ink is taken before the next prompt clears the board: the canvas
+    // has been frozen since FLIP, so this is exactly the ink that was graded
+    const won: RoundCard = {
+      word: current,
+      card: { rarity: rarityFor(n), tries: n },
+      ink: canvasRef.current?.snapshot() ?? undefined,
+    };
     const held = [...hand, won];
     const rest = queue.slice(1);
     const card = promptRef.current;

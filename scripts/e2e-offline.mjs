@@ -195,6 +195,17 @@ async function playRun(missFirst) {
 const widest = await playRun(true);
 assert.ok(widest >= 2, `the whole word reveals one cell per character offline, got ${widest}`);
 assert.match(await page.locator(".resultCount").innerText(), /^10\s*EARNED$/);
+// the receipt, offline: the card holds for its ink, and the model laid over
+// it is the same stroke SVG the reveal drew from the precache (SPEC-v6 §9)
+await page.locator(".resultRows .revealSlot").first().click();
+await page.locator(".receiptCard").focus();
+await page.keyboard.press("Enter");
+await page.waitForSelector(".receiptHeld .receiptInk");
+await page.waitForSelector(".receiptHeld .wordRevealCell svg");
+assert.match(await page.locator(".receiptHeld .cardKind").innerText(), /^ATTEMPT \d+$/);
+await page.keyboard.press("Enter");
+await page.mouse.click(8, 8);
+assert.equal(await page.locator(".cardView").count(), 0, "the receipt shows and puts away offline");
 await page.click("button:has-text('BACK TO DECK')");
 await page.click(".setRow");
 const afterOne = await totals();

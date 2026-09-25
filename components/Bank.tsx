@@ -19,6 +19,7 @@ import {
   type Capture,
 } from "@/lib/bank";
 import { useJokerLine } from "@/lib/joker-lines";
+import { getReceipts, getServerReceipts, subscribeReceipts } from "@/lib/receipts";
 import Joker from "./Joker";
 
 /** the count flash is one frame of inverse, no motion — anything springier is
@@ -53,6 +54,10 @@ export default function Bank({
   onOpen: (id: string) => void;
 }) {
   const bank = useSyncExternalStore(subscribeBank, getBank, getServerBank);
+  // the export carries the receipts too, so cards with no photos still leave
+  const receipts = useSyncExternalStore(subscribeReceipts, getReceipts, getServerReceipts);
+  const nothingToExport =
+    bank.captures.length === 0 && [...receipts.byWord.values()].every((l) => l.length === 0);
   const urls = useObjectUrls(bank.captures);
   const [flash, setFlash] = useState(false);
 
@@ -147,7 +152,7 @@ export default function Bank({
       <button
         type="button"
         className="btnSeam bankExport"
-        disabled={count === 0}
+        disabled={nothingToExport}
         onClick={() => {
           clearBankError();
           void exportBank();

@@ -17,14 +17,22 @@
 //      any run; a finished run earns one copy per word; a replay earns a
 //      second; leaving through the Joker's confirm earns nothing, and neither
 //      does a reload; a v2 blob is wiped once with a line about it
+//  10.9 The receipt (SPEC-v6): every earned copy keeps the ink that earned it,
+//      in its own store; the card view holds for it, swipes through copies,
+//      dates the chip; a shelf from before v6 is one legacy card per stock and
+//      he says so; the export carries the receipts
 //   9. A self-intersecting stroke animates as ONE pen stroke: its clipped
 //      copies run concurrently, not one after the other
 
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
-import { readFile, readdir } from "node:fs/promises";
+import { execFile, spawn } from "node:child_process";
+import { mkdtemp, readFile, readdir } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
+import { promisify } from "node:util";
 import { chromium } from "playwright";
+
+const run = promisify(execFile);
 
 // Kana whose stroke file has a <g style="--i:N"> — one pen stroke drawn as
 // several clipped copies. These are the ones the animator used to stall on.
@@ -355,6 +363,40 @@ const totals = async () =>
 const sum = (xs) => xs.reduce((a, b) => a + b, 0);
 assert.deepEqual(await totals(), [0, 0, 0], "a set with no finished run owns nothing");
 
+/** every receipt in IndexedDB, strokes summarised — and never a database
+    created by asking: an open with no version would make one with no store */
+const receipts = () =>
+  page.evaluate(async () => {
+    const dbs = await indexedDB.databases();
+    if (!dbs.some((d) => d.name === "kanahero-receipts")) return [];
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open("kanahero-receipts");
+      req.onerror = () => reject(req.error);
+      req.onsuccess = () => {
+        const db = req.result;
+        const all = db.transaction("receipts").objectStore("receipts").getAll();
+        all.onsuccess = () => {
+          db.close();
+          resolve(
+            all.result.map((r) => ({
+              ...r,
+              strokes: r.strokes.length,
+              points: r.strokes.reduce((n, s) => n + s.length / 3, 0),
+            })),
+          );
+        };
+        all.onerror = () => reject(all.error);
+      };
+    });
+  });
+/** the chip's date, the way the card prints it: m-d-yy, no leading zeros */
+const today = (() => {
+  const d = new Date();
+  return `${d.getMonth() + 1}-${d.getDate()}-${String(d.getFullYear()).slice(-2)}`;
+})();
+/** the overlay's backdrop — the one place a tap puts the card back */
+const tapOutside = () => page.mouse.click(8, 8);
+
 // 10.1b the MEANING switch (SPEC-v5e): one run-level choice, made here, held
 // for the run, remembered per set
 /** his line once it has moved on from `was` — a flip is a new beat */
@@ -557,17 +599,34 @@ assert.equal(
 assert.equal(await said(), "result.01", "and he counts it up once the last card has landed");
 
 // a tap on a card opens its whole face — stock and tries, the mark, the word,
-// its reading and what it means — over the screen, and a tap puts it back
+// its reading and what it means — over the screen. A tap on the card does
+// nothing; a tap outside puts it back (SPEC-v6 §5.1). Held — here toggled with
+// Enter, which is the hold for a keyboard — it turns into its receipt: the ink
+// from run state, the model over it, the attempt on the foot (§5.2, §5.5).
 await page.locator(".resultRows .revealSlot").first().click();
-assert.equal(await page.locator(".cardOverlay .card-earn").count(), 1, "the full face opens");
+assert.equal(await page.locator(".cardView .receiptCard").count(), 1, "the full face opens, one card");
 assert.match(
-  await page.locator(".cardOverlay .cardChip").innerText(),
+  await page.locator(".cardView .cardChip").innerText(),
   /^(SHINY|BASE|WORN) · (1st TRY|2nd TRY|\d+ TRIES)$/,
   "the face carries its stock and the tries that earned it",
 );
-assert.equal(await page.locator(".cardOverlay .cardMeaning").count(), 1, "and what it means");
-await page.click(".cardOverlay");
-assert.equal(await page.locator(".cardOverlay").count(), 0, "a tap anywhere puts it back");
+assert.equal(await page.locator(".cardView .cardMeaning").count(), 1, "and what it means");
+assert.equal(await page.locator(".receiptPager").count(), 0, "one card from one run: nothing to page");
+assert.equal(await page.locator(".receiptLegendBlank").count(), 0, "the legend is lit: this card has ink");
+await page.locator(".receiptCard").click();
+assert.equal(await page.locator(".cardView").count(), 1, "a tap on the card does nothing");
+await page.locator(".receiptCard").focus();
+await page.keyboard.press("Enter");
+await page.waitForSelector(".receiptHeld .receiptInk");
+assert.match(await page.locator(".receiptHeld .cardKind").innerText(), /^ATTEMPT \d+$/, "held: the foot reads the attempt");
+assert.equal(await page.locator(".receiptHeld .cardMeaning").count(), 0, "held: the meaning goes");
+await page.waitForSelector(".receiptHeld .wordRevealCell svg");
+assert.ok((await page.locator(".receiptHeld .wordRevealCell").count()) >= 1, "held: the model is laid over the ink");
+assert.equal(await page.locator(".receiptHeld .cardChip").count(), 1, "held: the chip stays");
+await page.keyboard.press("Enter");
+assert.equal(await page.locator(".receiptHeld").count(), 0, "released: the print is back");
+await tapOutside();
+assert.equal(await page.locator(".cardView").count(), 0, "a tap outside puts it back");
 
 await page.click("button:has-text('BACK TO DECK')");
 await page.click(".setRow");
@@ -584,14 +643,31 @@ assert.equal(await page.locator(".collectionRowEmpty").count(), 0, "every word n
 assert.equal(await page.locator(".collectionRow .card").count(), 10, "one card each, one stock each");
 assert.equal(await page.locator(".collectionRow .cardWord").count(), 10);
 await page.locator(".collectionRow .card").first().click();
-assert.equal(await page.locator(".cardOverlay .card-earn").count(), 1, "a shelf card opens too");
-assert.match(
-  await page.locator(".cardOverlay .cardChip").innerText(),
-  /^(SHINY|BASE|WORN) · ×\d+$/,
-  "no copy on the shelf remembers its tries, so the chip counts copies",
+assert.equal(await page.locator(".cardView .receiptCard").count(), 1, "a shelf card opens too: one copy, one card");
+assert.equal(
+  await page.locator(".cardView .cardChip").innerText(),
+  `SHINY · ${today}`,
+  "a receipted copy's chip is the date it was earned (SPEC-v6 §5.3)",
 );
-await page.click(".cardOverlay");
-assert.equal(await page.locator(".cardOverlay").count(), 0);
+assert.equal(await page.locator(".receiptPager").count(), 0, "one copy: no pager");
+await tapOutside();
+assert.equal(await page.locator(".cardView").count(), 0);
+
+// 10.9a the receipts landed with the run: one per word, the missed word's
+// counting its second try, every one with ink, all sharing the finishing write
+const kept = await receipts();
+assert.equal(kept.length, 10, "one receipt per copy, written with the run");
+assert.deepEqual(
+  kept.map((r) => r.tries).sort(),
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+  "the receipt remembers the tries the count forgot",
+);
+assert.ok(kept.every((r) => r.strokes > 0 && r.points > 1), "every receipt carries ink");
+assert.ok(kept.every((r) => r.box.w > 0 && r.box.h > 0), "and the board it was drawn on");
+assert.equal(new Set(kept.map((r) => r.earnedAt)).size, 1, "every receipt of a run shares its moment");
+assert.equal(new Set(kept.map((r) => r.seed)).size, 1, "and its seed");
+assert.equal(kept.filter((r) => r.rarity === "base").length, 1, "the missed word's receipt is base");
+console.log("receipts: ten kept with the run, tries and ink and all");
 const rowSums = async () =>
   Promise.all(
     (await page.locator(".collectionRow").all()).map(async (row) =>
@@ -610,7 +686,56 @@ assert.equal(sum(await totals()), 20, "the second run stacked on the first");
 await page.click("button:has-text('VIEW COLLECTION')");
 assert.deepEqual(await rowSums(), Array(10).fill(2), "every word is two copies deep");
 console.log("run 2: the set replays and the copies stack");
-await page.click(".backLink"); // ← back to the set
+
+// 10.9b two copies of one stock are two cards on the track, newest first,
+// each dated, and the pager steps through them (SPEC-v6 §5.3)
+{
+  // a word shiny in both runs — the one missed in run 1 is shiny once, base once
+  const twice = page.locator('.collectionSlot-shiny:has(.collectionTimes:text-is("×2")) .card').first();
+  assert.equal(await twice.count(), 1, "a word shiny twice has one shiny slot to open");
+  await twice.click();
+  assert.equal(await page.locator(".cardView .receiptCard").count(), 2, "two copies, two cards");
+  assert.equal(await page.locator(".receiptPage").innerText(), "1 / 2");
+  assert.ok(await page.locator(".receiptStep").first().isDisabled(), "‹ is dead at the newest");
+  await page.click(".receiptStep:not([disabled])");
+  assert.equal(await page.locator(".receiptPage").innerText(), "2 / 2", "› steps to the older copy");
+  assert.ok(await page.locator(".receiptStep").last().isDisabled(), "› is dead at the oldest");
+  for (const chip of await page.locator(".cardView .cardChip").allInnerTexts()) {
+    assert.equal(chip, `SHINY · ${today}`, "every copy carries its own date");
+  }
+  await tapOutside();
+  assert.equal(await page.locator(".cardView").count(), 0);
+  assert.equal((await receipts()).length, 20, "two runs, twenty receipts");
+  console.log("stack: two copies page as two cards, newest first");
+}
+
+// 10.9c the export carries the receipts — and is live with no photos at all
+{
+  await goHome();
+  await page.click(".bankStrip");
+  await page.click("button:has-text('OPEN BANK')");
+  await page.waitForSelector(".bankExport");
+  assert.equal(await page.locator(".bankExport").isDisabled(), false, "cards with no photos still leave (SPEC-v6 §6)");
+  const [download] = await Promise.all([page.waitForEvent("download"), page.click(".bankExport")]);
+  const tmp = await mkdtemp(path.join(os.tmpdir(), "kanahero-receipts-"));
+  const zipPath = path.join(tmp, download.suggestedFilename());
+  await download.saveAs(zipPath);
+  await run("unzip", ["-t", zipPath]);
+  await run("unzip", ["-o", "-q", zipPath, "-d", path.join(tmp, "unpacked")]);
+  const manifest = JSON.parse(await readFile(path.join(tmp, "unpacked", "manifest.json"), "utf8"));
+  assert.equal(manifest.version, 2);
+  assert.equal(manifest.captures.length, 0);
+  assert.equal(manifest.receipts, 20, "the manifest counts them");
+  const exported = JSON.parse(await readFile(path.join(tmp, "unpacked", "receipts.json"), "utf8"));
+  assert.equal(exported.format, "kanahero-receipts");
+  assert.equal(exported.receipts.length, 20, "and receipts.json carries them, strokes inline");
+  assert.ok(exported.receipts.every((r) => Array.isArray(r.strokes) && r.strokes.length > 0));
+  assert.ok(exported.receipts.every((r, i, all) => i === 0 || all[i - 1].earnedAt <= r.earnedAt), "oldest first");
+  console.log("export: the receipts leave with the cards");
+  await goHome();
+  await openDeck("HIRAGANA");
+  await page.click(".setRow");
+}
 
 // 10.5 leaving costs the run — and cancelling costs nothing
 const banked = await totals();
@@ -629,6 +754,7 @@ await page.click(".quit");
 await page.click("button:has-text('LEAVE RUN')");
 await page.waitForSelector("button:has-text('DEAL')");
 assert.deepEqual(await totals(), banked, "leaving a run earns nothing at all");
+assert.equal((await receipts()).length, 20, "and leaves no receipt behind");
 console.log("abandon: KEEP WRITING resumes the run, LEAVE RUN discards it whole");
 
 // 10.6 and neither does a reload
@@ -638,7 +764,40 @@ await page.reload();
 await openDeck("HIRAGANA");
 await page.click(".setRow");
 assert.deepEqual(await totals(), banked, "a run that never finished was never written");
+assert.equal((await receipts()).length, 20, "receipts included");
 console.log("reload: an unfinished run leaves storage exactly as it found it");
+
+// 10.9d a shelf from before v6: copies with no receipts are one legacy card
+// per stock, counted on the chip, with no hold and no pager — and he says so
+await goHome();
+await page.evaluate(async () => {
+  // the store closes with the screens that read it; from S1 nothing holds it
+  await new Promise((resolve, reject) => {
+    const req = indexedDB.deleteDatabase("kanahero-receipts");
+    req.onsuccess = resolve;
+    req.onerror = () => reject(req.error);
+    req.onblocked = () => reject(new Error("receipts db still open"));
+  });
+  const blob = JSON.parse(localStorage.getItem("kanahero:v1"));
+  blob.joker = { "everyday-hiragana": { はい: { shiny: 1, base: 2, worn: 0 } } };
+  localStorage.setItem("kanahero:v1", JSON.stringify(blob));
+});
+await page.goto(URL);
+await openDeck("HIRAGANA");
+await page.click(".setRow");
+assert.deepEqual(await totals(), [1, 2, 0], "the shelf holds three copies from before receipts");
+await page.click("button:has-text('VIEW COLLECTION')");
+assert.equal(await said(), "collection.unreceipted.01", "he says these predate receipts (SPEC-v6 §7)");
+await page.locator(".collectionSlot-base .card").first().click();
+assert.equal(await page.locator(".cardView .receiptCard").count(), 1, "two copies with no receipt are one legacy card");
+assert.equal(await page.locator(".cardView .cardChip").innerText(), "BASE · ×2", "counted on its chip");
+assert.equal(await page.locator(".receiptPager").count(), 0, "no pager");
+assert.equal(await page.locator(".receiptLegendBlank").count(), 1, "the legend's row is there, blank");
+await page.locator(".receiptCard").focus();
+await page.keyboard.press("Enter");
+assert.equal(await page.locator(".receiptHeld").count(), 0, "and nothing to hold for");
+await tapOutside();
+console.log("legacy: a pre-v6 shelf is one counted card per stock, and he owns the gap");
 
 // 10.7 a v2 blob is wiped once, with a line about it, and keeps its characters
 await page.evaluate(() => {

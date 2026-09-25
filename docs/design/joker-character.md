@@ -7,6 +7,42 @@ in `lib/joker-lines.ts` (SPEC-v5a §4) are replaced wholesale by the corpus this
 
 Spec wins on behavior. This wins on what he says and how the app picks it.
 
+## READ FIRST — the law as it stands *(added 2026-09-25)*
+
+This file is layered: the original sections are kept unedited for the reasoning trail, and the
+amendment blocks override them. **Write from this list; read the sections for the why.** Where
+this list and an older section disagree, this list wins.
+
+**Premise.** He is a guide who has dealt this deck ten thousand times, and you are the most
+entertaining thing at his table. *(§1's "he thinks he is the Kana Hero" is retired.)*
+
+1. **Positive only** (§12). Every line is warm: praise, a fact, or a cue. No jab, no diss, no
+   sarcasm at the user, not even affectionate. His ego appears only as service ("I shuffled
+   already"), never as standing, and never at the user's expense.
+2. **Information first.** Cover the joke; what remains tells the user something true and useful
+   about this screen, this app, Japanese, or (in a set block) the word on the card.
+3. **The button.** The joke lives in the last one to four words.
+4. **The user is the subject.** At most one line in three is about him (`subj:`).
+5. **Under twelve words** (a token is one word, Japanese words count). No `!`, no capitals for
+   emphasis.
+6. **His Japanese.** About 70% of lines carry some (`ja:`), written **in kana**. Never
+   load-bearing, never self-translated, never romaji. Kanji only for a character on the table
+   (`kanji:card`) and for 親 / 俺 (`kanji:glyph`). Kansai only in retorts (`dialect:kansai`).
+7. **Placement.** Card mechanics are explained on home and collection only. Drill screens react
+   and cue. The miss line may say the word comes back.
+8. **Truth.** Nothing is called kept, earned or yours before the run finishes. Numbers about data
+   are tokens. A literal number, or any claim that can go stale, carries `needs:` and a fact
+   with a proof.
+9. **No spoilers** (§11). A prompt-screen line never contains the answer's kana, and never its
+   English meaning when the meaning switch is off.
+10. **Never** streaks, days, XP, ranks, levels, or time since. Never needy. Never the same
+    explanation twice in a row.
+
+**Where things live.** Live global lines: `joker/corpus.md`. Set lines: `public/sets/<id>.json`
+under `joker` (§11). Set drafts: `joker/drafts/<id>.md`. Facts: `joker/facts.json`.
+`docs/design/joker-corpus.md` is **history** (drafts 1 and 2), not the corpus. The police:
+`node scripts/joker-audit.mjs`, run in prebuild.
+
 > ⚠️ **AMENDED 2026-09-17 (same day, after the first cold read) — read everything below through
 > this block.** Creator's read of `home` draft 1: *too much about him, too vague.* Eight of thirty
 > lines survived. That is new information, so this is an amendment, not a relitigation. The
@@ -506,3 +542,87 @@ toggle flips his **mix**: English mode ≈ 70/30 English/Japanese by line covera
   not hold UI strings and the UI never holds his.
 - **Corpus grammar, when it lands:** a second line under the same id, `- [home.11] ja: …`,
   parsed as the `text.ja` variant. No new file, no new id.
+
+---
+
+## 11. Set blocks — how to write one *(added 2026-09-25)*
+
+Collected from §7.1, SPEC-v5b §4, `scripts/joker-audit.mjs` and `lib/joker-lines.ts` so the
+next writer finds it in one place. Where this section describes code, the code was read on
+2026-09-25. If the code moves, re-read it.
+
+### 11.1 Which screens a set can speak on
+A set line can only fire where the screen passes the active set to the engine:
+
+| key | fires | notes |
+| :-- | :-- | :-- |
+| `set` | S6b, before the deal | answers the meaning switch (`when:meaning` / `!meaning`) |
+| `round.kana` / `round.kanji` | the prompt | **spoiler zone**, see 11.4 |
+| `reveal.kana` / `reveal.kanji` | the answer is shown | the one screen where the card's kana may appear in his line |
+| `round.missed` | after MISSED | may say the word comes back |
+| `earned.shiny` / `.base` / `.worn` | after GOT IT, on the **next** prompt | see 11.5 |
+| `result` | end of run | cards are kept here, so "earned" is true |
+| `collection` | the collection opened from a set | |
+| `once` | asides on the prompt, `trigger` required | retire forever after one showing |
+
+Keys that never receive a set (home*, deck.*, drill*, bank, abandon, credits) are legal to the
+audit but **silent at runtime**. Don't write set lines for them.
+
+### 11.2 Entry shape (JSON)
+```json
+{ "id": "<setId>/<name>", "text": "…", "status": "ship",
+  "when": ["meaning"], "ja": ["すごい"], "subj": "you",
+  "needs": ["world.italy.mostHeritage"], "trigger": { "wordIncludes": "イタリア" } }
+```
+- `id` **must** start with `<setId>/`. The audit fails it otherwise.
+- `{n:X}` (count of words containing X) is legal only in set lines. Other tokens as in the corpus.
+- **Weight.** Each non-once set line goes into the bag three times (`SET_WEIGHT = 3`).
+- **`trigger` works on every set line, not only `once`.** The engine checks it in `eligible()`
+  for all lines. A triggered pool line waits in the bag, keeping its place, until its word is on
+  the card. This is how a per-word fact is written without spending it forever.
+
+### 11.3 Facts about the world
+A set about countries (or food, or places) may carry facts about the word's meaning, not only
+about Japanese. Same truth law: each fact is verified before it is written, and any fact that can
+go stale (superlatives, counts, rankings) carries `needs: world.<set>.<fact>` with a source in
+`joker/facts.json`.
+
+### 11.4 Spoilers
+On `round.*` and `once` (the prompt), his line must not contain the answer's kana. With the
+meaning switch off, it also must not name the English meaning. A line that names the meaning on
+any screen carries `when:meaning`. A partial hint ("this one needs a small ィ") is allowed only as
+a `once` aside, and must be marked as a hint in the draft so the creator can rule on it.
+
+### 11.5 Known runtime gaps (found 2026-09-25, not yet fixed)
+1. **`status` and `needs` are not enforced at runtime for set lines.** The app reads the set JSON
+   raw. The audit silences a `draft` or failed-`needs` set line in its report, but the app still
+   speaks it. `calendar-kanji/you` (draft) is live today. **Until fixed, set drafts live in
+   `joker/drafts/<id>.md`, never in the set JSON.** The fix is to filter set lines by
+   `status === "ship"` and resolve `needs` in the runtime, or have the audit write a filtered
+   copy.
+2. **`earned.*` receives the next word, not the earned one.** `Round.tsx` passes
+   `word: current`, and after GOT IT `current` is already the next card. A `trigger` on an
+   earned line would fire for the wrong word. Until `justEarned` carries its word, earned set
+   lines are untriggered.
+
+### 11.6 Flow
+Draft in `joker/drafts/<id>.md` → verify every fact → creator cold-reads → shipped lines move
+into the set JSON with `status: ship` → run the audit → commit.
+
+---
+
+## 12. Positive only *(added 2026-09-25, creator call)*
+
+Creator's direction for the set pass: *dialogue should always be positive or praise, never a jab
+or a diss.* This is new information, so it is an amendment. It narrows law 5 ("the barb lands on
+the stroke, the deck…") and the tsukkomi retort of §9: **there is no barb.** A retort word
+(おっと, まさか, なんでやねん) may still react to the *situation*. It never lands on the user, and a
+line never implies the user is slow, lucky, suspicious or failing.
+
+**Scope.** Every line written from 2026-09-25. Shipped lines that read as a tease under this law
+are queued for the creator, not changed here:
+`round.missed.03` (happens to everyone but me) · `earned.shiny.04` (don't let it go to your head)
+· `earned.shiny.06` (suspicious) · `earned.base.02` (the first one was a warm-up) ·
+`earned.base.03` (まあまあ) · `earned.base.04` (I'll pretend I didn't see the first) ·
+`earned.base.06` (one more than me) · `earned.worn.02` (I enjoyed every miss) ·
+`earned.worn.08` (many tries, だいじょうぶ?).

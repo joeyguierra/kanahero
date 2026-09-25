@@ -49,7 +49,7 @@ import {
 } from "@/lib/reveal";
 import type { WordSet } from "@/lib/sets";
 import type { RoundCard } from "./Round";
-import Card from "./Card";
+import CardView from "./CardView";
 import Joker from "./Joker";
 import RevealCard from "./RevealCard";
 
@@ -338,7 +338,7 @@ export default function Result({
                   }
                   shining={done}
                   shineDelay={lastFlipMs}
-                  onClick={done ? () => setOpen({ word, card }) : undefined}
+                  onClick={done ? () => setOpen(order[index]) : undefined}
                   ref={(el) => {
                     slots.current[index] = el;
                   }}
@@ -362,18 +362,14 @@ export default function Result({
       </button>
 
       {/* the whole card, the way it is read: stock and tries, the set's mark,
-          the word, its reading, what it means. Tap anywhere to put it back. */}
+          the word, its reading, what it means — and, held, the ink that earned
+          it, straight from run state (SPEC-v6 §5.5). Tap outside to put it back. */}
       {open && (
-        <div
-          className="cardOverlay"
-          role="dialog"
-          onClick={(e) => {
-            e.stopPropagation();
-            setOpen(null);
-          }}
-        >
-          <Card word={open.word} set={set} size="earn" card={open.card} />
-        </div>
+        <CardView
+          set={set}
+          cards={[{ word: open.word, card: open.card, ink: open.ink }]}
+          onClose={() => setOpen(null)}
+        />
       )}
     </main>
   );

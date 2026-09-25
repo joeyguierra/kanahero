@@ -202,8 +202,9 @@ const exported = JSON.parse(await readFile(path.join(tmp, "unpacked", "progress.
 assert.equal(exported.v, 3, "the export carries the current progress blob");
 assert.ok("joker" in exported, "including the copies the Joker has earned, even when none");
 assert.equal(manifest.format, "kanahero-bank");
-assert.equal(manifest.version, 1);
+assert.equal(manifest.version, 2);
 assert.equal(manifest.captures.length, 1);
+assert.equal(manifest.receipts, 0, "the writing loop never ran here, so no receipts left with it");
 const entry = manifest.captures[0];
 assert.equal(entry.id, first.id);
 assert.equal(entry.file, `captures/${first.id}.jpg`);

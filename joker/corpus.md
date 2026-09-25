@@ -90,6 +90,10 @@ one when the meaning does. Tokens: `{bank}` `{shiny}` `{earned}` `{words}` `{cha
 ## collection.empty
 - [collection.empty.01] まだ nothing here. Finish a run. ·· ja:まだ ·· needs:rule.allOrNothing ·· status:ship
 
+## collection.unreceipted
+<!-- SPEC-v6 §7: every copy on this shelf predates receipts; true on every visit until the first receipted run, then never again -->
+- [collection.unreceipted.01] These predate receipts. Your next run keeps its ink. ·· needs:feature.receipts ·· subj:app ·· status:ship
+
 ## abandon
 - [abandon.01] Leave now and the cards stay with me. ·· needs:rule.allOrNothing ·· status:ship
 

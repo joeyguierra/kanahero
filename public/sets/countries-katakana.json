@@ -10,5 +10,14 @@
 {"word":"ブラジル","reading":"ブラジル","romaji":"burajiru","meaning":"brazil"},
 {"word":"メキシコ","reading":"メキシコ","romaji":"mekishiko","meaning":"mexico"},
 {"word":"フィリピン","reading":"フィリピン","romaji":"firipin","meaning":"philippines"},
-{"word":"ベトナム","reading":"ベトナム","romaji":"betonamu","meaning":"vietnam"}
+{"word":"ベトナム","reading":"ベトナム","romaji":"betonamu","meaning":"vietnam"},
+{"word":"ポルトガル","reading":"ポルトガル","romaji":"porutogaru","meaning":"portugal"},
+{"word":"オランダ","reading":"オランダ","romaji":"oranda","meaning":"netherlands"},
+{"word":"イギリス","reading":"イギリス","romaji":"igirisu","meaning":"uk"},
+{"word":"エジプト","reading":"エジプト","romaji":"ejiputo","meaning":"egypt"},
+{"word":"トルコ","reading":"トルコ","romaji":"toruko","meaning":"turkey"},
+{"word":"モンゴル","reading":"モンゴル","romaji":"mongoru","meaning":"mongolia"},
+{"word":"スイス","reading":"スイス","romaji":"suisu","meaning":"switzerland"},
+{"word":"フィンランド","reading":"フィンランド","romaji":"finrando","meaning":"finland"},
+{"word":"ジャマイカ","reading":"ジャマイカ","romaji":"jamaika","meaning":"jamaica"}
 ]}

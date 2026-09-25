@@ -88,6 +88,8 @@ export default function App() {
   const [deckId, setDeckId] = useState<DeckId>("hiragana");
   const [activeSet, setActiveSet] = useState<WordSet | null>(null);
   const [queue, setQueue] = useState<SetWord[]>([]);
+  /** the seed the queue was dealt from — the run's receipts carry it */
+  const [runSeed, setRunSeed] = useState(0);
   const [hand, setHand] = useState<RoundCard[]>([]);
   /** S6b's MEANING switch as it stood at DEAL: the run reads this, never the
       stored choice, so flipping the switch later cannot reach a run in play */
@@ -259,7 +261,9 @@ export default function App() {
         onCollection={() => go("collection")}
         onDeal={() => {
           setRunMeaning(meaning);
-          setQueue(deal(activeSet, newSeed()));
+          const seed = newSeed();
+          setRunSeed(seed);
+          setQueue(deal(activeSet, seed));
           setHand([]);
           setPhase("round");
         }}
@@ -277,6 +281,7 @@ export default function App() {
         key={activeSet.id + queue.length}
         set={activeSet}
         queue={queue}
+        seed={runSeed}
         meaning={runMeaning}
         onAbandon={() => setPhase("set")}
         onFinish={(won, fresh) => {

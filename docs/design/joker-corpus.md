@@ -1,3 +1,6 @@
+> 🗄 **HISTORY — not the live corpus.** Drafts 1 and 2 of `home` and their cold-read verdicts,
+> kept for the reasoning trail. Live lines: `joker/corpus.md`. Laws: `joker-character.md` §READ FIRST.
+
 # The Joker — corpus (draft)
 
 Governed by `joker-character.md`. One pool per screen key. Format per line:

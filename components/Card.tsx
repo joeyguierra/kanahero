@@ -12,9 +12,11 @@
 
 import type { Ref } from "react";
 
+import type { InkSnapshot } from "@/lib/ink";
 import type { EarnedCard } from "@/lib/joker";
 import { CARD_W } from "@/lib/reveal";
 import type { SetWord, WordSet } from "@/lib/sets";
+import InkPanel from "./InkPanel";
 
 export type CardSize = "round" | "earn" | "earned" | "shelf";
 
@@ -63,7 +65,8 @@ export default function Card({
   size,
   card,
   stamp = true,
-  copies,
+  chip,
+  held,
   /** replaces the footer's kind line while a round is flipped: ATTEMPT n */
   attempt,
   /** false: the prompt face without its English line (SPEC-v5e §2). The
@@ -81,9 +84,13 @@ export default function Card({
   card?: EarnedCard;
   /** false: the face without its rarity stamp */
   stamp?: boolean;
-  /** the shelf's full face: no copy on S6d remembers its own tries, so the
-      chip counts copies of that stock instead of the tries that earned one */
-  copies?: number;
+  /** what follows the stock on the chip instead of the tries: the date a
+      receipted copy was earned, or `×k` for the copies that have no receipt
+      (SPEC-v6 §5.3). Absent, the chip prints the tries. */
+  chip?: string;
+  /** the held face (SPEC-v6 §5.2): the body under the chip becomes the ink
+      that earned the copy, and the foot reads the attempt it took */
+  held?: { ink: InkSnapshot; tries: number; play: boolean };
   attempt?: number;
   meaning?: boolean;
   onClick?: () => void;
@@ -128,26 +135,39 @@ export default function Card({
           <span className="cardChip">
             {!stamp
               ? "COLLECTED"
-              : copies !== undefined
-                ? `${card.rarity.toUpperCase()} · \u00d7${copies}`
+              : chip !== undefined
+                ? `${card.rarity.toUpperCase()} · ${chip}`
                 : `${card.rarity.toUpperCase()} · ${card.rarity === "worn" ? `${card.tries} ` : ""}${RARITY_TRY[card.rarity]}`}
           </span>
           <span className="cardMark">{mark}</span>
         </div>
-        <div className="cardMid">
-          <span className="cardRomaji">{word.romaji.toUpperCase()}</span>
-          <span className="cardWord" style={{ fontSize: wordSize(size, word.word.length) }}>
-            {word.word}
-          </span>
-          {kanji && <span className="cardReading">{word.reading}</span>}
-        </div>
-        <div className="cardFoot">
-          <span className="cardRule" />
-          <span className="cardMeaning">{word.meaning.toUpperCase()}</span>
-          <span className="cardKind">
-            {kindWord} · {mark} {set.name}
-          </span>
-        </div>
+        {held ? (
+          // ---- held: the ink that earned it, the model over it, the attempt ----
+          <>
+            <InkPanel ink={held.ink} word={word.word} play={held.play} />
+            <div className="cardFoot">
+              <span className="cardRule" />
+              <span className="cardKind">ATTEMPT {held.tries}</span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="cardMid">
+              <span className="cardRomaji">{word.romaji.toUpperCase()}</span>
+              <span className="cardWord" style={{ fontSize: wordSize(size, word.word.length) }}>
+                {word.word}
+              </span>
+              {kanji && <span className="cardReading">{word.reading}</span>}
+            </div>
+            <div className="cardFoot">
+              <span className="cardRule" />
+              <span className="cardMeaning">{word.meaning.toUpperCase()}</span>
+              <span className="cardKind">
+                {kindWord} · {mark} {set.name}
+              </span>
+            </div>
+          </>
+        )}
       </>
     )
   ) : (
