@@ -598,8 +598,12 @@ a `once` aside, and must be marked as a hint in the draft so the creator can rul
 > itself: not the answer's kana, not its romaji, not its English name. A clue is a hint, not a
 > giveaway, and it is positive like every other line.
 
-### 11.5 Known runtime gaps (found 2026-09-25, not yet fixed)
-1. **`status` and `needs` are not enforced at runtime for set lines.** The app reads the set JSON
+### 11.5 Known runtime gaps (found 2026-09-25)
+1. **FIXED 2026-09-25.** `lib/joker-lines.ts` `setLines()` now drops any set line that is not
+   `status: ship`, or whose id the audit lists in the bundle's `quiet` (a `needs:` that does not
+   hold). `calendar-kanji/you` (draft) went silent with it. Drafts may still live in
+   `joker/drafts/`; the JSON is no longer unsafe for them. What it said before:
+   **`status` and `needs` are not enforced at runtime for set lines.** The app reads the set JSON
    raw. The audit silences a `draft` or failed-`needs` set line in its report, but the app still
    speaks it. `calendar-kanji/you` (draft) is live today. **Until fixed, set drafts live in
    `joker/drafts/<id>.md`, never in the set JSON.** The fix is to filter set lines by

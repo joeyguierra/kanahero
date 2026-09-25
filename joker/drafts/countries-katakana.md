@@ -1,4 +1,12 @@
-# COUNTRIES (countries-katakana) — joker block, DRAFT 2 (2026-09-25)
+# COUNTRIES (countries-katakana) — joker block, SHIPPED 2026-09-25
+
+**Shipped.** Every line below is live in `public/sets/countries-katakana.json` with `status: ship`,
+and its facts are in `joker/facts.json`. This file stays as the record of sources. Edit the JSON,
+not this file. Review changes at ship: アルバイト / ランドセル "is German/Dutch" → "comes from"
+(the word is borrowed, the meaning is Japanese); dejima "Japan's only European trading partner" →
+"the only Europeans trading in Japan" (§12 refinement: no relationship between countries);
+clue.germany "precise engineering" → "the autobahn" (reads as a national trait). once.smallI
+ships under the 2026-09-25 clue ruling.
 
 **Set grown 12 → 21 (the ceiling), 2026-09-25:** ポルトガル オランダ イギリス エジプト トルコ モンゴル スイス
 フィンランド ジャマイカ. Chosen for: no ー or ヴ (no stroke files for either), six kana or fewer (the card's
@@ -21,7 +29,7 @@ meaning carry `when:meaning` (§11.4).
 - [canada.village] Canada comes from kanata, a word for village. Cozy. ほっこり. ·· trigger:カナダ ·· when:meaning ·· ja:ほっこり ·· subj:world
 - [france.survey] アンケート, the survey, came from French. Elegant paperwork. ほら. ·· trigger:フランス ·· ja:アンケート,ほら ·· subj:world
 - [germany.dutch] ドイツ reached Japanese through Dutch traders. Well-travelled word. なるほど. ·· trigger:ドイツ ·· ja:なるほど ·· subj:world
-- [germany.arbeit] アルバイト, a part-time job, is German. Hard-working word. さすが. ·· trigger:ドイツ ·· ja:アルバイト,さすが ·· subj:world
+- [germany.arbeit] アルバイト, a part-time job, comes from German. Hard-working word. さすが. ·· trigger:ドイツ ·· ja:アルバイト,さすが ·· subj:world
 - [germany.tsu] ドイツ ends in ツ: last stroke falls from the top. きれい. ·· trigger:ドイツ ·· ja:きれい ·· subj:app
 - [italy.heritage] Italy has the most World Heritage sites. Handsome country. みごと. ·· trigger:イタリア ·· when:meaning ·· needs:world.italy.mostHeritage ·· ja:みごと ·· subj:world
 - [spain.vowels] Spanish vowels sound almost like Japanese ones. Easy listening. いいね. ·· trigger:スペイン ·· when:meaning ·· ja:いいね ·· subj:world
@@ -37,8 +45,8 @@ meaning carry `when:meaning` (§11.4).
 ### reveal.kana — the nine new countries
 - [portugal.pan] パン, bread, came from Portuguese. A delicious import. おいしい. ·· trigger:ポルトガル ·· when:meaning ·· ja:パン,おいしい ·· subj:world
 - [portugal.first] The first Europeans to reach Japan. Long voyage. すごい. ·· trigger:ポルトガル ·· when:meaning ·· ja:すごい ·· subj:world
-- [netherlands.randoseru] ランドセル, the school backpack, is Dutch. Very well packed. ほら. ·· trigger:オランダ ·· when:meaning ·· ja:ランドセル,ほら ·· subj:world
-- [netherlands.dejima] During さこく, Japan's only European trading partner. ほう. ·· trigger:オランダ ·· when:meaning ·· ja:さこく,ほう ·· subj:world
+- [netherlands.randoseru] ランドセル, the school backpack, comes from Dutch. Very well packed. ほら. ·· trigger:オランダ ·· when:meaning ·· ja:ランドセル,ほら ·· subj:world
+- [netherlands.dejima] During さこく, the only Europeans trading in Japan. ほう. ·· trigger:オランダ ·· when:meaning ·· ja:さこく,ほう ·· subj:world
 - [uk.left] Japan and the UK both drive on the left. ほら. ·· trigger:イギリス ·· when:meaning ·· ja:ほら ·· subj:world
 - [uk.portuguese] イギリス came to Japanese through Portuguese. Scenic route. なるほど. ·· trigger:イギリス ·· ja:なるほど ·· subj:world
 - [egypt.paper] Paper is named after papyrus. A very old word. ほう. ·· trigger:エジプト ·· when:meaning ·· ja:ほう ·· subj:world
@@ -57,7 +65,7 @@ Never the answer's kana, romaji or English name. Fires on the prompt, meaning on
 - [clue.america] Stars and stripes on this one. Very big skies. さあ. ·· trigger:アメリカ ·· ja:さあ ·· subj:world
 - [clue.canada] Maple syrup country. Starts with a word you love. ふふ. ·· trigger:カナダ ·· ja:ふふ ·· subj:world
 - [clue.france] Croissants, the Eiffel Tower, very good bread. さあ. ·· trigger:フランス ·· ja:さあ ·· subj:world
-- [clue.germany] Pretzels, castles and precise engineering. どうぞ. ·· trigger:ドイツ ·· ja:どうぞ ·· subj:world
+- [clue.germany] Pretzels, castles, and the autobahn. どうぞ. ·· trigger:ドイツ ·· ja:どうぞ ·· subj:world
 - [clue.italy] Pizza, pasta, and a boot-shaped coastline. おいしい. ·· trigger:イタリア ·· ja:おいしい ·· subj:world
 - [clue.spain] Paella and flamenco. Olé, in katakana. さあ. ·· trigger:スペイン ·· ja:さあ ·· subj:world
 - [clue.thailand] {chars} kana, the shortest trip in the deck. らくらく. ·· trigger:タイ ·· ja:らくらく ·· subj:world

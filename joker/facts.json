@@ -56,6 +56,22 @@
     "app.threeScripts": {
       "holds": true,
       "proof": "lib/sets.ts SetScript"
+    },
+    "world.italy.mostHeritage": {
+      "holds": true,
+      "proof": "whc.unesco.org/en/statesparties/it · Statista chart 23622 · still first after the 48th session (Busan, July 2026). Re-check each July: China is one behind"
+    },
+    "world.brazil.largestNikkei": {
+      "holds": true,
+      "proof": "en.wikipedia.org/wiki/Japanese_Brazilians — ~2M, the largest outside Japan"
+    },
+    "world.philippines.islands": {
+      "holds": true,
+      "proof": "en.wikipedia.org/wiki/List_of_islands_of_the_Philippines — 7,641 (NAMRIA, 2017)"
+    },
+    "world.jamaica.blueMountain": {
+      "holds": true,
+      "proof": "thebusinessyear.com (Wallenford interview) · en.wikipedia.org/wiki/Jamaican_Blue_Mountain_Coffee — Japan takes ~70%. Market share: re-check yearly"
     }
   }
 }

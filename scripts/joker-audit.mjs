@@ -336,7 +336,10 @@ const hash = createHash("sha256")
   .digest("hex")
   .slice(0, 12);
 
-const bundle = { hash, pools: {} };
+// Set lines ship inside the set JSON, so the runtime filters them itself: it
+// drops anything not `ship`, and anything named here (bible §11.5, gap 1).
+const quiet = setLines.filter((l) => l.silenced).map((l) => l.id);
+const bundle = { hash, pools: {}, quiet };
 let bundled = 0;
 for (const [pool, lines] of pools) {
   const keep = lines.filter((l) => l.status === "ship" && !l.silenced);

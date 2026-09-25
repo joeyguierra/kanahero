@@ -91,8 +91,11 @@ export interface JokerLine {
   tier?: string;
   ja?: string[];
   subj?: string;
-  /** set `once` lines only: what has to be on screen for the line to be due */
+  /** set lines: what has to be on the card for the line to be eligible */
   trigger?: { wordIncludes?: string };
+  /** set lines only — the set JSON is read raw, so these are enforced here */
+  status?: string;
+  needs?: string[];
 }
 
 /** what a set may carry under its own `joker` key (SPEC-v5b §4) */
@@ -155,6 +158,8 @@ const NO_LINE: JokerPick = { id: "", text: "" };
 
 const POOLS = corpus.pools as Record<string, JokerLine[]>;
 const HASH = corpus.hash;
+/** set-line ids the audit silenced because a `needs:` does not hold */
+const QUIET = new Set<string>(corpus.quiet);
 
 // ---- counting ----
 
@@ -321,16 +326,22 @@ function reconcile(bags: Bags): Bags {
 
 // ---- the pool for a screen, in this context ----
 
+/** A set's lines arrive raw with the set, so the law the audit applies to the
+    corpus is applied here: a draft never speaks, and nor does a line whose
+    claim the audit found false (bible §11.5, gap 1). */
+function setLines(ctx: JokerContext, key: JokerScreen | "once"): JokerLine[] {
+  return (ctx.set?.joker?.[key] ?? []).filter((l) => l.status === "ship" && !QUIET.has(l.id));
+}
+
 function poolFor(screen: JokerScreen, ctx: JokerContext): JokerLine[] {
-  const set = ctx.set?.joker?.[screen] ?? [];
-  return [...(POOLS[screen] ?? []), ...set];
+  return [...(POOLS[screen] ?? []), ...setLines(ctx, screen)];
 }
 
 /** The once-lines that could be due here: the global pool plus the active
     set's asides, which carry their own trigger. Sitting in a `once` block is
     what makes a set line a once-line — it does not restate the tag. */
 function oncePool(ctx: JokerContext): JokerLine[] {
-  const asides = (ctx.set?.joker?.once ?? []).map((line) => ({ ...line, once: true as const }));
+  const asides = setLines(ctx, ONCE_POOL).map((line) => ({ ...line, once: true as const }));
   return [...(POOLS[ONCE_POOL] ?? []), ...asides];
 }
 
@@ -363,7 +374,7 @@ function eligible(lines: JokerLine[], ctx: JokerContext, seen: Set<string>): Eli
 function refill(screen: JokerScreen, ctx: JokerContext, avoidFirst?: string): string[] {
   const ids: string[] = [];
   for (const line of POOLS[screen] ?? []) if (!line.once) ids.push(line.id);
-  for (const line of ctx.set?.joker?.[screen] ?? []) {
+  for (const line of setLines(ctx, screen)) {
     if (!line.once) for (let i = 0; i < SET_WEIGHT; i++) ids.push(line.id);
   }
   const rand = mulberry32(newSeed());
