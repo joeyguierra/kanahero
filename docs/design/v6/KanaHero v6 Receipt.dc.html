@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<title>KanaHero v6 — the receipt · S8 and S6d</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&amp;family=JetBrains+Mono:wght@400;600;800&amp;family=Noto+Sans+JP:wght@400;700;900&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#151517;color:#F2F0EB;font-family:Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#FF2E88;text-decoration:none}a:hover{color:#F2F0EB}
+</style>
+</helmet>
+
+<section style="padding:44px 48px 40px;border-bottom:1px solid rgba(255,255,255,.08)">
+  <div style="display:flex;align-items:baseline;gap:11px;margin-bottom:8px">
+    <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#FF2E88;color:#000">V6</span>
+    <b style="font:700 14px Archivo,sans-serif">The receipt — the only two places it can be seen</b>
+  </div>
+  <div style="font:400 12px/1.6 'JetBrains Mono',monospace;color:#8C8C93;max-width:940px;letter-spacing:.02em">
+    SPEC-V6 §5: AN EARNED FACE IS VIEWED IN TWO PLACES, S8'S TAP-TO-VIEW AND S6D'S TAP-TO-VIEW, BOTH THE SAME <span style="color:#F2F0EB">CardView</span> OVERLAY. NOTHING ELSE CHANGES — THE SMALL FACES ARE TAP TARGETS, S7/S7B SAY NOTHING, THERE IS NO RECEIPT SCREEN. BELOW: EVERY STATE THE OVERLAY CAN BE IN, ON BOTH SCREENS. CARD IS THE V5A EARN FACE, 214×300, UNCHANGED WHERE THE SPEC IS SILENT.
+  </div>
+</section>
+
+<!-- ============================================================ S8 -->
+<section style="padding:44px 48px 40px;border-bottom:1px solid rgba(255,255,255,.08)">
+  <div style="display:flex;align-items:baseline;gap:11px;margin-bottom:8px">
+    <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:rgba(255,255,255,.11);color:#F2F0EB">S8</span>
+    <b style="font:700 14px Archivo,sans-serif">Result — one card, from run state, no storage read</b>
+  </div>
+  <div style="font:400 12px/1.6 'JetBrains Mono',monospace;color:#8C8C93;max-width:940px;letter-spacing:.02em;margin-bottom:32px">
+    TAP A CARD IN THE ROW → THE OVERLAY. CHIP KEEPS ITS TRIES (<span style="color:#F2F0EB">SHINY · 1st TRY</span>), NO DATE, NO PAGER. THE INK COMES FROM <span style="color:#F2F0EB">open.ink</span>, SO THIS WORKS EVEN IF THE WRITE FAILED. OPENS ONLY AFTER THE REVEAL IS DONE.
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:38px;align-items:flex-start">
+
+    <!-- 1a printed -->
+    <div id="1a" style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:800 10px 'JetBrains Mono',monospace;padding:3px 7px;background:#FF2E88;color:#000">1a</span>
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S8</span>CardView — printed face, after the opening flash
+      </div>
+      <div data-screen-label="S8 CardView printed" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;padding:44px 28px 36px;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+        <div style="position:absolute;inset:0;overflow:hidden;z-index:-1;pointer-events:none"><span style="position:absolute;right:-52px;bottom:200px;font:900 250px/1 'Noto Sans JP',sans-serif;color:transparent;-webkit-text-stroke:1px #1D1D21">駅</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93">SET DEALT OUT</span>
+          <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93">駅 STATION</span>
+        </div>
+        <div style="font:900 64px/.92 Archivo,sans-serif;letter-spacing:-.04em;margin-top:28px">10<span style="font-size:26px;letter-spacing:-.01em;margin-left:.14em">EARNED</span></div>
+        <div style="display:flex;align-items:center;gap:9px;margin-top:14px">
+          <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;background:#FF2E88;color:#000;padding:5px 8px">2 SHINY</span>
+          <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#8C8C93">5 BASE · 3 WORN</span>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;min-width:0;margin-top:22px">
+          <img src="assets/joker.png" alt="" style="flex:none;object-fit:contain;width:78px;height:78px;margin:-10px -4px -10px -10px;filter:drop-shadow(0 12px 22px rgba(255,46,136,.28))">
+          <div style="position:relative;flex:1;min-width:0;border:1px solid #2A2A2E;background:#141416;padding:10px 13px 11px">
+            <span style="position:absolute;width:10px;height:10px;background:#141416;transform:rotate(45deg);left:-6px;top:50%;margin-top:-5px;border-left:1px solid #2A2A2E;border-bottom:1px solid #2A2A2E"></span>
+            <div style="font:400 8px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#FF2E88;margin-bottom:4px">JOKER</div>
+            <p style="font:400 13px/1.45 Archivo,sans-serif;color:#F2F0EB;min-height:2.9em">Ten cards earned, two shiny. お疲れ. Deal again whenever.</p>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px;margin:16px -28px 0;padding:0 12px">
+          <sc-for list="{{ rows }}" as="row" hint-placeholder-count="2">
+            <div style="display:flex;align-items:flex-start;position:relative">
+              <sc-for list="{{ row.cards }}" as="c" hint-placeholder-count="7">
+                <div style="position:relative;flex:none;width:84px;height:118px;margin-left:{{ c.ml }}px;z-index:{{ c.z }};background:{{ c.bg }};border:1px solid {{ c.border }};color:{{ c.ink }};box-shadow:{{ c.shadow }};clip-path:polygon(0 0,100% 0,100% 100%,8px 100%,0 calc(100% - 8px));overflow:hidden">
+                  <div style="position:absolute;inset:0;background:{{ c.stripe }}"></div>
+                  <div style="position:absolute;inset:0;padding:7px 7px 8px;display:flex;flex-direction:column;justify-content:space-between">
+                    <span style="font:{{ c.chipWeight }} 8px 'JetBrains Mono',monospace;letter-spacing:.12em;color:{{ c.chipInk }}">{{ c.tier }}</span>
+                    <span style="font:900 {{ c.wordSize }}px/1 'Noto Sans JP',sans-serif;text-align:center">{{ c.word }}</span>
+                    <span style="font:600 {{ c.romajiSize }}px 'JetBrains Mono',monospace;letter-spacing:.02em;color:{{ c.subInk }}">{{ c.romaji }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font:400 9px/1.7 'JetBrains Mono',monospace;letter-spacing:.14em;color:#5A5A5F">2 NEW STOCK · 8 COPIES TO THE COLLECTION</div>
+        <div style="margin-top:16px;height:62px;flex:none;background:#F2F0EB;color:#0A0A0B;font:900 21px Archivo,sans-serif;display:flex;align-items:center;justify-content:center;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px))">BACK TO DECK</div>
+
+        <!-- overlay -->
+        <div style="position:absolute;inset:0;z-index:30;background:rgba(10,10,11,.86);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px">
+          <div style="position:relative;width:214px;height:300px;flex:none;padding:16px;display:flex;flex-direction:column;background:#FF2E88;border:1px solid #FF2E88;color:#000;overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px));box-shadow:0 22px 44px -12px rgba(0,0,0,.8),0 0 40px -8px rgba(255,46,136,.5)">
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.14) 0 7px,transparent 7px 14px);pointer-events:none"></div>
+            <div style="position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
+              <span style="font:600 8px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:3px 6px;background:#F2F0EB;border:1px solid #F2F0EB;color:#000;white-space:nowrap">SHINY · 1st TRY</span>
+              <span style="font:900 14px/1 'Noto Sans JP',sans-serif">駅</span>
+            </div>
+            <div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:0">
+              <span style="font:600 9px 'JetBrains Mono',monospace;letter-spacing:.18em;color:rgba(0,0,0,.72)">DEGUCHI</span>
+              <span style="font:900 74px/1 'Noto Sans JP',sans-serif;white-space:nowrap">出口</span>
+              <span style="font:400 11px 'Noto Sans JP',sans-serif;letter-spacing:.14em;color:rgba(0,0,0,.72)">でぐち</span>
+            </div>
+            <div style="position:relative">
+              <span style="display:block;height:1px;background:rgba(0,0,0,.42);margin-bottom:8px"></span>
+              <span style="display:block;font:900 18px/1 Archivo,sans-serif;letter-spacing:-.01em">EXIT</span>
+              <span style="display:block;font:400 8px 'JetBrains Mono',monospace;letter-spacing:.14em;color:rgba(0,0,0,.72);margin-top:4px">PLACE · 駅 STATION</span>
+            </div>
+          </div>
+          <div style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93;margin-top:18px">HOLD · YOUR INK</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1b held -->
+    <div id="1b" style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:800 10px 'JetBrains Mono',monospace;padding:3px 7px;background:#FF2E88;color:#000">1b</span>
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S8</span>CardView — held, the ink finished
+      </div>
+      <div data-screen-label="S8 CardView held" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;padding:44px 28px 36px;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+        <div style="position:absolute;inset:0;overflow:hidden;z-index:-1;pointer-events:none"><span style="position:absolute;right:-52px;bottom:200px;font:900 250px/1 'Noto Sans JP',sans-serif;color:transparent;-webkit-text-stroke:1px #1D1D21">駅</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93">SET DEALT OUT</span>
+          <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93">駅 STATION</span>
+        </div>
+        <div style="font:900 64px/.92 Archivo,sans-serif;letter-spacing:-.04em;margin-top:28px">10<span style="font-size:26px;letter-spacing:-.01em;margin-left:.14em">EARNED</span></div>
+        <div style="display:flex;align-items:center;gap:9px;margin-top:14px">
+          <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;background:#FF2E88;color:#000;padding:5px 8px">2 SHINY</span>
+          <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#8C8C93">5 BASE · 3 WORN</span>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;min-width:0;margin-top:22px">
+          <img src="assets/joker.png" alt="" style="flex:none;object-fit:contain;width:78px;height:78px;margin:-10px -4px -10px -10px;filter:drop-shadow(0 12px 22px rgba(255,46,136,.28))">
+          <div style="position:relative;flex:1;min-width:0;border:1px solid #2A2A2E;background:#141416;padding:10px 13px 11px">
+            <span style="position:absolute;width:10px;height:10px;background:#141416;transform:rotate(45deg);left:-6px;top:50%;margin-top:-5px;border-left:1px solid #2A2A2E;border-bottom:1px solid #2A2A2E"></span>
+            <div style="font:400 8px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#FF2E88;margin-bottom:4px">JOKER</div>
+            <p style="font:400 13px/1.45 Archivo,sans-serif;color:#F2F0EB;min-height:2.9em">Ten cards earned, two shiny. お疲れ. Deal again whenever.</p>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px;margin:16px -28px 0;padding:0 12px">
+          <sc-for list="{{ rows }}" as="row" hint-placeholder-count="2">
+            <div style="display:flex;align-items:flex-start;position:relative">
+              <sc-for list="{{ row.cards }}" as="c" hint-placeholder-count="7">
+                <div style="position:relative;flex:none;width:84px;height:118px;margin-left:{{ c.ml }}px;z-index:{{ c.z }};background:{{ c.bg }};border:1px solid {{ c.border }};color:{{ c.ink }};box-shadow:{{ c.shadow }};clip-path:polygon(0 0,100% 0,100% 100%,8px 100%,0 calc(100% - 8px));overflow:hidden">
+                  <div style="position:absolute;inset:0;background:{{ c.stripe }}"></div>
+                  <div style="position:absolute;inset:0;padding:7px 7px 8px;display:flex;flex-direction:column;justify-content:space-between">
+                    <span style="font:{{ c.chipWeight }} 8px 'JetBrains Mono',monospace;letter-spacing:.12em;color:{{ c.chipInk }}">{{ c.tier }}</span>
+                    <span style="font:900 {{ c.wordSize }}px/1 'Noto Sans JP',sans-serif;text-align:center">{{ c.word }}</span>
+                    <span style="font:600 {{ c.romajiSize }}px 'JetBrains Mono',monospace;letter-spacing:.02em;color:{{ c.subInk }}">{{ c.romaji }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font:400 9px/1.7 'JetBrains Mono',monospace;letter-spacing:.14em;color:#5A5A5F">2 NEW STOCK · 8 COPIES TO THE COLLECTION</div>
+        <div style="margin-top:16px;height:62px;flex:none;background:#F2F0EB;color:#0A0A0B;font:900 21px Archivo,sans-serif;display:flex;align-items:center;justify-content:center;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px))">BACK TO DECK</div>
+
+        <!-- overlay: held -->
+        <div style="position:absolute;inset:0;z-index:30;background:rgba(10,10,11,.86);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px">
+          <div style="position:relative;width:214px;height:300px;flex:none;padding:16px;display:flex;flex-direction:column;background:#FF2E88;border:1px solid #FF2E88;color:#000;overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px));box-shadow:0 22px 44px -12px rgba(0,0,0,.8),0 0 40px -8px rgba(255,46,136,.5)">
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.14) 0 7px,transparent 7px 14px);pointer-events:none"></div>
+            <div style="position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
+              <span style="font:600 8px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:3px 6px;background:#F2F0EB;border:1px solid #F2F0EB;color:#000;white-space:nowrap">SHINY · 1st TRY</span>
+              <span style="font:900 14px/1 'Noto Sans JP',sans-serif">駅</span>
+            </div>
+            <div style="position:relative;flex:1;margin-top:10px;background:#F2F0EB;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:0">
+              <div style="position:relative;width:100%;aspect-ratio:1;flex:none">
+                <svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible">
+                  <sc-for list="{{ inkAll }}" as="s" hint-placeholder-count="8">
+                    <path d="{{ s.d }}" style="fill:none;stroke:#0A0A0B;stroke-width:{{ s.w }};stroke-linecap:round;stroke-linejoin:round;display:{{ s.display }}"></path>
+                  </sc-for>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;opacity:{{ modelOpacity }}">
+                  <div style="flex:1;display:flex;align-items:center;justify-content:center;font:400 78px/1 'Noto Sans JP',sans-serif;color:#FF2E88;border-right:1px dashed rgba(10,10,11,.22)">出</div>
+                  <div style="flex:1;display:flex;align-items:center;justify-content:center;font:400 78px/1 'Noto Sans JP',sans-serif;color:#FF2E88">口</div>
+                </div>
+              </div>
+            </div>
+            <div style="position:relative;margin-top:10px">
+              <span style="display:block;height:1px;background:rgba(0,0,0,.42);margin-bottom:8px"></span>
+              <span style="display:block;font:400 8px 'JetBrains Mono',monospace;letter-spacing:.14em;color:rgba(0,0,0,.72)">ATTEMPT 1</span>
+            </div>
+          </div>
+          <div style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93;margin-top:18px">HOLD · YOUR INK</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1c the opening flash + notes -->
+    <div id="1c" style="flex:1;min-width:300px;max-width:440px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:800 10px 'JetBrains Mono',monospace;padding:3px 7px;background:#FF2E88;color:#000">1c</span>The opening — ink first, then print (§5.4)
+      </div>
+      <div style="border:1px solid #2A2A2E;background:#141416;padding:16px">
+        <div style="display:flex;gap:10px">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div style="width:64px;height:90px;padding:5px;display:flex;flex-direction:column;background:#FF2E88;clip-path:polygon(0 0,100% 0,100% 100%,6px 100%,0 calc(100% - 6px))">
+              <span style="display:block;width:26px;height:5px;background:#F2F0EB"></span>
+              <div style="flex:1;margin-top:4px;background:#F2F0EB;display:flex;align-items:center;justify-content:center;font:400 26px/1 'Noto Sans JP',sans-serif;color:#0A0A0B">出口</div>
+            </div>
+            <span style="font:600 8px/1.5 'JetBrains Mono',monospace;letter-spacing:.1em;color:#8C8C93;text-align:center">0 MS<br>INK, FINISHED</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div style="position:relative;width:64px;height:90px;padding:5px;display:flex;flex-direction:column;background:#FF2E88;clip-path:polygon(0 0,100% 0,100% 100%,6px 100%,0 calc(100% - 6px))">
+              <span style="display:block;width:26px;height:5px;background:#F2F0EB"></span>
+              <div style="flex:1;margin-top:4px;background:#F2F0EB;opacity:.5;display:flex;align-items:center;justify-content:center;font:400 26px/1 'Noto Sans JP',sans-serif;color:#0A0A0B">出口</div>
+              <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 26px/1 'Noto Sans JP',sans-serif;color:#000;opacity:.5">出口</span>
+            </div>
+            <span style="font:600 8px/1.5 'JetBrains Mono',monospace;letter-spacing:.1em;color:#8C8C93;text-align:center">500 MS<br>CROSSFADE · 300</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div style="width:64px;height:90px;padding:5px;display:flex;flex-direction:column;background:#FF2E88;clip-path:polygon(0 0,100% 0,100% 100%,6px 100%,0 calc(100% - 6px))">
+              <span style="display:block;width:26px;height:5px;background:#F2F0EB"></span>
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;font:900 26px/1 'Noto Sans JP',sans-serif;color:#000">出口</div>
+            </div>
+            <span style="font:600 8px/1.5 'JetBrains Mono',monospace;letter-spacing:.1em;color:#8C8C93;text-align:center">800 MS<br>PRINTED · RESTS</span>
+          </div>
+        </div>
+        <p style="font:400 12px/1.6 Archivo,sans-serif;color:#B9B6B1;margin-top:14px">Once per open, first card only. The legend is visible throughout. Reduced motion: printed at once. A card with no receipt opens printed. E2E with motion on: ink face inside 400 ms, printed after 1 s.</p>
+      </div>
+
+      <div style="border:1px solid #2A2A2E;background:#141416;padding:20px 22px;font:400 12.5px/1.65 Archivo,sans-serif;color:#B9B6B1">
+        <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">THE HELD FACE</h4>
+        <p style="margin:0 0 14px">Chip stays. Mid and meaning go. The body under the chip becomes bone paper, <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">drawInk</span> at <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">scale = 180 / box.w</span>, letterboxed, never cropped. The model word sits over it as <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">WordReveal animate=false</span>, cells at <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">180 / N</span> — S7b at half scale. The foot's kind line reads <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">ATTEMPT n</span>. The face says when, the ink says how.</p>
+        <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">THE HOLD</h4>
+        <p style="margin:0 0 14px">150 ms on <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">pointerdown</span>; release restores the face at once, no toggle to get stuck in. The strokes play in recorded time, sped to fit 2 s; held past the end they rest finished. Enter / Space toggles for keyboard and switch users — that is what e2e drives. Tap outside closes; tap on the card is inert.</p>
+        <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">FLAGS — YOUR CALL</h4>
+        <p style="margin:0 0 10px"><b style="color:#F2F0EB">Model over ink.</b> S7b prints the model at .9 strike over faded ink. Here the ink is the subject, so I inverted it: ink full, model at .55 (tweakable). §2.6 says the panel must match the canvas — if that means opacity too, this flips back.</p>
+        <p style="margin:0"><b style="color:#F2F0EB">Paper edge.</b> The bone body has no border — the card's own stock is the frame. On a base card (plate on plate) it still reads because the paper is bone.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ S6d -->
+<section style="padding:44px 48px 40px">
+  <div style="display:flex;align-items:baseline;gap:11px;margin-bottom:8px">
+    <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:rgba(255,255,255,.11);color:#F2F0EB">S6d</span>
+    <b style="font:700 14px Archivo,sans-serif">Collection — the stack: every copy of one stock, newest first</b>
+  </div>
+  <div style="font:400 12px/1.6 'JetBrains Mono',monospace;color:#8C8C93;max-width:940px;letter-spacing:.02em;margin-bottom:32px">
+    A SHELF SLOT OPENS ONE CARD PER RECEIPT ON A SCROLL-SNAP TRACK, THEN ONE LEGACY CARD IF COPIES EXCEED RECEIPTS. CHIP READS <span style="color:#F2F0EB">STOCK · M-D-YY</span>; THE COUNT LEAVES THE CHIP. <span style="color:#F2F0EB">‹ 1 / 3 ›</span> UNDER THE LEGEND, HIDDEN AT ONE CARD. SHINY 出口 BELOW: ×4 ON THE SHELF = 2 RECEIPTS + 2 PRE-V6 COPIES.
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:38px;align-items:flex-start">
+
+    <!-- 1d stack printed -->
+    <div id="1d" style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:800 10px 'JetBrains Mono',monospace;padding:3px 7px;background:#FF2E88;color:#000">1d</span>
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S6d</span>Stack — 1 / 3, newest, printed
+      </div>
+      <div data-screen-label="S6d CardView stack 1 of 3" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;padding:44px 28px 36px;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <span style="font:400 11px 'JetBrains Mono',monospace;letter-spacing:.16em;color:#8C8C93">← STATION</span>
+          <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93">COLLECTION</span>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;min-width:0;margin-top:22px">
+          <img src="assets/joker.png" alt="" style="flex:none;object-fit:contain;width:78px;height:78px;margin:-10px -4px -10px -10px;filter:drop-shadow(0 12px 22px rgba(255,46,136,.28))">
+          <div style="position:relative;flex:1;min-width:0;border:1px solid #2A2A2E;background:#141416;padding:10px 13px 11px">
+            <span style="position:absolute;width:10px;height:10px;background:#141416;transform:rotate(45deg);left:-6px;top:50%;margin-top:-5px;border-left:1px solid #2A2A2E;border-bottom:1px solid #2A2A2E"></span>
+            <div style="font:400 8px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#FF2E88;margin-bottom:4px">JOKER</div>
+            <p style="font:400 13px/1.45 Archivo,sans-serif;color:#F2F0EB">Every copy you've made, word by word.</p>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:22px;margin-top:20px">
+          <sc-for list="{{ shelf }}" as="r" hint-placeholder-count="3">
+            <div style="padding-bottom:20px;border-bottom:1px solid #2A2A2E">
+              <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px">
+                <span style="font:900 20px/1 'Noto Sans JP',sans-serif;white-space:nowrap">{{ r.word }}</span>
+                <span style="flex:1;min-width:0;font:400 9px 'JetBrains Mono',monospace;letter-spacing:.16em;color:#5A5A5F;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.meaning }}</span>
+                <span style="font:400 11px 'JetBrains Mono',monospace;letter-spacing:.1em;color:#B9B6B1;white-space:nowrap">{{ r.total }}</span>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:9px">
+                <sc-for list="{{ r.slots }}" as="s" hint-placeholder-count="3">
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px">
+                    <div style="position:relative;width:100%;aspect-ratio:5/7;padding:8px;display:flex;flex-direction:column;justify-content:{{ s.justify }};align-items:{{ s.align }};background:{{ s.bg }};border:1px {{ s.borderStyle }} {{ s.border }};color:{{ s.ink }};box-shadow:{{ s.shadow }};overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))">
+                      <div style="position:absolute;inset:0;background:{{ s.stripe }}"></div>
+                      <span style="position:relative;font:{{ s.chipWeight }} 7px 'JetBrains Mono',monospace;letter-spacing:.14em;color:{{ s.chipInk }}">{{ s.stock }}</span>
+                      <span style="position:relative;font:900 {{ s.wordSize }}px/1 'Noto Sans JP',sans-serif;text-align:center;display:{{ s.faceDisplay }}">{{ r.word }}</span>
+                      <span style="position:relative;font:600 7px 'JetBrains Mono',monospace;letter-spacing:.1em;color:{{ s.subInk }};display:{{ s.faceDisplay }};overflow:hidden;max-width:100%">{{ r.romaji }}</span>
+                    </div>
+                    <span style="font:600 13px 'JetBrains Mono',monospace;color:{{ s.countInk }}">×{{ s.count }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- overlay: stack -->
+        <div style="position:absolute;inset:0;z-index:30;background:rgba(10,10,11,.86);display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="position:relative;width:390px;height:300px;overflow:hidden;flex:none">
+            <div style="position:absolute;top:0;left:88px;display:flex;gap:36px;align-items:flex-start">
+              <!-- card 1: receipt 9-25-26 -->
+              <div style="position:relative;width:214px;height:300px;flex:none;padding:16px;display:flex;flex-direction:column;background:#FF2E88;border:1px solid #FF2E88;color:#000;overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px));box-shadow:0 22px 44px -12px rgba(0,0,0,.8),0 0 40px -8px rgba(255,46,136,.5)">
+                <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.14) 0 7px,transparent 7px 14px);pointer-events:none"></div>
+                <div style="position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
+                  <span style="font:600 8px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:3px 6px;background:#F2F0EB;border:1px solid #F2F0EB;color:#000;white-space:nowrap">SHINY · 9-25-26</span>
+                  <span style="font:900 14px/1 'Noto Sans JP',sans-serif">駅</span>
+                </div>
+                <div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:0">
+                  <span style="font:600 9px 'JetBrains Mono',monospace;letter-spacing:.18em;color:rgba(0,0,0,.72)">DEGUCHI</span>
+                  <span style="font:900 74px/1 'Noto Sans JP',sans-serif;white-space:nowrap">出口</span>
+                  <span style="font:400 11px 'Noto Sans JP',sans-serif;letter-spacing:.14em;color:rgba(0,0,0,.72)">でぐち</span>
+                </div>
+                <div style="position:relative">
+                  <span style="display:block;height:1px;background:rgba(0,0,0,.42);margin-bottom:8px"></span>
+                  <span style="display:block;font:900 18px/1 Archivo,sans-serif;letter-spacing:-.01em">EXIT</span>
+                  <span style="display:block;font:400 8px 'JetBrains Mono',monospace;letter-spacing:.14em;color:rgba(0,0,0,.72);margin-top:4px">PLACE · 駅 STATION</span>
+                </div>
+              </div>
+              <!-- card 2 peek -->
+              <div style="position:relative;width:214px;height:300px;flex:none;padding:16px;display:flex;flex-direction:column;background:#FF2E88;border:1px solid #FF2E88;color:#000;overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px));visibility:{{ peekVis }}">
+                <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.14) 0 7px,transparent 7px 14px);pointer-events:none"></div>
+                <div style="position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
+                  <span style="font:600 8px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:3px 6px;background:#F2F0EB;border:1px solid #F2F0EB;color:#000;white-space:nowrap">SHINY · 9-18-26</span>
+                </div>
+                <div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px"><span style="font:900 74px/1 'Noto Sans JP',sans-serif;white-space:nowrap">出口</span></div>
+                <div style="position:relative"><span style="display:block;height:1px;background:rgba(0,0,0,.42);margin-bottom:8px"></span><span style="display:block;font:900 18px/1 Archivo,sans-serif">EXIT</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93;margin-top:18px">HOLD · YOUR INK</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:6px">
+            <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;font:400 20px/1 'JetBrains Mono',monospace;color:#5A5A5F">‹</span>
+            <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#8C8C93;min-width:44px;text-align:center">1 / 3</span>
+            <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;font:400 20px/1 'JetBrains Mono',monospace;color:#F2F0EB">›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1e stack held mid-play -->
+    <div id="1e" style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:800 10px 'JetBrains Mono',monospace;padding:3px 7px;background:#FF2E88;color:#000">1e</span>
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S6d</span>Stack — 2 / 3, held mid-play
+      </div>
+      <div data-screen-label="S6d CardView stack held" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;padding:44px 28px 36px;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <span style="font:400 11px 'JetBrains Mono',monospace;letter-spacing:.16em;color:#8C8C93">← STATION</span>
+          <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93">COLLECTION</span>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;min-width:0;margin-top:22px">
+          <img src="assets/joker.png" alt="" style="flex:none;object-fit:contain;width:78px;height:78px;margin:-10px -4px -10px -10px;filter:drop-shadow(0 12px 22px rgba(255,46,136,.28))">
+          <div style="position:relative;flex:1;min-width:0;border:1px solid #2A2A2E;background:#141416;padding:10px 13px 11px">
+            <span style="position:absolute;width:10px;height:10px;background:#141416;transform:rotate(45deg);left:-6px;top:50%;margin-top:-5px;border-left:1px solid #2A2A2E;border-bottom:1px solid #2A2A2E"></span>
+            <div style="font:400 8px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#FF2E88;margin-bottom:4px">JOKER</div>
+            <p style="font:400 13px/1.45 Archivo,sans-serif;color:#F2F0EB">Every copy you've made, word by word.</p>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:22px;margin-top:20px">
+          <sc-for list="{{ shelf }}" as="r" hint-placeholder-count="3">
+            <div style="padding-bottom:20px;border-bottom:1px solid #2A2A2E">
+              <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px">
+                <span style="font:900 20px/1 'Noto Sans JP',sans-serif;white-space:nowrap">{{ r.word }}</span>
+                <span style="flex:1;min-width:0;font:400 9px 'JetBrains Mono',monospace;letter-spacing:.16em;color:#5A5A5F;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.meaning }}</span>
+                <span style="font:400 11px 'JetBrains Mono',monospace;letter-spacing:.1em;color:#B9B6B1;white-space:nowrap">{{ r.total }}</span>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:9px">
+                <sc-for list="{{ r.slots }}" as="s" hint-placeholder-count="3">
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px">
+                    <div style="position:relative;width:100%;aspect-ratio:5/7;padding:8px;display:flex;flex-direction:column;justify-content:{{ s.justify }};align-items:{{ s.align }};background:{{ s.bg }};border:1px {{ s.borderStyle }} {{ s.border }};color:{{ s.ink }};box-shadow:{{ s.shadow }};overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))">
+                      <div style="position:absolute;inset:0;background:{{ s.stripe }}"></div>
+                      <span style="position:relative;font:{{ s.chipWeight }} 7px 'JetBrains Mono',monospace;letter-spacing:.14em;color:{{ s.chipInk }}">{{ s.stock }}</span>
+                      <span style="position:relative;font:900 {{ s.wordSize }}px/1 'Noto Sans JP',sans-serif;text-align:center;display:{{ s.faceDisplay }}">{{ r.word }}</span>
+                      <span style="position:relative;font:600 7px 'JetBrains Mono',monospace;letter-spacing:.1em;color:{{ s.subInk }};display:{{ s.faceDisplay }};overflow:hidden;max-width:100%">{{ r.romaji }}</span>
+                    </div>
+                    <span style="font:600 13px 'JetBrains Mono',monospace;color:{{ s.countInk }}">×{{ s.count }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- overlay: stack held -->
+        <div style="position:absolute;inset:0;z-index:30;background:rgba(10,10,11,.86);display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="position:relative;width:390px;height:300px;overflow:hidden;flex:none">
+            <div style="position:absolute;top:0;left:-162px;display:flex;gap:36px;align-items:flex-start">
+              <!-- card 1 peek -->
+              <div style="position:relative;width:214px;height:300px;flex:none;padding:16px;display:flex;flex-direction:column;align-items:flex-end;background:#FF2E88;border:1px solid #FF2E88;color:#000;overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px));visibility:{{ peekVis }}">
+                <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.14) 0 7px,transparent 7px 14px);pointer-events:none"></div>
+                <span style="position:relative;font:900 14px/1 'Noto Sans JP',sans-serif">駅</span>
+                <div style="position:relative;flex:1;display:flex;align-items:center;justify-content:center;width:100%"><span style="font:900 74px/1 'Noto Sans JP',sans-serif;white-space:nowrap">出口</span></div>
+                <span style="position:relative;display:block;width:100%;height:1px;background:rgba(0,0,0,.42)"></span>
+              </div>
+              <!-- card 2 held -->
+              <div style="position:relative;width:214px;height:300px;flex:none;padding:16px;display:flex;flex-direction:column;background:#FF2E88;border:1px solid #FF2E88;color:#000;overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px));box-shadow:0 22px 44px -12px rgba(0,0,0,.8),0 0 40px -8px rgba(255,46,136,.5)">
+                <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.14) 0 7px,transparent 7px 14px);pointer-events:none"></div>
+                <div style="position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
+                  <span style="font:600 8px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:3px 6px;background:#F2F0EB;border:1px solid #F2F0EB;color:#000;white-space:nowrap">SHINY · 9-18-26</span>
+                  <span style="font:900 14px/1 'Noto Sans JP',sans-serif">駅</span>
+                </div>
+                <div style="position:relative;flex:1;margin-top:10px;background:#F2F0EB;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:0">
+                  <div style="position:relative;width:100%;aspect-ratio:1;flex:none">
+                    <svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible">
+                      <sc-for list="{{ inkPlay }}" as="s" hint-placeholder-count="8">
+                        <path d="{{ s.d }}" style="fill:none;stroke:#0A0A0B;stroke-width:{{ s.w }};stroke-linecap:round;stroke-linejoin:round;display:{{ s.display }}"></path>
+                      </sc-for>
+                    </svg>
+                    <div style="position:absolute;inset:0;display:flex;opacity:{{ modelOpacity }}">
+                      <div style="flex:1;display:flex;align-items:center;justify-content:center;font:400 78px/1 'Noto Sans JP',sans-serif;color:#FF2E88;border-right:1px dashed rgba(10,10,11,.22)">出</div>
+                      <div style="flex:1;display:flex;align-items:center;justify-content:center;font:400 78px/1 'Noto Sans JP',sans-serif;color:#FF2E88">口</div>
+                    </div>
+                  </div>
+                </div>
+                <div style="position:relative;margin-top:10px">
+                  <span style="display:block;height:1px;background:rgba(0,0,0,.42);margin-bottom:8px"></span>
+                  <span style="display:block;font:400 8px 'JetBrains Mono',monospace;letter-spacing:.14em;color:rgba(0,0,0,.72)">ATTEMPT 2</span>
+                </div>
+              </div>
+              <!-- card 3 legacy peek -->
+              <div style="position:relative;width:214px;height:300px;flex:none;padding:16px;display:flex;flex-direction:column;background:#FF2E88;border:1px solid #FF2E88;color:#000;overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px));visibility:{{ peekVis }}">
+                <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.14) 0 7px,transparent 7px 14px);pointer-events:none"></div>
+                <div style="position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
+                  <span style="font:600 8px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:3px 6px;background:#F2F0EB;border:1px solid #F2F0EB;color:#000;white-space:nowrap">SHINY · ×2</span>
+                </div>
+                <div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px"><span style="font:900 74px/1 'Noto Sans JP',sans-serif;white-space:nowrap">出口</span></div>
+                <div style="position:relative"><span style="display:block;height:1px;background:rgba(0,0,0,.42);margin-bottom:8px"></span><span style="display:block;font:900 18px/1 Archivo,sans-serif">EXIT</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93;margin-top:18px">HOLD · YOUR INK</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:6px">
+            <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;font:400 20px/1 'JetBrains Mono',monospace;color:#F2F0EB">‹</span>
+            <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#8C8C93;min-width:44px;text-align:center">2 / 3</span>
+            <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;font:400 20px/1 'JetBrains Mono',monospace;color:#F2F0EB">›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1f legacy card in the stack -->
+    <div id="1f" style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:800 10px 'JetBrains Mono',monospace;padding:3px 7px;background:#FF2E88;color:#000">1f</span>
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S6d</span>Stack — 3 / 3, the legacy card
+      </div>
+      <div data-screen-label="S6d CardView legacy card" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;padding:44px 28px 36px;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <span style="font:400 11px 'JetBrains Mono',monospace;letter-spacing:.16em;color:#8C8C93">← STATION</span>
+          <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93">COLLECTION</span>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;min-width:0;margin-top:22px">
+          <img src="assets/joker.png" alt="" style="flex:none;object-fit:contain;width:78px;height:78px;margin:-10px -4px -10px -10px;filter:drop-shadow(0 12px 22px rgba(255,46,136,.28))">
+          <div style="position:relative;flex:1;min-width:0;border:1px solid #2A2A2E;background:#141416;padding:10px 13px 11px">
+            <span style="position:absolute;width:10px;height:10px;background:#141416;transform:rotate(45deg);left:-6px;top:50%;margin-top:-5px;border-left:1px solid #2A2A2E;border-bottom:1px solid #2A2A2E"></span>
+            <div style="font:400 8px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#FF2E88;margin-bottom:4px">JOKER</div>
+            <p style="font:400 13px/1.45 Archivo,sans-serif;color:#F2F0EB">Every copy you've made, word by word.</p>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:22px;margin-top:20px">
+          <sc-for list="{{ shelf }}" as="r" hint-placeholder-count="3">
+            <div style="padding-bottom:20px;border-bottom:1px solid #2A2A2E">
+              <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px">
+                <span style="font:900 20px/1 'Noto Sans JP',sans-serif;white-space:nowrap">{{ r.word }}</span>
+                <span style="flex:1;min-width:0;font:400 9px 'JetBrains Mono',monospace;letter-spacing:.16em;color:#5A5A5F;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.meaning }}</span>
+                <span style="font:400 11px 'JetBrains Mono',monospace;letter-spacing:.1em;color:#B9B6B1;white-space:nowrap">{{ r.total }}</span>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:9px">
+                <sc-for list="{{ r.slots }}" as="s" hint-placeholder-count="3">
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px">
+                    <div style="position:relative;width:100%;aspect-ratio:5/7;padding:8px;display:flex;flex-direction:column;justify-content:{{ s.justify }};align-items:{{ s.align }};background:{{ s.bg }};border:1px {{ s.borderStyle }} {{ s.border }};color:{{ s.ink }};box-shadow:{{ s.shadow }};overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))">
+                      <div style="position:absolute;inset:0;background:{{ s.stripe }}"></div>
+                      <span style="position:relative;font:{{ s.chipWeight }} 7px 'JetBrains Mono',monospace;letter-spacing:.14em;color:{{ s.chipInk }}">{{ s.stock }}</span>
+                      <span style="position:relative;font:900 {{ s.wordSize }}px/1 'Noto Sans JP',sans-serif;text-align:center;display:{{ s.faceDisplay }}">{{ r.word }}</span>
+                      <span style="position:relative;font:600 7px 'JetBrains Mono',monospace;letter-spacing:.1em;color:{{ s.subInk }};display:{{ s.faceDisplay }};overflow:hidden;max-width:100%">{{ r.romaji }}</span>
+                    </div>
+                    <span style="font:600 13px 'JetBrains Mono',monospace;color:{{ s.countInk }}">×{{ s.count }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- overlay: legacy -->
+        <div style="position:absolute;inset:0;z-index:30;background:rgba(10,10,11,.86);display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="position:relative;width:390px;height:300px;overflow:hidden;flex:none">
+            <div style="position:absolute;top:0;left:-162px;display:flex;gap:36px;align-items:flex-start">
+              <!-- card 2 peek -->
+              <div style="position:relative;width:214px;height:300px;flex:none;padding:16px;display:flex;flex-direction:column;align-items:flex-end;background:#FF2E88;border:1px solid #FF2E88;color:#000;overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px));visibility:{{ peekVis }}">
+                <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.14) 0 7px,transparent 7px 14px);pointer-events:none"></div>
+                <span style="position:relative;font:900 14px/1 'Noto Sans JP',sans-serif">駅</span>
+                <div style="position:relative;flex:1;display:flex;align-items:center;justify-content:center;width:100%"><span style="font:900 74px/1 'Noto Sans JP',sans-serif;white-space:nowrap">出口</span></div>
+                <span style="position:relative;display:block;width:100%;height:1px;background:rgba(0,0,0,.42)"></span>
+              </div>
+              <!-- card 3 legacy -->
+              <div style="position:relative;width:214px;height:300px;flex:none;padding:16px;display:flex;flex-direction:column;background:#FF2E88;border:1px solid #FF2E88;color:#000;overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px));box-shadow:0 22px 44px -12px rgba(0,0,0,.8),0 0 40px -8px rgba(255,46,136,.5)">
+                <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.14) 0 7px,transparent 7px 14px);pointer-events:none"></div>
+                <div style="position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
+                  <span style="font:600 8px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:3px 6px;background:#F2F0EB;border:1px solid #F2F0EB;color:#000;white-space:nowrap">SHINY · ×2</span>
+                  <span style="font:900 14px/1 'Noto Sans JP',sans-serif">駅</span>
+                </div>
+                <div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:0">
+                  <span style="font:600 9px 'JetBrains Mono',monospace;letter-spacing:.18em;color:rgba(0,0,0,.72)">DEGUCHI</span>
+                  <span style="font:900 74px/1 'Noto Sans JP',sans-serif;white-space:nowrap">出口</span>
+                  <span style="font:400 11px 'Noto Sans JP',sans-serif;letter-spacing:.14em;color:rgba(0,0,0,.72)">でぐち</span>
+                </div>
+                <div style="position:relative">
+                  <span style="display:block;height:1px;background:rgba(0,0,0,.42);margin-bottom:8px"></span>
+                  <span style="display:block;font:900 18px/1 Archivo,sans-serif;letter-spacing:-.01em">EXIT</span>
+                  <span style="display:block;font:400 8px 'JetBrains Mono',monospace;letter-spacing:.14em;color:rgba(0,0,0,.72);margin-top:4px">PLACE · 駅 STATION</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:transparent;margin-top:18px;user-select:none">HOLD · YOUR INK</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:6px">
+            <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;font:400 20px/1 'JetBrains Mono',monospace;color:#F2F0EB">‹</span>
+            <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#8C8C93;min-width:44px;text-align:center">3 / 3</span>
+            <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;font:400 20px/1 'JetBrains Mono',monospace;color:#5A5A5F">›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1g unreceipted -->
+    <div id="1g" style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:800 10px 'JetBrains Mono',monospace;padding:3px 7px;background:#FF2E88;color:#000">1g</span>
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">S6d</span>Day one — every copy predates v6
+      </div>
+      <div data-screen-label="S6d CardView unreceipted" style="width:390px;height:844px;background:#0A0A0B;color:#F2F0EB;position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;padding:44px 28px 36px;border:1px solid #2A2A2E;box-shadow:0 18px 44px rgba(0,0,0,.5)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <span style="font:400 11px 'JetBrains Mono',monospace;letter-spacing:.16em;color:#8C8C93">← STATION</span>
+          <span style="font:400 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#8C8C93">COLLECTION</span>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;min-width:0;margin-top:22px">
+          <img src="assets/joker.png" alt="" style="flex:none;object-fit:contain;width:78px;height:78px;margin:-10px -4px -10px -10px;filter:drop-shadow(0 12px 22px rgba(255,46,136,.28))">
+          <div style="position:relative;flex:1;min-width:0;border:1px solid #2A2A2E;background:#141416;padding:10px 13px 11px">
+            <span style="position:absolute;width:10px;height:10px;background:#141416;transform:rotate(45deg);left:-6px;top:50%;margin-top:-5px;border-left:1px solid #2A2A2E;border-bottom:1px solid #2A2A2E"></span>
+            <div style="font:400 8px 'JetBrains Mono',monospace;letter-spacing:.2em;color:#FF2E88;margin-bottom:4px">JOKER</div>
+            <p style="font:400 13px/1.45 Archivo,sans-serif;color:#F2F0EB">These predate receipts. Your next run keeps its ink.</p>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:22px;margin-top:20px">
+          <sc-for list="{{ shelf }}" as="r" hint-placeholder-count="3">
+            <div style="padding-bottom:20px;border-bottom:1px solid #2A2A2E">
+              <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px">
+                <span style="font:900 20px/1 'Noto Sans JP',sans-serif;white-space:nowrap">{{ r.word }}</span>
+                <span style="flex:1;min-width:0;font:400 9px 'JetBrains Mono',monospace;letter-spacing:.16em;color:#5A5A5F;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.meaning }}</span>
+                <span style="font:400 11px 'JetBrains Mono',monospace;letter-spacing:.1em;color:#B9B6B1;white-space:nowrap">{{ r.total }}</span>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:9px">
+                <sc-for list="{{ r.slots }}" as="s" hint-placeholder-count="3">
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px">
+                    <div style="position:relative;width:100%;aspect-ratio:5/7;padding:8px;display:flex;flex-direction:column;justify-content:{{ s.justify }};align-items:{{ s.align }};background:{{ s.bg }};border:1px {{ s.borderStyle }} {{ s.border }};color:{{ s.ink }};box-shadow:{{ s.shadow }};overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))">
+                      <div style="position:absolute;inset:0;background:{{ s.stripe }}"></div>
+                      <span style="position:relative;font:{{ s.chipWeight }} 7px 'JetBrains Mono',monospace;letter-spacing:.14em;color:{{ s.chipInk }}">{{ s.stock }}</span>
+                      <span style="position:relative;font:900 {{ s.wordSize }}px/1 'Noto Sans JP',sans-serif;text-align:center;display:{{ s.faceDisplay }}">{{ r.word }}</span>
+                      <span style="position:relative;font:600 7px 'JetBrains Mono',monospace;letter-spacing:.1em;color:{{ s.subInk }};display:{{ s.faceDisplay }};overflow:hidden;max-width:100%">{{ r.romaji }}</span>
+                    </div>
+                    <span style="font:600 13px 'JetBrains Mono',monospace;color:{{ s.countInk }}">×{{ s.count }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- overlay: lone legacy -->
+        <div style="position:absolute;inset:0;z-index:30;background:rgba(10,10,11,.86);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px">
+          <div style="position:relative;width:214px;height:300px;flex:none;padding:16px;display:flex;flex-direction:column;background:#FF2E88;border:1px solid #FF2E88;color:#000;overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,18px 100%,0 calc(100% - 18px));box-shadow:0 22px 44px -12px rgba(0,0,0,.8),0 0 40px -8px rgba(255,46,136,.5)">
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.14) 0 7px,transparent 7px 14px);pointer-events:none"></div>
+            <div style="position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
+              <span style="font:600 8px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:3px 6px;background:#F2F0EB;border:1px solid #F2F0EB;color:#000;white-space:nowrap">SHINY · ×4</span>
+              <span style="font:900 14px/1 'Noto Sans JP',sans-serif">駅</span>
+            </div>
+            <div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:0">
+              <span style="font:600 9px 'JetBrains Mono',monospace;letter-spacing:.18em;color:rgba(0,0,0,.72)">DEGUCHI</span>
+              <span style="font:900 74px/1 'Noto Sans JP',sans-serif;white-space:nowrap">出口</span>
+              <span style="font:400 11px 'Noto Sans JP',sans-serif;letter-spacing:.14em;color:rgba(0,0,0,.72)">でぐち</span>
+            </div>
+            <div style="position:relative">
+              <span style="display:block;height:1px;background:rgba(0,0,0,.42);margin-bottom:8px"></span>
+              <span style="display:block;font:900 18px/1 Archivo,sans-serif;letter-spacing:-.01em">EXIT</span>
+              <span style="display:block;font:400 8px 'JetBrains Mono',monospace;letter-spacing:.14em;color:rgba(0,0,0,.72);margin-top:4px">PLACE · 駅 STATION</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-width:300px;max-width:440px;border:1px solid #2A2A2E;background:#141416;padding:20px 22px;font:400 12.5px/1.65 Archivo,sans-serif;color:#B9B6B1">
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">THE TRACK</h4>
+      <p style="margin:0 0 14px">Horizontal scroll-snap, one 214 card per snap, 36 px gap. Centred, the neighbours peek 52 px at each edge — that peek is the swipe affordance, so the arrows can stay quiet. <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">touch-action: pan-x</span>: a moving finger gets the browser's pan and cancels the hold; a still one gets the hold.</p>
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">THE PAGER</h4>
+      <p style="margin:0 0 14px"><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">‹ 1 / 3 ›</span> in the detail-position style under the legend. Arrows are 44 px targets, bone when they step, carbon at the end of the track; the number is not tappable. Hidden entirely at one card.</p>
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">THE CHIP</h4>
+      <p style="margin:0 0 14px">One suffix prop, three readings. S8: <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">SHINY · 1st TRY</span>. Receipted: <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">SHINY · 9-18-26</span>, no leading zeros. Legacy: <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">SHINY · ×2</span>, the copies without a receipt. Tries move to the foot on hold, so nothing is lost when the date takes the chip.</p>
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">THE LEGACY CARD</h4>
+      <p style="margin:0 0 14px">Always last. No hold, no legend — <a href="#1f">1f</a> keeps the legend's row height so the pager does not jump when you swipe onto it. <a href="#1g">1g</a> is every stock in the app the day this ships: one card, no pager, and the Joker's one new line on the screen beneath. The screen cannot tell a pre-v6 copy from a failed write and does not try.</p>
+      <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">FLAGS — YOUR CALL</h4>
+      <p style="margin:0 0 10px"><b style="color:#F2F0EB">The peek.</b> Spec says one card per snap; it does not say the neighbours show. I think they should. Toggle it off in tweaks to see the alternative.</p>
+      <p style="margin:0 0 10px"><b style="color:#F2F0EB">Legend row on the legacy card.</b> Reserved (blank) vs collapsed. Blank wins on a track; collapse if you would rather the lone card in <a href="#1g">1g</a> and the tracked one match.</p>
+      <p style="margin:0"><b style="color:#F2F0EB">Two runs, one day.</b> Two cards read <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">SHINY · 9-25-26</span> and are told apart only by ink and tries. Spec accepts that; flagging it so it is a decision.</p>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;modelOpacity&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.55,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Held face&quot;},&quot;playStrokes&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:4,&quot;min&quot;:0,&quot;max&quot;:8,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Held face&quot;},&quot;peek&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Stack&quot;}}">
+class Component extends DCLogic {
+  cards = [
+    { tier: "WORN", word: "新幹線", romaji: "SHINKANSEN" }, { tier: "WORN", word: "中央口", romaji: "CHUUOUGUCHI" }, { tier: "WORN", word: "北口", romaji: "KITAGUCHI" },
+    { tier: "BASE", word: "入口", romaji: "IRIGUCHI" }, { tier: "BASE", word: "禁煙", romaji: "KIN'EN" }, { tier: "BASE", word: "西口", romaji: "NISHIGUCHI" },
+    { tier: "BASE", word: "南口", romaji: "MINAMIGUCHI" }, { tier: "BASE", word: "切符", romaji: "KIPPU" }, { tier: "SHINY", word: "出口", romaji: "DEGUCHI" }, { tier: "SHINY", word: "改札", romaji: "KAISATSU" }
+  ];
+  skin = {
+    WORN: { bg: "#101011", border: "#1D1D21", ink: "#8C8C93", chipInk: "#5A5A5F", subInk: "#5A5A5F", shadow: "none", chipWeight: 400, stripe: "repeating-linear-gradient(-45deg,rgba(242,240,235,.03) 0 1px,transparent 1px 5px)" },
+    BASE: { bg: "#141416", border: "#2A2A2E", ink: "#F2F0EB", chipInk: "#5A5A5F", subInk: "#8C8C93", shadow: "none", chipWeight: 400, stripe: "none" },
+    SHINY: { bg: "#FF2E88", border: "#FF2E88", ink: "#000", chipInk: "#000", subInk: "rgba(0,0,0,.72)", shadow: "0 0 22px -8px rgba(255,46,136,.55)", chipWeight: 600, stripe: "repeating-linear-gradient(45deg,rgba(0,0,0,.14) 0 7px,transparent 7px 14px)" }
+  };
+  // 出口 as written on a 334px canvas, normalised to 0-100. Widths vary with recorded speed.
+  ink = [
+    { d: "M26.5 9 C26.2 35 26.6 62 26 89", w: 3.6 },
+    { d: "M13.5 23 C13.2 32 13.6 41 13.8 48.5 C22 48.2 31 48.4 40.5 48.6", w: 3.1 },
+    { d: "M40 21.5 C40.2 30 40.4 39 40.6 48", w: 2.9 },
+    { d: "M7.5 57 C7.2 68 7.6 79 8 89.5 C20 89.2 33 89.6 45.5 89.4", w: 3.4 },
+    { d: "M45 55 C45.3 66 45.6 78 45.8 89", w: 2.9 },
+    { d: "M60.5 27 C60.2 46 60.8 66 60.3 84.5", w: 3.5 },
+    { d: "M59.5 27.5 C70 27.2 81 27.6 91.5 27.8 C91.8 46 91.4 65 91.6 84", w: 3.0 },
+    { d: "M60.5 84.5 C71 84.2 81 84.6 91 84.4", w: 3.2 }
+  ];
+  slot(stock, count, word) {
+    const empty = count === 0;
+    const s = this.skin[stock];
+    const countInk = empty ? "#5A5A5F" : stock === "SHINY" ? "#FF2E88" : stock === "WORN" ? "#8C8C93" : "#F2F0EB";
+    if (empty) return { stock, count, justify: "center", align: "center", bg: "transparent", borderStyle: "dashed", border: "#2A2A2E", ink: "#5A5A5F", shadow: "none", stripe: "none", chipWeight: 400, chipInk: "#5A5A5F", subInk: "#5A5A5F", wordSize: 18, faceDisplay: "none", countInk };
+    return { stock, count, justify: "space-between", align: "stretch", ...s, borderStyle: "solid", chipInk: stock === "SHINY" ? "#000" : "#5A5A5F", wordSize: word.length > 2 ? 14 : 19, faceDisplay: "block", countInk };
+  }
+  renderVals() {
+    const modelOpacity = this.props.modelOpacity ?? .55;
+    const peek = this.props.peek ?? true;
+    const playStrokes = this.props.playStrokes ?? 4;
+    const overlap = 38;
+    const rows = [];
+    for (let i = 0; i < 10; i += 7) rows.push({ cards: this.cards.slice(i, i + 7).map((c, j) => ({ ...c, ...this.skin[c.tier], ml: j ? -overlap : 0, z: j + 1,
+      wordSize: c.word.length > 2 ? 18 : 25, romajiSize: Math.max(6, Math.min(8.5, Math.floor((70 / c.romaji.length / 0.62) * 10) / 10)) })) });
+    const shelf = [
+      { word: "出口", romaji: "DEGUCHI", meaning: "EXIT", total: "7 COPIES", slots: [this.slot("SHINY", 4, "出口"), this.slot("BASE", 2, "出口"), this.slot("WORN", 1, "出口")] },
+      { word: "入口", romaji: "IRIGUCHI", meaning: "ENTRANCE", total: "4 COPIES", slots: [this.slot("SHINY", 1, "入口"), this.slot("BASE", 3, "入口"), this.slot("WORN", 0, "入口")] },
+      { word: "改札", romaji: "KAISATSU", meaning: "TICKET GATE", total: "2 COPIES", slots: [this.slot("SHINY", 0, "改札"), this.slot("BASE", 1, "改札"), this.slot("WORN", 1, "改札")] }
+    ];
+    return {
+      rows, shelf, modelOpacity,
+      inkAll: this.ink.map(s => ({ ...s, display: "inline" })),
+      inkPlay: this.ink.map((s, i) => ({ ...s, display: i < playStrokes ? "inline" : "none" })),
+      peekVis: peek ? "visible" : "hidden"
+    };
+  }
+}
+</script>
+</body>
+</html>

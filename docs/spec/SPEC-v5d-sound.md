@@ -1,9 +1,39 @@
 # kanahero — v5d · the sound pass (ElevenLabs generation brief)
 
-**Status: BRIEF, not built.** Drop at `docs/spec/SPEC-v5d-sound.md`.
-**Base:** `e3cd9e3`. **Unfreezes:** SPEC-v5a §9.4 — *"There is no sound engine. Build none, add
-no audio code or assets."* Five `// sfx:` markers are the entire existing footprint.
-**Palette decision (2026-09-18): CARD TABLE.** Cardstock, felt, wood, clay, one metallic accent.
+**Status: PARTLY BUILT** (updated 2026-09-22). This started as a generation brief and is now half
+a build record; the two halves are marked. **Unfreezes:** SPEC-v5a §9.4 — *"There is no sound
+engine. Build none, add no audio code or assets."*
+
+**Palette (2026-09-18): CARD TABLE.** Brush · paper · cardstock · felt and wood · one metal.
+Graphite was removed 2026-09-20 when both hands became brushes (§2b); clay was never used.
+
+### What exists in the tree
+
+| | |
+| :-- | :-- |
+| `lib/audio.ts` | the one `AudioContext`, two channels (`voice`, `sfx`), silent derived from both being off |
+| `lib/sfx.ts` · `lib/sfx-schedule.ts` | the one-shot player and the pure cue list |
+| `lib/joker-voice.ts` | his blip — synthesized, no file (§5b) |
+| `scripts/sfx-defaults.mjs` | every cue's tier, cap, peak, gap, loop — the tables below, in code |
+| `scripts/build-sfx.mjs` | `npm run sfx` — the bake |
+| `scripts/sfx-lab.mjs` + `.html` | `npm run sfx:lab` — tune by ear, write the config, run the bake |
+| `scripts/gen-melt.py` | `prompt.melt`, synthesized (§2c) |
+| `sfx-src/sfx.config.json` | **the tuned numbers. This file wins over every table below.** |
+
+### Still to build
+
+`lib/ink-voice.ts` and the whole tier 1 ink family (§2b) · `reveal.arrive` (§2c) · the four modal
+and overlay cues (§2d) · `deal.throw`, if the deal ever feels weightless without it (§2c).
+
+**Done since this list was last honest:** the settings dialog (`components/Settings.tsx`), the
+Joker's voice (wired in `Joker.tsx`), tier 2's `deal.land` and `prompt.melt`, and tier 3's
+`ui.nav` · `drawer.open` · `ui.primary` · `ui.toggle` (§2d). `deal.press` was wired and then
+dropped (§2c).
+
+> **⚠️ WHERE THE NUMBERS REALLY LIVE.** The caps and peaks in every table below are the DESIGN
+> defaults — what was reasoned to before anything was heard. `sfx-src/sfx.config.json` holds what
+> was decided **by ear in the lab**, and it overrides them. When the two disagree, the config is
+> right and the table is history. §2e lists the divergences and why they matter.
 
 ---
 
@@ -277,16 +307,49 @@ see §5b. That was decided and shipped; the inventory entry is superseded.
 ## 2c. Tier 2 — deals and arrivals
 
 **Added 2026-09-20.** Once per run each, the beats between screens. **Four files** — the fifth cue
-is held (below).
+is held (below), and a sixth has since lost its call site.
 
 | File | Site | Trim to | Peak | Fires |
 | :-- | :-- | :-- | :-- | :-- |
-| `deal.press` | DEAL, the S6b CTA | ≤400 ms | −12 dBFS | once, opening the run |
+| ~~`deal.press`~~ | ~~DEAL, the S6b CTA~~ | ≤400 ms | −12 dBFS | **never — unwired 2026-09-25** |
 | `prompt.melt` | M5, every presentation | ≤700 ms | −24 dBFS | **9–21× a run** |
 | `deal.land` | M4, S6b mount | **≤80 ms** | −18 dBFS | ×9, **90 ms apart** |
 | `reveal.arrive` | M14, S8 mount | **≤240 ms** | −14 dBFS | once |
 
-### The bookend got better
+### ⛔ `deal.press` — DROPPED FROM DEAL 2026-09-25
+
+**The cue is good. The call site was wrong, and the call site is the whole design.**
+
+`SetScreen.tsx` fired it on the DEAL tap and called `onDeal()` in the same handler, which sets the
+phase. S7 therefore mounts immediately, and all 400 ms of riffle played **over the new screen** —
+heard, correctly, as a stray `reveal.skip` at the top of the round. The two cues are near-identical
+by brief (a cascade closing on a knock; a spread dropped flat) and sit at the same −12, so the
+misattribution is the design's fault, not the listener's.
+
+The comment at the call site had already talked itself past the problem — *"the screen it belongs to
+is already unmounting while it sounds, which is fine: the node lives on the audio graph, not on this
+component."* True about the graph, false about the ear. **A cue that outlives its screen belongs to
+the next one.** That is the general lesson; it applies to anything fired on a tap that navigates.
+
+**Three things this costs, named:**
+
+1. **The bookend, below.** `reveal.end` now stands alone.
+2. **DEAL is the only strike CTA in the app with no sound.** Accepted. Neither screen is silent:
+   S6b deals nine `deal.land`s on its own mount, and S7 opens on `prompt.melt`.
+3. **The category rule will try to fill the hole.** Tier 3 gives `ui.primary` to "any bone/strike
+   CTA without a cue of its own", and DEAL is now exactly that. **Do not.** The objection is to a
+   cue landing on the next screen at all, not to which cue it was — and `ui.primary` is longer.
+   `sfx-defaults.mjs` carries this warning at the `ui.primary` entry so it is read before wiring.
+
+**What is kept:** the source (`sfx-src/deal-press.mp3`, irreplaceable per that folder's README), the
+entry in `sfx-defaults.mjs`, the bake, and the row on `/sfx` — marked unwired. Nothing is deleted;
+the cue lost its site, not its argument. Restoring it means finding a site where the screen it
+belongs to is still on screen when it finishes.
+
+### ~~The bookend got better~~ — HALF OF IT IS GONE
+
+*Kept as the record of why the pair was built. Superseded above: `deal.press` no longer sounds, so
+the run has a close and no open.*
 
 `deal.press` and `reveal.end` are the same deck heard opening and closing a run. The first draft
 made them a *cut* and a *tap* — too close together to read as two different moments. **A shuffle to
@@ -316,6 +379,8 @@ one place. Only generate if it plainly does not.
 clause and the no-hiss ban the ink family taught us (§2b).
 
 **`deal.press`** — the end of a shuffle · `duration_seconds: 1` · `prompt_influence: 0.5`
+*(Generated and baked, then unwired 2026-09-25 — see above. The prompt is kept because the file is
+kept.)*
 *(Rewritten 2026-09-20: was "squared once and then cut". A shuffle is the better opening gesture —
 see the bookend note below.)*
 > The last half-second of a riffle shuffle: the cascade snapping closed and the deck settling
@@ -333,11 +398,39 @@ see the bookend note below.)*
 > If it sits too far forward against `deal.land` and the melt, take it to −14 in the lab. This is a
 > gesture that opens a run, not a reward.
 
-**`prompt.melt`** — must be felt, not heard
-> Fine paper settling and drifting down to stillness. A soft low hush that drains away to nothing —
-> no impact at the start, no event inside it. Close-mic'd, anechoic, warm and muffled. No scratch,
-> no grit, no hiss, no sibilance, nothing bright, no room tone, no music, no reverb. One isolated
+**`prompt.melt`** — the card being made · `duration_seconds: 1` · `prompt_influence: 0.4`
+*(Rewritten 2026-09-20: was paper settling. Synthetic, not foley — see below.)*
+> Something materialising out of nothing: fine particles drawing inward and settling into place. A
+> soft synthetic shimmer that swells gently and resolves to stillness — airy, weightless, warm. No
+> melody, no chime, no bell, no pitched tone. No impact, no whoosh, no sizzle, no hiss, no
+> sibilance, nothing bright or sharp. Anechoic, no room tone, no music, no reverb. One isolated
 > one-shot fading to silence.
+
+**Lower `prompt_influence` here than anywhere else (0.4).** Every other cue names a physical object
+and wants a literal read. This one names an abstraction and needs room to interpret it — a 0.6 read
+of "materialising" tends to come back as a whoosh.
+
+> **⚠️ It must not be pitched.** The app's hierarchy is now **noise is the hand, pitch is reward and
+> character** — the only pitched things are `flip.shiny`'s ring and the Joker's square wave. A melt
+> that arrives as a chime or a bell steals from both and fires 9–21 times a run doing it. If a
+> generation comes back with a note in it, that is the failure, not a stylistic variant.
+>
+> If several rounds still land pitched or bell-like, stop generating and synthesize it instead — a
+> filtered noise bloom on a 900 ms envelope is twenty lines against `lib/ink-voice.ts`, and it is
+> where this cue was always heading.
+
+### Why a synthetic melt is consistent, and why `reveal.shinyHold` still stays dead
+
+Worth writing down, because the two look contradictory. `reveal.shinyHold` was cut on 2026-09-19
+partly because *"a rising swell has no material — nothing on a card table makes one."* That was
+true when every cue in the app was foley. **It is not true any more:** the Joker's voice is
+synthesized, and the entire ink family is a noise instrument. The material map has a synthetic half
+now, and the melt belongs to it — the card is not a physical object being placed, it is an image
+being *made*.
+
+`shinyHold` still stays cut, on the reasons that had nothing to do with material: the 450 ms silence
+before the only sound in the app that rings **is** the anticipation, and `flip.shiny`'s own ring is
+the sweep.
 
 **`deal.land`** — RR3
 > One playing card landing flat on green felt. A single soft low muffled slap, dull and cushioned,
@@ -369,6 +462,148 @@ as the ink bed. **It ducks to nothing while the bed is active** — the player i
 textures at the same level is how a mix turns to mud. If it ever reads as noise, the answer is
 silence, not a louder file.
 
+
+---
+
+## 2d. Tier 3 — chrome, and where it actually fires
+
+**Written 2026-09-25, after wiring.** The numbers landed in `sfx-defaults.mjs` on 2026-09-21 and
+this section was promised and not written, which left the tables pointing at nothing. Four of the
+eight cues are now baked and wired; the other four are named at the bottom.
+
+**The rule, and it is the whole section: BY CATEGORY, NEVER BY BUTTON.** A cue belongs to a *kind*
+of action. Write it that way and a button added next year inherits the right sound by being the
+right kind of thing. Write it per button and every new button is a decision, then an inconsistency,
+then a bug.
+
+### The four kinds
+
+| Cue | The kind | Baked |
+| :-- | :-- | :-- |
+| `ui.nav` | **Moving between screens.** Nothing is chosen, nothing is confirmed. | 150 ms · −22 |
+| `drawer.open` | **A deck or a set is chosen.** The thing under the finger goes live. | 260 ms · −16 |
+| `ui.primary` | **A confirm.** A latch closing on a choice already made. | 725 ms · −14 |
+| `ui.toggle` | **A switch.** One file, ON at 1.0 and OFF at `TOGGLE_OFF` (0.89). | 60 ms · −16 |
+
+### `ui.nav` lives on the state machine, not on the buttons
+
+It **is** the screen transition — the inventory lists transitions as deliberately silent *because*
+this cue is the transition, not because they have none. So it hangs off one function:
+
+```ts
+// app/page.tsx
+function go(next: Phase) { play("ui.nav"); setPhase(next); }
+```
+
+Every plain move routes through `go()`: ← BACK on a deck, set or collection, `VIEW COLLECTION →`,
+`BACK TO DECK`, `CREDITS`, the bank's back and the ✕ on a capture, `Deck` on the session summary,
+and a session quit. The leaf components stay sound-free, which is the point — `Deck.tsx` and
+`Collection.tsx` import nothing from `lib/sfx` at all.
+
+**The moves that do NOT route through it**, each because something else owns the moment:
+
+| Move | Instead |
+| :-- | :-- |
+| DEAL → S7 | **silence**, deliberately (§2c) |
+| S7 → S8 | `reveal.arrive`, when it is baked |
+| A drill starting | `ui.primary` on the CTA that started it |
+| LEAVE RUN → S6b | `modal.leave` (`reveal.skip` at −6 dB), when the modal cues land |
+| SETTINGS opening | `modal.open`, when it is baked |
+
+### `drawer.open` is the selection, `ui.primary` is the confirm — and S1 fires both
+
+This is the pair worth understanding, because S1 separates selecting from committing and the sound
+should say so. Tapping HIRAGANA fires `drawer.open`; tapping START SESSION fires `ui.primary`.
+Browse three decks and hit go, and you hear three drawers and one latch. That reads correctly
+because it *is* what happened.
+
+- **`drawer.open`** — `choose()` on S1 (a deck row or the bank strip) and the `onOpenSet` handler
+  (a set row on S2/S3). **Guarded on the row actually changing**: its 250 ms `gap` is a fact about
+  the cue, not something the player enforces by tapping slowly, and re-choosing what is already
+  chosen is not a choice.
+- **`ui.primary`** — `commit()` (START SESSION / OPEN BANK), the CHARACTERS panel, and
+  `Replay missed` / `Again` on the session summary. That is the general rule *"any bone or strike
+  CTA without a cue of its own"*, and the exclusions matter:
+
+> **⚠️ DEAL and FLIP are excluded, for two different reasons.** FLIP has `ink.reveal`, because what
+> it confirms is a specific object. **DEAL is excluded because it is deliberately silent** (§2c) —
+> and "a CTA with no cue of its own" is exactly what DEAL now looks like, so the rule will try to
+> refill it. Do not let it. Anything fired there is heard on the next screen.
+
+`ui.primary` at 725 ms is far over the 120 the inventory asked for, and it is accepted (§2e). It
+survives where `deal.press` did not because every site it fires from leads to a screen that takes
+longer than that to arrive, so it is never heard over anything.
+
+### `ui.toggle` — and the one cue that must always play
+
+Three switches, one file, two rates. **The rate follows the switch the finger moved, not the boolean
+underneath it** — DAKUTEN ON sets `base = false`, and a click that pitches *down* on the way *on*
+reads as broken:
+
+| Switch | Where |
+| :-- | :-- |
+| DAKUTEN | `Deck.tsx` — ON at 1.0, OFF at 0.89, whatever `onToggle` is passed |
+| MEANING | `SetScreen.tsx` |
+| JOKER VOICE · SOUND EFFECTS · SILENT MODE | `changeAudio()` in `app/page.tsx`, not the dialog |
+
+The audio switches are in `changeAudio()` rather than in `Settings.tsx` because that function owns
+the ordering, and the ordering is the whole difficulty:
+
+```ts
+if (next.sfx) void preload().then(() => play("ui.toggle", { rate: on ? 1 : TOGGLE_OFF }));
+```
+
+**It waits for the decode.** Turning SOUND EFFECTS on is the one cue in the app that must always be
+heard — it is how the player learns the channel exists — and at that moment the context has just
+been built and nothing is decoded, so a bare `play()` would be silent for precisely the tap that
+must not be. Switching sfx *off* sounds nothing, which is the point of switching it off.
+
+`play()` gained one option for this — `{ rate }`, multiplied into the existing ±3 % jitter rather
+than replacing it, because a derived cue is still a cue and must not be the one sound in the app
+that repeats exactly. `TOGGLE_OFF` is exported from `lib/sfx.ts` so all three switches read one
+number.
+
+### Still to bake
+
+`modal.open` · `modal.close` · `overlay.lift` · `overlay.set`. `modal.leave` needs no file — it is
+`reveal.skip` at −6 dB, and that file exists, so it can be wired the moment the abandon dialog is
+given its pair.
+
+---
+
+## 2e. Where the config departs from the tables, and why
+
+The header of this document says the tables are the design and `sfx-src/sfx.config.json` is what was
+decided by ear, and that the config wins. This is the list of places they disagree, as of
+**2026-09-25**. A divergence here is a decision; a divergence not here is drift.
+
+| Cue | Table | Config | Why |
+| :-- | :-- | :-- | :-- |
+| `hand.tick` | 180 ms | **65** | a tick, not a tap. The cap was never the target, it was the ceiling |
+| `flip.worn` | ≤75 ms | **90** | over §0.2's hard number, and the 21-card reveal was re-tested at it |
+| `flip.base` | ≤95 ms | 90 | inside |
+| `reveal.end` | ≤700 ms | 530 | inside |
+| `reveal.skip` | ≤250 ms | **545** | more than double. One thud, and the thud has a body |
+| `deal.land` | ≤80 ms | 80 | on the number, after a pass at 90 that equalled its own 90 ms gap |
+| `prompt.melt` | ≤700 ms | **240** | a sourced file replaced the synthesis (§2c), and it is shorter |
+| `ui.nav` | ≤50 ms | **150** | the tap has a body a 50 ms cap cut off; −22 rather than −20 pays for it |
+| `ui.primary` | ≤160 ms | **725** | see §2d — accepted because nothing follows it fast enough to collide |
+| `drawer.open` | ≤260 ms | 260 | on the number, at `head: 2000` into a 4 s take |
+
+**Two of these are worth watching rather than just recording:**
+
+1. **`ui.nav` at 150 ms has a 150 ms `gap`.** Cap equals gap, so two fast back-taps meet end to end
+   with no margin. It is a quiet cue and the overlap is one tap deep, so it is filed as accepted —
+   but it is the same defect shape that `deal.land` was pulled back from.
+2. **`flip.worn` at 90 ms against §0.2's ≤75.** §0.2 calls that the hardest number in the document.
+   If a 21-card reveal ever reads as a rattle, this is the first thing to move, and the instruction
+   there still stands: **trim, do not re-generate.**
+
+**`head` values are not divergences** — they are where the transient is, which is a fact about the
+file. But two of them say something about the source: `drawer.open` at `head: 2000` and
+`prompt.melt` at `243` are both picking one moment out of a multi-second take, which is why the lab
+now scrubs the whole file (§3).
+
 ---
 
 ## 3. Post-processing (this is where the sounds actually get made)
@@ -380,8 +615,30 @@ Generation gets you raw material. The trim is the design.
 | | |
 | :-- | :-- |
 | `scripts/sfx-defaults.mjs` | every cue's tier, cap, target peak, gap and loop flag — the tables in §1 and §2b, in code. One module, because the bake and the lab both read it and a second copy would drift silently. |
-| `scripts/sfx-lab.mjs` + `sfx-lab.html` | `npm run sfx:lab` → a local page on 127.0.0.1. Tabs per tier. Per sound: waveform with the kept region lit, the numbers, and **PLAY RAW / PLAY TRIMMED / PLAY BAKED**. Sliders for cap, target peak and head trim. **SAVE** writes `sfx-src/sfx.config.json`; **BAKE** runs the real pass and reloads so you hear the actual `.m4a`. |
+| `scripts/sfx-lab.mjs` + `sfx-lab.html` | `npm run sfx:lab` → a local page on 127.0.0.1. Tabs per tier. Per sound: waveform with the kept region lit, the numbers, and **PLAY RAW / PLAY TRIMMED / PLAY BAKED**. Cap, target peak and head trim by slider, by typed ms, or **by dragging on the waveform itself**. **SAVE** writes `sfx-src/sfx.config.json`; **BAKE** runs the real pass and reloads so you hear the actual `.m4a`. |
 | `scripts/build-sfx.mjs` | `npm run sfx` → the bake. Defaults, overridden per sound by `sfx.config.json`, rendered by ffmpeg. |
+
+### The slice can start anywhere — AMENDED 2026-09-25
+
+The lab was built for a half-second ElevenLabs generation, and it quietly assumed one: **cap topped
+out at 900 ms and head trim at half the file's duration.** A sourced take is not that shape. A
+four-second recording of four switch clicks could only ever bake as the first click, and the back
+half of any source over ~2 s was unreachable — `drawer.open` at `head: 2000` and `ui.primary` at
+`ms: 900` are both sitting on a ceiling rather than on anything anyone heard.
+
+Both knobs now run the whole file, and three things make the far end usable rather than merely
+reachable:
+
+- **Drag on the waveform.** Anywhere sets the head; within 8 px of the right edge drags the cap. A
+  slider can place an edge, it cannot place it *on* something.
+- **Onsets.** Every rise above the −50 dB floor after 30 ms of silence is marked green, and
+  **◀ HIT / HIT ▶** walks them. `silenceremove` in the bake only ever finds the *first*, so this is
+  how a multi-take recording tells you the `head` values for the other three.
+- **Scrub.** Double-click the waveform, or **SCRUB FROM HEAD**, plays the raw take from that point
+  with a playhead running. **ZOOM TO SLICE** then rescales the window for the trim itself.
+
+The division of labour is untouched: the page still writes only `sfx.config.json`, and ffmpeg still
+renders. Zoom and playhead are view state and are never written.
 
 **The browser decides, ffmpeg renders.** The page never writes audio — float samples in a tab
 cannot tell you what AAC did to the peak, and that is exactly the thing that matters (below). So
@@ -489,31 +746,6 @@ So, split by nature:
 
 The pure scheduler they wrote for testability turns out to be the correct audio driver. That is the
 whole recommendation.
-
-### Two ways a scheduled cue lands late — both found on S6b's deal, 2026-09-21
-
-The deal sounded a beat behind the picture: the first back was down and the first `deal.land` had
-not arrived. Two causes, both of them general.
-
-**1. An animation's duration is not when the thing it draws arrives.** A WAAPI `easing` on the
-effect warps the *whole iteration*, not one keyframe segment — this is where it parts company with
-CSS — and S6b's flight ease, `cubic-bezier(.2,.9,.25,1.12)`, is violently front-loaded: progress
-first reaches 1 at **0.468** of the duration, and the remaining 53 % is the overshoot going past
-the slot and settling. The card is down at **197 ms** of a 420 ms flight. Cueing on the duration
-put every land **223 ms** late. So the screen exports the moment the card is *down* (`LAND`), not
-the length of the animation, and `dealCues()` takes that. Measured on the running screen, not
-inferred: the first back is within a pixel of its slot at ~192 ms, exactly on it at ~197 ms.
-
-**2. The first cue of a session pays for the context.** Nothing decodes until something sounds, and
-S6b's deal is almost always the session's first one-shot — so it was arming eight decodes inside a
-200 ms window, and reading `currentTime` off a context created in the same breath, whose clock has
-not started (~29 ms of wall time passes before its zero). Both are fixed by warming a screen early:
-`app/page.tsx` preloads on S6 (the deck), which is a tap the player has already made. A cue that
-still falls in the past is dropped, never bunched — one late thud is worse than none.
-
-Related, and the reason `schedule()` now subtracts it: a source started at audio time *T* is heard
-at *T* + the hardware's output latency — 5 ms of buffer on a laptop, a fifth of a second over
-Bluetooth. The whole list shifts together, so the rhythm inside it is untouched.
 
 ---
 

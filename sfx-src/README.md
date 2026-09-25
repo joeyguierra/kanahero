@@ -30,9 +30,20 @@ skipped with a warning. The seven:
 Keep 3 variants of `hand.tick`, `flip.worn` and `flip.base` — those fire up to
 21 times a run and are the fatigue risk.
 
-## If a sound's attack gets clipped
+## If a sound's attack gets clipped, or the take has several in it
 
-The head trim strips leading silence automatically at -50dB, which can eat the
-front of a soft attack (felt and paper especially). Open it in Audacity, read
-where the transient really starts, and add an explicit `head: <ms>` to that
-entry in `SOUNDS`. It is then settled for good.
+The head trim strips leading silence automatically at -50dB. That goes wrong two
+ways, and the lab (`npm run sfx:lab`) answers both — you do not need Audacity:
+
+- **A soft attack** (felt and paper especially) gets its front eaten. Drag the
+  head back on the waveform until the transient is inside the lit region.
+- **A multi-take source** — four switch clicks in one file — bakes as the FIRST
+  one, because that is the only onset `silenceremove` can find. The lab marks
+  every onset in green and `◀ HIT / HIT ▶` jumps between them, so picking the
+  fourth click is a button press.
+
+Either way, SAVE writes the explicit `head: <ms>` into `sfx.config.json` and it
+is settled for good. Note that `head` is per NAME, not per file: round-robin
+variants share one value, so a take you want three variants out of must be split
+into three files first — and if each split starts just before its own hit, the
+automatic strip handles them all and no `head` is needed at all.

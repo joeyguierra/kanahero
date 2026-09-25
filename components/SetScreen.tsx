@@ -14,7 +14,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { setTotals } from "@/lib/joker";
 import { useJokerLine } from "@/lib/joker-lines";
-import { play, schedule } from "@/lib/sfx";
+import { play, schedule, TOGGLE_OFF } from "@/lib/sfx";
 import { dealCues } from "@/lib/sfx-schedule";
 import type { WordSet } from "@/lib/sets";
 import { CardBack } from "./Card";
@@ -259,7 +259,10 @@ export default function SetScreen({
             role="radio"
             aria-checked={meaning}
             className={`toggleOpt${meaning ? " toggleOn" : ""}`}
-            onClick={() => onMeaning(true)}
+            onClick={() => {
+              play("ui.toggle");
+              onMeaning(true);
+            }}
           >
             ON
           </button>
@@ -268,7 +271,10 @@ export default function SetScreen({
             role="radio"
             aria-checked={!meaning}
             className={`toggleOpt toggleStrike${meaning ? "" : " toggleOn"}`}
-            onClick={() => onMeaning(false)}
+            onClick={() => {
+              play("ui.toggle", { rate: TOGGLE_OFF });
+              onMeaning(false);
+            }}
           >
             OFF
           </button>
@@ -307,18 +313,19 @@ export default function SetScreen({
           VIEW COLLECTION →
         </button>
       </div>
-      <button
-        type="button"
-        className="btnStrike actionBar"
-        onClick={() => {
-          // the deck squared and cut, as the run opens — the bookend to
-          // reveal.end. It answers the tap, so it plays on the tap; the screen
-          // it belongs to is already unmounting while it sounds, which is fine:
-          // the node lives on the audio graph, not on this component.
-          play("deal.press");
-          onDeal();
-        }}
-      >
+      {/* DEAL IS DELIBERATELY SILENT (creator call, 2026-09-25). It used to
+          play deal.press — 400 ms of riffle at −12, the second-loudest cue in
+          the app. But onDeal() sets the phase in this same handler, so S7
+          mounts immediately and the whole tail landed on the new screen; it
+          read as a stray reveal.skip at the top of the round, the two cues
+          being near-identical cardstock at the same level.
+
+          The category rule must NOT now hand DEAL ui.primary in its place
+          (sfx-defaults.mjs, tier 3): the objection is to a cue landing on the
+          next screen at all, not to which cue it was, and ui.primary is longer
+          still. Neither screen is left silent — S6b already deals nine lands
+          on mount, and S7 opens on prompt.melt. */}
+      <button type="button" className="btnStrike actionBar" onClick={onDeal}>
         DEAL
       </button>
     </main>

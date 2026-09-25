@@ -11,7 +11,8 @@
 import type { Rarity } from "./progress";
 import { FAST_FLIP_MS, FAST_STEP_MS, SPEAK_AFTER_MS, turnEnd, turnSchedule } from "./reveal";
 
-/** the baked files in public/sfx/ — SPEC-v5d §1's six, and tier 2's deal */
+/** the baked files in public/sfx/ — SPEC-v5d §1's six, and tier 2's land and
+    melt. deal.press is deliberately absent: DEAL is silent (SPEC-v5d §2c). */
 export type SfxName =
   | "hand.tick"
   | "flip.worn"
@@ -19,8 +20,14 @@ export type SfxName =
   | "flip.shiny"
   | "reveal.end"
   | "reveal.skip"
-  | "deal.press"
-  | "deal.land";
+  | "deal.land"
+  | "prompt.melt"
+  // tier 3 · chrome — by category, never by button. These are the only cues
+  // that fire outside a run, so they are the only ones a cold context meets.
+  | "ui.nav"
+  | "drawer.open"
+  | "ui.primary"
+  | "ui.toggle";
 
 /** one sound, this many ms from the moment the schedule is handed over */
 export interface Cue {
@@ -59,8 +66,9 @@ export function revealCues(order: { card: { rarity: Rarity } }[]): Cue[] {
  * apart is tighter than anything in S8, and setTimeout's jitter under the
  * mount of a nine-card grid is audible where it is invisible.
  *
- * deal.press is NOT here. It answers the tap that ends this screen, so it
- * plays on the tap (`play`), not against a clock.
+ * These lands are the whole of S6b's sound. deal.press used to answer the tap
+ * that ends the screen; it was dropped 2026-09-25 because the round mounts in
+ * the same handler and the cue played over it (SPEC-v5d §2c).
  *
  * Reduced motion seats the nine behind one 120 ms fade, so it is one land as
  * that fade finishes — nine at once would be a click, not a deal (§4).

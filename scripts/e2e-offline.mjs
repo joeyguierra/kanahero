@@ -66,10 +66,17 @@ await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
 const cached = await page.evaluate(async (name) => (await (await caches.open(name)).keys()).length, cacheName);
 assert.ok(cached > 500, `the whole export is precached, got ${cached} entries`);
 console.log(`1. service worker installed and controlling: ${cached} URLs in ${cacheName}`);
-// the six one-shots (SPEC-v5d §6) are static files under public/, so the
-// walk in gen-sw.mjs carries them like everything else — checked by name
-// because a count cannot tell a missing sound from a missing stroke
-const sfx = ["hand.tick", "flip.worn", "flip.base", "flip.shiny", "reveal.end", "reveal.skip"];
+// Every one-shot the app can ask for is a static file under public/, so the walk
+// in gen-sw.mjs carries them like everything else — checked BY NAME because a
+// count cannot tell a missing sound from a missing stroke, and because a cue
+// wired into lib/sfx.ts with no file behind it is silent rather than broken.
+// This list must match FILES in lib/sfx.ts. deal.press is deliberately not in
+// it: the file is still baked, but nothing plays it (SPEC-v5d §2c).
+const sfx = [
+  "hand.tick", "flip.worn", "flip.base", "flip.shiny", "reveal.end", "reveal.skip",
+  "deal.land", "prompt.melt",
+  "ui.nav", "drawer.open", "ui.primary", "ui.toggle",
+];
 const sfxCached = await page.evaluate(
   async ([name, names]) => {
     const cache = await caches.open(name);
@@ -78,8 +85,8 @@ const sfxCached = await page.evaluate(
   },
   [cacheName, sfx],
 );
-assert.deepEqual(sfxCached, sfx, "all six sfx files are in the precache");
-console.log(`   and the six sfx files with it`);
+assert.deepEqual(sfxCached, sfx, `all ${sfx.length} sfx files are in the precache`);
+console.log(`   and all ${sfx.length} sfx files with it`);
 
 // --- 2. offline cold reload ---
 await context.setOffline(true);

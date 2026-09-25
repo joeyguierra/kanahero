@@ -1,8 +1,8 @@
 {
-  "deal.land": {
-    "ms": 90,
-    "peak": -18,
-    "head": 190
+  "drawer.open": {
+    "ms": 260,
+    "peak": -16,
+    "head": 2000
   },
   "flip.base": {
     "ms": 90,
@@ -14,8 +14,13 @@
     "peak": -18
   },
   "hand.tick": {
-    "ms": 100,
+    "ms": 65,
     "peak": -12
+  },
+  "prompt.melt": {
+    "ms": 240,
+    "peak": -24,
+    "head": 243
   },
   "reveal.end": {
     "ms": 530,
@@ -23,7 +28,16 @@
   },
   "reveal.skip": {
     "ms": 545,
-    "peak": -12,
-    "head": 17
+    "peak": -12
+  },
+  "ui.nav": {
+    "ms": 150,
+    "peak": -22,
+    "head": 611
+  },
+  "ui.primary": {
+    "ms": 725,
+    "peak": -14,
+    "head": 1106
   }
 }

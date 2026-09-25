@@ -13,6 +13,7 @@
 import type { Script } from "@/lib/kana";
 import { useJokerLine, type JokerScreen } from "@/lib/joker-lines";
 import type { WordSet } from "@/lib/sets";
+import { play, TOGGLE_OFF } from "@/lib/sfx";
 import Joker from "./Joker";
 
 const DECK_NAME: Record<Script | "kanji", string> = {
@@ -88,6 +89,10 @@ export default function Deck({
                   className={`toggleOpt${characters.base ? "" : " toggleOn"}`}
                   onClick={(e) => {
                     e.stopPropagation();
+                    // the RATE follows the switch the finger moved, not the
+                    // boolean underneath it: DAKUTEN ON is base=false, and a
+                    // click that pitches DOWN on the way ON reads as wrong
+                    play("ui.toggle");
                     characters.onToggle(false);
                   }}
                 >
@@ -99,6 +104,7 @@ export default function Deck({
                   className={`toggleOpt${characters.base ? " toggleOn" : ""}`}
                   onClick={(e) => {
                     e.stopPropagation();
+                    play("ui.toggle", { rate: TOGGLE_OFF });
                     characters.onToggle(true);
                   }}
                 >

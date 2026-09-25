@@ -127,9 +127,15 @@ export default function Round({
     `${presented}.${phase}`,
   );
 
+  // M5: the card being made. One melt, one sound, every presentation — the
+  // miss that brings a word back round is a new presentation and gets its own.
+  // It is the quietest thing in the app (−24, SPEC-v5d §2c) because it fires
+  // 9–21 times a run: felt, not heard. Reduced motion arrives the card instead
+  // of melting it, and still arrives it audibly.
   useEffect(() => {
     const card = promptRef.current;
     if (!card) return;
+    play("prompt.melt");
     return meltIn(card, jokerRef.current);
   }, [presented]);
 

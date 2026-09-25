@@ -29,9 +29,18 @@ const FILES: Record<SfxName, string[]> = {
   "flip.shiny": ["/sfx/flip.shiny.m4a"],
   "reveal.end": ["/sfx/reveal.end.m4a"],
   "reveal.skip": ["/sfx/reveal.skip.m4a"],
-  "deal.press": ["/sfx/deal.press.m4a"],
   "deal.land": ["/sfx/deal.land.m4a"],
+  "prompt.melt": ["/sfx/prompt.melt.m4a"],
+  "ui.nav": ["/sfx/ui.nav.m4a"],
+  "drawer.open": ["/sfx/drawer.open.m4a"],
+  "ui.primary": ["/sfx/ui.primary.m4a"],
+  "ui.toggle": ["/sfx/ui.toggle.m4a"],
 };
+
+/** ui.toggle is one file at two rates: ON at 1.0, OFF at this. Down is off —
+    the only pitch symbolism in the app, and it does the work of a second
+    generation. Exported so every switch in the app reads the same number. */
+export const TOGGLE_OFF = 0.89;
 
 /** ± this much playbackRate on every play, so nothing repeats exactly */
 const JITTER = 0.03;
@@ -97,14 +106,20 @@ function source(url: string): { ctx: AudioContext; node: AudioBufferSourceNode }
  * One sound, now. For the cues that answer a tap — hand.tick, reveal.skip —
  * which fire when the tap fires. Returns a stop, for the rare caller that
  * needs to cut it.
+ *
+ * `rate` multiplies into the ±3 % jitter rather than replacing it, because a
+ * derived cue is still a cue and must not be the one sound in the app that
+ * repeats exactly. It exists for ui.toggle, which is one file played up for ON
+ * and down for OFF (TOGGLE_OFF).
  */
-export function play(name: SfxName): () => void {
+export function play(name: SfxName, opts?: { rate?: number }): () => void {
   const s = source(next(name));
   if (!s) {
     // first play after switching on: decode now, and this one is missed
     void preload();
     return () => {};
   }
+  if (opts?.rate) s.node.playbackRate.value *= opts.rate;
   s.node.start();
   return () => s.node.stop();
 }

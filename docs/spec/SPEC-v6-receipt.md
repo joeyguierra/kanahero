@@ -1,6 +1,7 @@
 # kanahero — build spec v6 · the receipt
 
-**Status: READY TO BUILD, after v5d (2026-09-18).** `SPEC-v5d-sound.md` ships first; this file is
+**Status: READY TO BUILD, after v5d (2026-09-18; §5 rewritten 2026-09-25 — the receipt lives
+in the card overlay, S6e dropped).** `SPEC-v5d-sound.md` ships first; this file is
 built against the tree v5d leaves. If v5d slips, this builds against `72f3232` unchanged — the two
 share `Round.tsx` and `Result.tsx` but not a line: v5d touches the `// sfx:` sites, this touches
 `gotIt` and the S8 overlay. Whichever lands second rebases.
@@ -19,7 +20,7 @@ channel the reward moment shipped without. All of it moved things the user alrea
 This adds a noun the app does not have. Today a copy is a count — v5a §2 collapsed cards to
 `{shiny, base, worn}` on purpose, and nothing in the app can point at *one* copy. A receipt is a
 record of one copy: the ink that earned it, the tries, the moment. That is a new store, a new
-screen, and the first data the app keeps that is not a number or a photo. It is the seam the
+gesture on the card, and the first data the app keeps that is not a number or a photo. It is the seam the
 online tier will one day sync across (§8), which is exactly the kind of thing a version boundary
 should sit on. So: v6, and its own store, so a later version can move it without touching the
 counts.
@@ -31,10 +32,10 @@ counts.
 2. A receipts store in IndexedDB, separate from the bank and from `kanahero:v1` (§3).
 3. `WritingCanvas` gives up its ink; the drawing code becomes a pure module so a receipt renders
    exactly as the canvas drew it (§4).
-4. S6e Receipt — a new screen off the collection: the face, the ink, the model over it (§5).
-5. S8's tap-to-view shows the ink under the face, from run state (§5).
-6. The export ZIP carries receipts (§6).
-7. One Joker screen key (§7).
+4. The card view: one overlay for S8 and S6d — hold the card for the ink, swipe through a
+   stock's copies, the date on the chip (§5).
+5. The export ZIP carries receipts (§6).
+6. One Joker screen key (§7).
 
 **Not in this build:** import/restore (the ZIP still has no reader), deleting a receipt, pruning
 or a storage budget, receipts for the character drill (`Session.tsx` earns characters, not
@@ -57,8 +58,8 @@ or graded.
    copy whose receipt failed to write. A receipt with no copy behind it is ignored by every
    screen and never deleted.
 5. **The receipt write failing costs nothing the user can see on S8.** The reveal is not the
-   place. The copy shows `NO RECEIPT` on S6e, which is the same thing a pre-v6 copy shows, and is
-   true of both.
+   place. The copy is a legacy card in S6d's stack (§5.3), which is the same card a pre-v6 copy
+   is, and is true of both.
 6. **The receipt renders the way the canvas did.** Same ink colour, same speed-varied width, same
    round caps. If the panel and the canvas ever disagree, the panel is wrong.
 
@@ -105,7 +106,7 @@ interface Receipt {
 - **`keepRun(receipts: Receipt[]): Promise<boolean>`** — the only write. One transaction, all or
   nothing; resolves `false` on failure and never throws. Called from `Round.tsx` immediately after
   `earnRun`, and nowhere else.
-- `receiptsFor(setId, wordId, rarity): Receipt[]` — newest first — for S6e.
+- `receiptsFor(setId, wordId, rarity): Receipt[]` — newest first — for S6d's stack.
 - `receiptCount(setId): number` — for the Joker (§7).
 - `allReceipts(): Promise<Receipt[]>` — for the export, in `earnedAt` order.
 
@@ -127,45 +128,92 @@ interface Receipt {
 
 ## 5. Screens
 
-**S6d Collection** — one change: tapping a shelf card opens **S6e** instead of the overlay. Remove
-the `cardOverlay` from `Collection.tsx`. Rows, slots, counts, empty state: unchanged.
+**Where an earned face is viewed.** Two places, and only two: S8's tap-to-view and S6d's
+tap-to-view. Both are the same `cardOverlay` with a `size="earn"` card in it. This build makes
+that overlay one component, `CardView`, and everything below is its behaviour. The small faces
+(S8's hand, S6d's shelf) are tap targets and do not change. There is no separate receipt screen.
 
-**S6e Receipt — NEW.** A full screen, like the bank's S5b: the receipt is the subject and gets the
-room. No Joker on it.
-- Header: back `← COLLECTION` → S6d; right slot `RECEIPT n / m` in `detailPosition` style, where
-  `m` is the receipts this stock of this word has. `m` is not the copy count — the chip below
-  carries that.
-- **The face**, `size="earn"`, centred. With a receipt on screen: `card={{ rarity, tries }}` from
-  the receipt, so the chip reads `SHINY · 1st TRY` / `BASE · 2nd TRY` / `WORN · n TRIES` — the
-  face `Card.tsx` already draws when it knows the tries. With no receipt (`m = 0`): the current
-  shelf face, `copies` chip and all.
-- **The ink panel**, below the face, full column width, `aspect-ratio: box.w / box.h` (capped so
-  the face and the panel both fit a 390×844 screen without scrolling; letterbox inside the cap,
-  never crop). Bone paper, the canvas's own dashed guides, tag `RECEIPT` top-left in the
-  `canvasTag` style. Inside it, in this order:
-  1. the receipt's ink, drawn at rest through `drawInk` with `scale = panelWidth / box.w`;
-  2. the model word over it, exactly S7b: `WordReveal` with a new `animate={false}` prop that
-     mounts every character finished (the reduced-motion path it already has, made a prop).
-     Cells are `panelWidth / N`, so it lays over the ink where it lay on the day.
-  A foot line under the panel: `EARNED 2026-09-18 21:47` in local time (the bank's `timestamp`
-  format), then ` · ×k COPIES` where `k` is the copy count of that stock.
-- **Replay.** A tap on the panel redraws the ink in its own time from `t` — the model stays put
-  underneath. A second tap during replay snaps it finished. `prefers-reduced-motion`: no replay;
-  the tap does nothing. This is the one thing points can do that a PNG cannot, and it is the whole
-  reason §3 stores points.
-- **Pager.** `‹` `›` in the header slot step through receipts, newest first. Wrap at the ends.
-  Hidden when `m ≤ 1`.
-- **No receipt** (`m = 0`): the panel is the empty bone paper with `NO RECEIPT` set in it, in the
-  `shelfSlotStock` style; no replay, no pager, the foot line reads `×k COPIES` only. True for every
-  copy earned before this build and for a copy whose write failed; the screen does not
-  distinguish them because it cannot.
-- Ink on S6e is `pointer-events: none` except the replay tap; the viewport lock is unchanged (only
-  S5b unlocks it).
+### 5.1 The overlay
+- **Tap outside closes; a tap on the card does nothing.** Close fires only when the event target
+  is the backdrop itself. Today any tap closes; that ends.
+- The card is a button (it already is when given `onClick`). Under it, a legend in the `legend`
+  style: `HOLD · YOUR INK`. Shown always in this build; drop it once someone has been watched
+  finding the hold unaided. Under reduced motion it is the only signal (§5.4), so it never goes
+  there.
+- Under the legend, the pager (§5.3), when there is more than one card.
 
-**S8 Result** — the tap-to-view overlay gains the ink panel from §5 under the face, static, drawn
-from `open.ink` in run state — no storage read, and it works even if `keepRun` failed. No replay
-(a tap anywhere closes the overlay, as today), no foot line, no pager. Cards with no ink (none in
-practice — every `GOT IT` needs ink to have flipped) show the face alone.
+### 5.2 The hold
+- `pointerdown` on the card starts a 150 ms timer. `pointerup`, `pointercancel` or leaving before
+  it fires: nothing — a tap on the card is inert. When it fires, the card takes pointer capture
+  and turns into its receipt in place; release restores the face at once. No toggle state to get
+  stuck in.
+- **The held face.** The chip stays. The mid and the foot's meaning go; the body under the chip
+  becomes bone paper carrying the ink through `drawInk` at
+  `scale = min(innerWidth / box.w, bodyHeight / box.h)`, letterboxed, never cropped, with the
+  model word over it through `WordReveal animate={false}` laid out inside the **drawn box**
+  (`box.w × scale` wide), cells at `box.w × scale / N` — not the card's inner width, or a
+  receipt letterboxed by height would put the model where the ink is not. The canvas's own
+  dashed centre guides come with it, at the same place in the box: the ink was written against
+  them. S7b's layout at half scale (the card's inner width is 182 px against a canvas of roughly
+  358; the canvas height is viewport-derived, so the scale is not a constant). **Not S7b's opacities:** the flip
+  fades the ink to 0.3 under a full model because the model is the thing to compare against; here
+  the ink is the subject, so the ink is full and the model sits over it faint (~0.55, tune by
+  eye). §2.6 is about the line — colour, width, caps — not the layer. The foot's kind line reads
+  `ATTEMPT n` from the receipt's tries: the round's own words for it. The face says when (§5.3),
+  the ink says how.
+- **The hold plays the ink.** The strokes draw in their recorded time from `t`, sped up so the
+  whole attempt fits 2 s at most; held past the end, it rests finished. Reduced motion: finished
+  at once. This is the one thing points can do that a PNG cannot, and it is the whole reason §3
+  stores points.
+- Suppress the phone's own long press while the overlay is up: `-webkit-touch-callout: none`,
+  `user-select: none`, `contextmenu` prevented on the card. `touch-action: pan-x` — not `none` —
+  so the swipe in §5.3 stays native: a finger that moves gets the browser's pan and the browser's
+  `pointercancel` kills the hold timer; a finger that stays still gets the hold.
+- Keyboard and switch users cannot hold: Enter / Space on the card toggles the receipt, and the
+  toggle is what e2e drives.
+- A card with no receipt has no hold: nothing on `pointerdown`, and the legend's text goes but
+  its row stays, blank, so the pager under it does not jump when the track lands on that card.
+
+### 5.3 The stack — S6d only
+A shelf slot opens every copy of that stock, one card each, newest first.
+- The cards sit on a horizontal scroll-snap track, one card per snap, centred, the native swipe
+  with momentum and snapping for free. **The neighbours peek** — about 52 px of the next and
+  previous card at each edge, 36 px gap — and that peek is the swipe affordance, so the arrows
+  can stay quiet. `‹ 1 / 3 ›` under the legend in the `detailPosition` style; the arrows step
+  (44 px targets, dimmed at the ends), the number is not tappable. Hidden when there is one card,
+  and a lone card sits centred with nothing peeking.
+- One card per receipt, newest first — you open the shelf after a run to see the card you just
+  earned, so `1` is the newest, the bank's own rule. Then, if the stock's copy count exceeds its
+  receipt count, **one legacy card** last: the current shelf face with `SHINY · ×k`, where `k` is
+  the copies with no receipt, no hold, no date. A stock with no receipts is that one card alone,
+  and no pager — which is every stock in the app the day this ships, and the copy whose write
+  failed (§2.5), which the screen cannot tell apart and does not try to.
+- Swiping is scoped to the stock tapped. Three slots stay three overlays.
+- **The chip on a receipted card reads `<STOCK> · <date>`** — `SHINY · 9-18-26`: month, day,
+  two-digit year, local time, no leading zero on the month or the day (the day is assumed from
+  the month rule; say so in the report if that is wrong). The copy count leaves the chip: with one
+  card per copy there is nothing for `×4` to count. This is the second date format in the app
+  (the bank stamps `2026-09-14 21:47`); it is a decision, not an accident. Two runs on one day
+  make two cards with one date, told apart by their ink and tries.
+- `Card.tsx`: the `copies` chip stays for the legacy card. Generalise it to one chip-suffix prop
+  that the date and the `×k` both go through — one prop, not two.
+
+### 5.4 The opening — the ink first
+On open, the first card mounts as its held face with the ink already finished, holds ~500 ms,
+then crossfades to the printed face over ~300 ms: the ink drying into print. It says "this card
+came from your hand" without a word, and it is how the hold is taught. Once per open, on the first
+card only — a card swiped into view shows its printed face; by the third copy the flash would be
+old. The legend is visible through it. Reduced motion: no flash, the printed face at once. A card
+with no receipt opens printed.
+
+### 5.5 S8
+The same `CardView`, one card, from `open.ink` in run state — no storage read, and it works even
+if `keepRun` failed. Chip unchanged (`SHINY · 1st TRY`; the tries are already on it), no date, no
+pager. The hold and the opening flash as in §5.2 and §5.4. The overlay opens only after the reveal
+is done, as today, so the flash never runs over the turn.
+
+**S6d Collection** — the overlay is `CardView` with the stack. Rows, slots, counts, empty state:
+unchanged.
 
 **S7 / S7b** — nothing. No copy, no tag, no line mentions the receipt during a run (§2.3).
 
@@ -195,7 +243,7 @@ information first, under twelve words). Interim, until the corpus owner replaces
 | :-- | :-- |
 | `collection.unreceipted` | These predate receipts. Your next run keeps its ink. |
 
-No `{receipts}` token, no line on S6e, no line on S8 about the ink.
+No `{receipts}` token, no line in the card overlay, no line on S8 about the ink.
 
 ## 8. The seam this leaves for later
 
@@ -212,23 +260,30 @@ handwriting in it leaves the phone only in the user's own export.
 - `e2e-loop.mjs` (reduced motion, as v5a §9.6 left it), new steps:
   1. finish a kana run with one word missed once → `kanahero-receipts` holds `n` records, one per
      word, `tries` 2 on the missed word, every `strokes` non-empty, one shared `earnedAt`.
-  2. S6d → tap the base-stock card of the missed word → S6e reads `RECEIPT 1 / 1`, the chip reads
-     `BASE · 2nd TRY`, the panel has `N` reveal cells and a drawn canvas.
-  3. replay the set → that word's S6e reads `RECEIPT 1 / 2`; `›` shows `2 / 2`; `‹` wraps back.
+  2. S6d → tap the base-stock card of the missed word → one card, no pager, chip
+     `BASE · <today m-d-yy>`, legend present; Enter on the card → the foot reads `ATTEMPT 2`, the
+     body has `N` reveal cells and a drawn canvas; Enter again → the printed face.
+  3. replay the set → that stock shows `1 / 2`; `›` → `2 / 2`; a tap on the backdrop closes, a
+     tap on the card does not.
   4. start a run, earn one card, `✕` → `LEAVE RUN` → receipt count unchanged. Same for a reload.
   5. a v3 blob with copies and an empty receipts DB → S6d's line id is `collection.unreceipted.*`;
-     S6e for any card reads `NO RECEIPT`, no pager.
-  6. S8 after a run: tap a card → the overlay holds a face and a panel with ink.
+     any slot opens one legacy card with `×k` on the chip, no legend, no pager, and Enter does
+     nothing.
+  6. S8 after a run: tap a card → the overlay holds the face with its tries chip; Enter → ink.
   7. export → the ZIP has `receipts.json` with `n` entries and a manifest at version 2; with no
      captures and receipts present, export is not `"empty"`.
 - `e2e-offline.mjs`: steps 1, 2 and 6 with no network.
 - `e2e-bank.mjs`: unchanged and passing — that is the check that lifting `idb.ts` broke nothing.
-- Report: commits, and 390px screenshots of S6e with a receipt, S6e with `NO RECEIPT`, S6e
-  mid-replay, and the S8 overlay with ink.
+- One run **with motion on**: open a card on S8 and assert the ink face is on screen inside the
+  first 400 ms and the printed face after 1 s (the opening flash, §5.4).
+- Report: commits, and 390px screenshots of the S6d overlay printed, held mid-play, with the pager
+  at `2 / 3`, the legacy card, and the S8 overlay held.
 
 ## 10. Build order
 
 1 `lib/ink.ts` + `snapshot()` (§4) → 2 `lib/idb.ts` lifted, `e2e-bank` green → 3
-`lib/receipts.ts` + `keepRun` from the round (§3, §4) → 4 S8 overlay panel (§5) → 5 S6e + the
-S6d tap (§5) → 6 replay → 7 export (§6) → 8 Joker key + pool (§7) → 9 e2e + report. Commit per
-step; step 4 before step 5 so the panel component is proven on run state before it reads storage.
+`lib/receipts.ts` + `keepRun` from the round (§3, §4) → 4 `CardView` on S8: backdrop close, the
+hold, the held face, the opening flash (§5.1, 5.2, 5.4, 5.5) → 5 the stack on S6d: swipe, pager,
+date chip, legacy card (§5.3) → 6 the played hold (§5.2) → 7 export (§6) → 8 Joker key + pool
+(§7) → 9 e2e + report. Commit per step; step 4 before step 5 so the held face is proven on run
+state before it reads storage.

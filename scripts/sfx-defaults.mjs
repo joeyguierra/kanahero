@@ -13,7 +13,7 @@
 //   tier 0 the reveal and the tick (SPEC-v5d §1)
 //        1 the loop — fires every word, 9-21x a run. What the app sounds like.
 //        2 deals and arrivals — the beats between screens (SPEC-v5d §2c)
-//        3 chrome — not yet specced here.
+//        3 chrome — by category, never by button (SPEC-v5d §2d)
 //   ms   hard cap on length. The reveal's flips fire as little as 114ms apart
 //        at 21 cards (min(160, 2400/n) in lib/reveal.ts), so anything whose
 //        tail is still loud at that point smears into the next one.
@@ -70,9 +70,12 @@ export const DEFAULTS = {
   "ink.clear": { tier: 1, ms: 300, peak: -18, gap: null },
 
   // ---- tier 2 · deals and arrivals ----------------------------------------
-  // A deck squared and cut, as the run opens. The bookend to reveal.end: the
-  // same deck heard opening and closing, which is why the two must be audibly
-  // related and must not be the same recording.
+  // ⛔ UNWIRED 2026-09-25 — nothing in the app plays this any more. It answered
+  // the DEAL tap, but S7 mounts in the same handler and 400 ms of riffle played
+  // over the new screen (SPEC-v5d §2c). Kept here, and the source kept in
+  // sfx-src/, so the bake stays reproducible and the board can still audition
+  // it — the cue is good, the call site was wrong. The cost of the drop is the
+  // bookend with reveal.end; that argument is now one-sided.
   "deal.press": { tier: 2, ms: 400, peak: -12, gap: null },
   // M5, the card being MADE — synthetic, not foley (rewritten 2026-09-20): the
   // card is an image arriving, not an object being placed. Fires 9-21x a run,
@@ -94,6 +97,46 @@ export const DEFAULTS = {
   // has been heard without it; from t=420 throws and lands interleave 90ms
   // apart and it is probably one sound too many. Its prompt is written and
   // waiting; add the entry only if the deal feels weightless.
+
+  // ---- tier 3 · chrome ----------------------------------------------------
+  // BY CATEGORY, NEVER BY BUTTON. A cue belongs to a KIND of action, so a new
+  // button inherits the right sound by being the right kind of thing. Full call
+  // sites in SPEC-v5d §2d — read that before wiring, the boundaries matter.
+  //
+  // Moving between screens, and nothing else. NOT choosing a deck or a set:
+  // that is drawer.open below (scope corrected 2026-09-21). One dry cardstock
+  // tap. It is also the screen transition — there is no separate transition cue.
+  "ui.nav": { tier: 3, ms: 50, peak: -20, gap: 150 },
+  // A deck or a set is chosen. The decks live in the table's drawer, which is
+  // the detail that makes wood belong in a card-table palette at all. Capped at
+  // the OPENING — a real drawer runs 400-800ms with a swing, and browsing three
+  // decks must not be three slow doors. Louder than ui.nav on purpose: choosing
+  // is a bigger act than navigating, and the ladder should say so.
+  "drawer.open": { tier: 3, ms: 260, peak: -16, gap: 250 },
+  // The confirm: START SESSION and any bone/strike CTA without a cue of its own.
+  // FLIP is excluded — it has ink.reveal, because what it confirms is a specific
+  // object. DEAL is excluded too, but for a different reason and it matters: it
+  // is deliberately SILENT (2026-09-25), because the round mounts in the same
+  // handler and anything fired there is heard on the next screen. Do not read
+  // "no cue of its own" as an invitation to put this one on it.
+  // A brass latch that CLUNKS. Never rings: metal that resonates is flip.shiny's
+  // alone, and this cue must not steal from it.
+  "ui.primary": { tier: 3, ms: 160, peak: -14, gap: null },
+  // DAKUTEN on/off, and the audio switches. One file, two rates: ON at 1.0,
+  // OFF at 0.89. Turning SOUND EFFECTS on is the one cue that must always play —
+  // it is how the player learns the channel exists. Fire it inside the same
+  // gesture that unlocks the AudioContext.
+  "ui.toggle": { tier: 3, ms: 60, peak: -16, gap: null },
+  // M8, the abandon dialog. Open is felt-muffled as the blur comes in; close is
+  // lighter and shorter — the cancel. LEAVE RUN reuses reveal.skip at -18: cards
+  // gathered up all at once is exactly what happens to the hand.
+  "modal.open": { tier: 3, ms: 160, peak: -16, gap: null },
+  "modal.close": { tier: 3, ms: 100, peak: -18, gap: null },
+  // OVL-1: tap a card on S8 after the reveal, then tap to close. Two separate
+  // generations — do NOT reverse the lift for the set, reversed foley reads as
+  // reversed.
+  "overlay.lift": { tier: 3, ms: 120, peak: -18, gap: null },
+  "overlay.set": { tier: 3, ms: 120, peak: -18, gap: null },
 };
 
 /** what an unrecognised file gets, so anything can still be auditioned */
@@ -104,4 +147,5 @@ export const TIERS = [
   { id: 0, name: "Reveal + tick", note: "SPEC-v5d §1 — the run ends here" },
   { id: 1, name: "The loop", note: "every word, 9–21× a run — what the app sounds like" },
   { id: 2, name: "Deals + arrivals", note: "once per run — the beats between screens" },
+  { id: 3, name: "Chrome", note: "by category, never by button — nav, select, confirm, modal" },
 ];

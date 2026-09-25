@@ -309,8 +309,12 @@ export function DealRig({ board }: { board: Board }) {
     if (throws && !reduced) {
       for (let i = 0; i < HAND; i++) cues.push({ name: "deal.throw", ms: i * DEAL_INTERVAL });
     }
+    // deal.press is NOT here either, and for the opposite reason to throw: it
+    // was wired and then dropped (2026-09-25), because SetScreen mounts S7 in
+    // the same handler and the riffle played over the round. This rig mirrors
+    // the screen, so the screen's silence is the rig's silence — its own row in
+    // the table above is where you audition the file.
     board.fireSeq([
-      { name: "deal.press", ms: 0 },
       ...cues,
       ...lands.map((cue) => ({ name: cue.name as string, ms: cue.at })),
     ]);
@@ -320,7 +324,7 @@ export function DealRig({ board }: { board: Board }) {
     <Rig
       id="rig-deal"
       title="THE DEAL"
-      blurb={`S6b, wired: DEAL fires deal.press on the tap, and the nine backs each land as they seat — ${DEAL_INTERVAL} ms apart, ${LAND} ms after each release (SetScreen's LAND: where the flight's easing actually puts the card down, not the ${FLIGHT} ms its animation runs for), off SetScreen's own constants through the same dealCues() the screen schedules. Turn THROWS on to hear why the inventory holds it back: from t=${LAND} the throws and the lands interleave. PRESENT is M5 on its own, still unbaked.`}
+      blurb={`S6b, wired: the nine backs each land as they seat — ${DEAL_INTERVAL} ms apart, ${LAND} ms after each release (SetScreen's LAND: where the flight's easing actually puts the card down, not the ${FLIGHT} ms its animation runs for), off SetScreen's own constants through the same dealCues() the screen schedules. The tap itself is silent: deal.press was dropped from DEAL on 2026-09-25 because the round mounts in the same handler and the riffle was heard over it. Turn THROWS on to hear why the inventory holds it back: from t=${LAND} the throws and the lands interleave. PRESENT is M5 on its own.`}
     >
       <div className="rigRow">
         <button type="button" className="btnStrike rigBtn" onClick={deal}>
@@ -444,7 +448,7 @@ export function ChromeRig({ board }: { board: Board }) {
     <Rig
       id="rig-chrome"
       title="THE CHROME"
-      blurb="By category, never by button. Every control here is the real thing off S1 and M8: a back link and a deck row are both ui.nav, a row going live is the same file 12 % up, and the sound switch is the one cue in the app that must sound even when sound is off."
+      blurb="By category, never by button. Every control here is the real thing off S1: the back link is ui.nav — which is also the screen transition, so in the app it hangs off go() in the state machine rather than off any button — a deck row going live is drawer.open, the CTA is ui.primary, and the sound switch is the one cue in the app that must sound even when sound was off a moment ago. Re-tapping the live row is silent, exactly as S1 is: choosing the deck you already chose is not a choice."
     >
       <div className="rigChrome">
         <button type="button" className="backLink" onClick={() => board.fire("ui.nav")}>
@@ -459,7 +463,9 @@ export function ChromeRig({ board }: { board: Board }) {
               className={`rigDeck${deck === i ? " rigDeckOn" : ""}`}
               onClick={() => {
                 setDeck(i);
-                board.fire(deck === i ? "ui.nav" : "ui.select");
+                // the app guards this the same way: choose() only sounds when
+                // the row actually changes (app/page.tsx)
+                if (deck !== i) board.fire("drawer.open");
               }}
             >
               {label}

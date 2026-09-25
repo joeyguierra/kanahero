@@ -22,7 +22,7 @@ import { getBank, getServerBank, subscribeBank } from "@/lib/bank";
 import { shuffle } from "@/lib/session";
 import { audio, canSound, setAudioPrefs } from "@/lib/audio";
 import { voice } from "@/lib/joker-voice";
-import { play, preload } from "@/lib/sfx";
+import { play, preload, TOGGLE_OFF } from "@/lib/sfx";
 import { allTotals, deal, newSeed, runsFinished } from "@/lib/joker";
 import { useJokerLine, type JokerScreen } from "@/lib/joker-lines";
 import { loadPlatformSets, type SetWord, type WordSet } from "@/lib/sets";
@@ -135,9 +135,16 @@ export default function App() {
     updateProgress({ audio: next });
     setAudioPrefs(next);
     if (!audio()) return;
-    void preload();
+    // which way did the switch the user moved go? SILENT MODE moves both keys
+    // and moves them together, so any key in the patch answers it.
+    const on = Object.values(patch).some(Boolean);
+    // The click that says the switch moved. Turning SOUND EFFECTS on is the one
+    // cue in the app that must always be heard — it is how the player learns
+    // the channel exists — and on a cold context nothing is decoded yet, so it
+    // waits for the buffers rather than being the one tap that makes no sound.
+    // Switching sfx OFF is silent, which is the point of switching it off.
+    if (next.sfx) void preload().then(() => play("ui.toggle", { rate: on ? 1 : TOGGLE_OFF }));
     if (next.voice && !was.voice && canSound("voice")) voice().say("・");
-    else if (next.sfx && !was.sfx && canSound("sfx")) play("hand.tick");
   }
 
   // S1's line. The hook sits above every phase's early return, so the screen
@@ -181,6 +188,23 @@ export default function App() {
   const deckGlyph = DECKS.find((d) => d.id === deckId)!.glyph;
   const deckLabel = DECKS.find((d) => d.id === deckId)!.label;
 
+  /**
+   * Every plain move between screens (SPEC-v5d §2d, tier 3). ui.nav IS the
+   * transition — the inventory lists screen transitions as deliberately silent
+   * precisely because this cue is the transition — so it belongs to the state
+   * machine, not to eight buttons. A screen added later inherits it by being a
+   * screen.
+   *
+   * The louder moves opt out by not coming through here: choosing a deck or a
+   * set is drawer.open, a confirm is ui.primary, and the moves that happen
+   * inside a run (DEAL, FLIP, the grade) already own a cue or are deliberately
+   * silent.
+   */
+  function go(next: Phase) {
+    play("ui.nav");
+    setPhase(next);
+  }
+
   function runDrill(cards: Kana[]) {
     setDrill(shuffle(cards));
     setSummary(null);
@@ -200,11 +224,19 @@ export default function App() {
    */
   function choose(next: Selection) {
     if (progress.wiped) updateProgress({ wiped: false });
+    // the drawer under the table, where the decks live — a bigger act than
+    // navigating, and the ladder says so at −16 against nav's −22. Guarded on
+    // the row actually changing: its 250 ms gap is a fact about the cue, not
+    // something the player enforces by tapping slowly.
+    if (next !== selection) play("drawer.open");
     setSelection(next);
   }
 
   function commit() {
     if (selection === null) return;
+    // the confirm. START SESSION and OPEN BANK are both this: a latch closing
+    // on a choice already made, which is why the choice itself sounded first.
+    play("ui.primary");
     if (selection === "bank") {
       setOpenCapture(null);
       setPhase("bank");
@@ -223,8 +255,8 @@ export default function App() {
         deckName={deckLabel}
         meaning={meaning}
         onMeaning={(on) => setMeaningOn(activeSet.id, on)}
-        onBack={() => setPhase("deck")}
-        onCollection={() => setPhase("collection")}
+        onBack={() => go("deck")}
+        onCollection={() => go("collection")}
         onDeal={() => {
           setRunMeaning(meaning);
           setQueue(deal(activeSet, newSeed()));
@@ -236,7 +268,7 @@ export default function App() {
   }
 
   if (phase === "collection" && activeSet) {
-    return <Collection set={activeSet} onBack={() => setPhase("set")} />;
+    return <Collection set={activeSet} onBack={() => go("set")} />;
   }
 
   if (phase === "round" && activeSet && queue.length > 0) {
@@ -262,7 +294,7 @@ export default function App() {
         set={activeSet}
         hand={hand}
         newStock={newStock}
-        onBackToDeck={() => setPhase("deck")}
+        onBackToDeck={() => go("deck")}
       />
     );
   }
@@ -286,9 +318,16 @@ export default function App() {
               }
             : undefined
         }
-        onHome={() => setPhase("home")}
-        onCharacters={() => runDrill(kanaSet(deckId as Script, base))}
+        onHome={() => go("home")}
+        onCharacters={() => {
+          // the CHARACTERS panel starts a drill: a bone/strike CTA with no cue
+          // of its own, which is exactly what ui.primary is for
+          play("ui.primary");
+          runDrill(kanaSet(deckId as Script, base));
+        }}
         onOpenSet={(set) => {
+          // a set is chosen — the same act as choosing a deck, same cue
+          play("drawer.open");
           setActiveSet(set);
           setPhase("set");
         }}
@@ -297,7 +336,7 @@ export default function App() {
   }
 
   if (phase === "credits") {
-    return <Credits onBack={() => setPhase("home")} />;
+    return <Credits onBack={() => go("home")} />;
   }
 
   // ---- the v3 screens, unchanged but for the Joker ----
@@ -310,11 +349,22 @@ export default function App() {
           capture={bank.captures[index]}
           ordinal={bank.captures.length - index}
           total={bank.captures.length}
-          onBack={() => setOpenCapture(null)}
+          onBack={() => {
+            play("ui.nav");
+            setOpenCapture(null);
+          }}
         />
       );
     }
-    return <Bank onBack={() => setPhase("home")} onOpen={setOpenCapture} />;
+    return (
+      <Bank
+        onBack={() => go("home")}
+        onOpen={(id) => {
+          play("ui.nav");
+          setOpenCapture(id);
+        }}
+      />
+    );
   }
 
   if (phase === "session") {
@@ -324,7 +374,7 @@ export default function App() {
         deck={drill}
         trackLabel={script.toUpperCase()}
         earnKana={earnKana}
-        onQuit={() => setPhase("deck")}
+        onQuit={() => go("deck")}
         onFinish={(result) => {
           setSummary(result);
           setPhase("complete");
@@ -406,18 +456,28 @@ export default function App() {
         <div className="homeActions">
           {missed.length > 0 ? (
             <>
-              <button type="button" className="btnStrike homeStart" onClick={() => runDrill(missed)}>
+              <button
+                type="button"
+                className="btnStrike homeStart"
+                onClick={() => {
+                  play("ui.primary");
+                  runDrill(missed);
+                }}
+              >
                 Replay missed ({missed.length})
               </button>
               <div className="actionRow">
                 <button
                   type="button"
                   className="btnSeam"
-                  onClick={() => runDrill(kanaSet(script, base))}
+                  onClick={() => {
+                    play("ui.primary");
+                    runDrill(kanaSet(script, base));
+                  }}
                 >
                   Again
                 </button>
-                <button type="button" className="btnSeam" onClick={() => setPhase("deck")}>
+                <button type="button" className="btnSeam" onClick={() => go("deck")}>
                   Deck
                 </button>
               </div>
@@ -427,12 +487,15 @@ export default function App() {
               <button
                 type="button"
                 className="btnStrike homeStart"
-                onClick={() => runDrill(kanaSet(script, base))}
+                onClick={() => {
+                  play("ui.primary");
+                  runDrill(kanaSet(script, base));
+                }}
               >
                 Again
               </button>
               <div className="actionRow">
-                <button type="button" className="btnSeam" onClick={() => setPhase("deck")}>
+                <button type="button" className="btnSeam" onClick={() => go("deck")}>
                   Deck
                 </button>
               </div>
@@ -509,7 +572,7 @@ export default function App() {
         {selection === "bank" ? "OPEN BANK" : "START SESSION"}
       </button>
       <div className="homeFoot">
-        <button type="button" className="attribution" onClick={() => setPhase("credits")}>
+        <button type="button" className="attribution" onClick={() => go("credits")}>
           CREDITS
         </button>
         <button type="button" className="attribution" onClick={() => setSettings(true)}>
