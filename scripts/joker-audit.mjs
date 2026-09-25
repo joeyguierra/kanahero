@@ -70,7 +70,7 @@ const DEPTH = [
     "earned.shiny", "earned.base", "earned.worn", "round.missed"], 30],
   [["home", "deck.hiragana", "deck.katakana", "deck.kanji", "set", "result"], 15],
   [["bank", "collection", "abandon"], 6],
-  [["credits", "collection.empty", "collection.unreceipted", "home.wiped"], 2],
+  [["credits", "collection.empty", "home.wiped"], 2],
 ];
 
 const fail = [];

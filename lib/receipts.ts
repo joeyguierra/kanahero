@@ -3,9 +3,9 @@
 // Counts in `kanahero:v1` stay the source of truth. A receipt is an attachment
 // in its own IndexedDB database — never the blob, which has a ceiling, and
 // never the bank's database, whose version must not move for this. A copy
-// with no receipt is a full copy (every copy earned before v6, and any whose
-// write failed); a receipt with no copy behind it is ignored and never
-// deleted (§2.4).
+// with no receipt is a full copy (the v4 blob wiped every copy from before
+// receipts, so that is only a copy whose write failed); a receipt with no
+// copy behind it is ignored (§2.4).
 //
 // Store shape mirrors lib/bank.ts: subscribe/get/getServer, an async load, a
 // `ready: false` first snapshot that a real one replaces.
@@ -147,17 +147,21 @@ export function receiptsFor(setId: string, wordId: string, rarity: Rarity): Rece
   return (cache.byWord.get(key(setId, wordId)) ?? []).filter((r) => r.rarity === rarity);
 }
 
-/** how many receipts a set has at all — his line on S6d asks */
-export function receiptCount(setId: string): number {
-  let n = 0;
-  for (const [k, list] of cache.byWord) if (k.startsWith(`${setId}/`)) n += list.length;
-  return n;
-}
-
 /** every receipt, oldest first — the export */
 export async function allReceipts(): Promise<Receipt[]> {
   await load();
   return [...cache.byWord.values()].flat().sort((a, b) => a.earnedAt - b.earnedAt || a.id.localeCompare(b.id));
+}
+
+/** Empty the store. Only the blob migration calls it, when the cards the
+    receipts belonged to have just been wiped (SPEC-v6 §2). */
+export async function clearReceipts(): Promise<void> {
+  set({ byWord: new Map() });
+  try {
+    await db.tx("readwrite", (s) => s.clear());
+  } catch {
+    /* no store to clear is the same outcome */
+  }
 }
 
 // ---- the one write ----

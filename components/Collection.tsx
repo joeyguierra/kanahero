@@ -13,15 +13,15 @@
 //
 // A shelf card opens the stack (SPEC-v6 §5.3): one card per copy of that
 // stock, newest first, each with the date it was earned and — held — the ink
-// that earned it. Copies with no receipt (every copy from before v6, and any
-// whose write failed) are one legacy card at the end, counted on its chip.
+// that earned it. A copy with no receipt (its write failed; the v4 blob wiped
+// everything from before receipts) is one legacy card at the end, counted.
 
 import { useState, useSyncExternalStore } from "react";
 
 import { cardsFor } from "@/lib/joker";
-import { useJokerLine, type JokerScreen } from "@/lib/joker-lines";
+import { useJokerLine } from "@/lib/joker-lines";
 import { NO_COPIES, type Rarity } from "@/lib/progress";
-import { getReceipts, getServerReceipts, receiptCount, receiptsFor, subscribeReceipts } from "@/lib/receipts";
+import { getReceipts, getServerReceipts, receiptsFor, subscribeReceipts } from "@/lib/receipts";
 import type { SetWord, WordSet } from "@/lib/sets";
 import Card from "./Card";
 import CardView, { type ViewCard } from "./CardView";
@@ -45,7 +45,9 @@ function stackFor(setId: string, word: SetWord, stock: Rarity, copies: number): 
 
 export default function Collection({ set, onBack }: { set: WordSet; onBack: () => void }) {
   const cards = cardsFor(set.id);
-  const receipts = useSyncExternalStore(subscribeReceipts, getReceipts, getServerReceipts);
+  // subscribed so a stack opened after the store lands reads the real thing;
+  // the shelf itself is the counts, as ever
+  useSyncExternalStore(subscribeReceipts, getReceipts, getServerReceipts);
   /** the slot a tap opened: one word, in one stock, and how many of it */
   const [open, setOpen] = useState<{
     word: SetWord;
@@ -53,16 +55,7 @@ export default function Collection({ set, onBack }: { set: WordSet; onBack: () =
     copies: number;
   } | null>(null);
   const empty = set.words.every((w) => !cards[w.word]);
-  // his line waits for the receipts to land: a shelf whose every copy
-  // predates v6 gets its own pool, and he must not draw twice for one visit
-  const screen: JokerScreen | null = !receipts.ready
-    ? null
-    : empty
-      ? "collection.empty"
-      : receiptCount(set.id) === 0
-        ? "collection.unreceipted"
-        : "collection";
-  const line = useJokerLine(screen, { set });
+  const line = useJokerLine(empty ? "collection.empty" : "collection", { set });
 
   return (
     <main className="frame">

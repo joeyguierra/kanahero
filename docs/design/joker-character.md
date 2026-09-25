@@ -593,6 +593,11 @@ meaning switch off, it also must not name the English meaning. A line that names
 any screen carries `when:meaning`. A partial hint ("this one needs a small ィ") is allowed only as
 a `once` aside, and must be marked as a hint in the draft so the creator can rule on it.
 
+> **Creator ruling 2026-09-25 — clues are welcome.** On the prompt a line may be a **clue** to the
+> word (for COUNTRIES: food, flag, landmarks, a famous export). It still never says the answer
+> itself: not the answer's kana, not its romaji, not its English name. A clue is a hint, not a
+> giveaway, and it is positive like every other line.
+
 ### 11.5 Known runtime gaps (found 2026-09-25, not yet fixed)
 1. **`status` and `needs` are not enforced at runtime for set lines.** The app reads the set JSON
    raw. The audit silences a `draft` or failed-`needs` set line in its report, but the app still
@@ -626,3 +631,10 @@ are queued for the creator, not changed here:
 `earned.base.03` (まあまあ) · `earned.base.04` (I'll pretend I didn't see the first) ·
 `earned.base.06` (one more than me) · `earned.worn.02` (I enjoyed every miss) ·
 `earned.worn.08` (many tries, だいじょうぶ?).
+
+**Refinement 2026-09-25 (creator): nothing that reads as obligation or as a relationship between
+countries.** No *owe*, *debt*, *in our debt*. No friendship or kinship words about nations or peoples
+(なかま, ともだち, friends, cousins, neighbours), and no judgement of a people's character (brave, polite,
+welcoming). These are opinions open to debate, and in a country set they read as political.
+Gratitude aimed at a country (ありがとう, India) is out for the same reason. Say the fact and react
+to the fact: ほう, すごい, おいしい, なるほど.

@@ -19,8 +19,9 @@
 //      does a reload; a v2 blob is wiped once with a line about it
 //  10.9 The receipt (SPEC-v6): every earned copy keeps the ink that earned it,
 //      in its own store; the card view holds for it, swipes through copies,
-//      dates the chip; a shelf from before v6 is one legacy card per stock and
-//      he says so; the export carries the receipts
+//      dates the chip; the export carries the receipts; a v3 blob is wiped
+//      once, receipts and all, with a line about it; a copy whose receipt
+//      never wrote is one legacy card per stock
 //   9. A self-intersecting stroke animates as ONE pen stroke: its clipped
 //      copies run concurrently, not one after the other
 
@@ -767,17 +768,38 @@ assert.deepEqual(await totals(), banked, "a run that never finished was never wr
 assert.equal((await receipts()).length, 20, "receipts included");
 console.log("reload: an unfinished run leaves storage exactly as it found it");
 
-// 10.9d a shelf from before v6: copies with no receipts are one legacy card
-// per stock, counted on the chip, with no hold and no pager — and he says so
+// 10.9d the v4 wipe (SPEC-v6 §2.4): a v3 blob's cards go on load, and the
+// receipts with them; the characters stay, and he says so once
 await goHome();
-await page.evaluate(async () => {
-  // the store closes with the screens that read it; from S1 nothing holds it
-  await new Promise((resolve, reject) => {
-    const req = indexedDB.deleteDatabase("kanahero-receipts");
-    req.onsuccess = resolve;
-    req.onerror = () => reject(req.error);
-    req.onblocked = () => reject(new Error("receipts db still open"));
-  });
+const charsBefore = await page.evaluate(() => JSON.parse(localStorage.getItem("kanahero:v1")).earned.length);
+await page.evaluate(() => {
+  const blob = JSON.parse(localStorage.getItem("kanahero:v1"));
+  blob.v = 3;
+  localStorage.setItem("kanahero:v1", JSON.stringify(blob));
+});
+await page.goto(URL);
+await page.waitForSelector(".deckRow");
+assert.match(await said(), /^home\.wiped\.0[12]$/, "he owns the wipe on the way in");
+assert.equal(
+  await page.evaluate(() => JSON.parse(localStorage.getItem("kanahero:v1")).v),
+  4,
+  "the blob is v4 at once",
+);
+assert.equal(
+  await page.evaluate(() => JSON.parse(localStorage.getItem("kanahero:v1")).earned.length),
+  charsBefore,
+  "the characters survive the wipe",
+);
+await page.click(".deckRow:has-text('HIRAGANA')"); // reading the line spends it
+await page.click("button:has-text('Start session')");
+await page.click(".setRow");
+assert.deepEqual(await totals(), [0, 0, 0], "the shelf is bare: every pre-receipt copy is gone");
+assert.equal((await receipts()).length, 0, "and the receipts went with the cards they belonged to");
+console.log("wipe: v3 cards and their receipts go, characters stay, one line about it");
+
+// 10.9e a copy with no receipt — a write that failed — is one legacy card per
+// stock, counted on the chip, with no hold and no pager
+await page.evaluate(() => {
   const blob = JSON.parse(localStorage.getItem("kanahero:v1"));
   blob.joker = { "everyday-hiragana": { はい: { shiny: 1, base: 2, worn: 0 } } };
   localStorage.setItem("kanahero:v1", JSON.stringify(blob));
@@ -785,9 +807,9 @@ await page.evaluate(async () => {
 await page.goto(URL);
 await openDeck("HIRAGANA");
 await page.click(".setRow");
-assert.deepEqual(await totals(), [1, 2, 0], "the shelf holds three copies from before receipts");
+assert.deepEqual(await totals(), [1, 2, 0], "the shelf holds three copies with no receipts");
 await page.click("button:has-text('VIEW COLLECTION')");
-assert.equal(await said(), "collection.unreceipted.01", "he says these predate receipts (SPEC-v6 §7)");
+assert.match(await said(), /^collection\.\d+$/, "his ordinary shelf line — nothing predates receipts now");
 await page.locator(".collectionSlot-base .card").first().click();
 assert.equal(await page.locator(".cardView .receiptCard").count(), 1, "two copies with no receipt are one legacy card");
 assert.equal(await page.locator(".cardView .cardChip").innerText(), "BASE · ×2", "counted on its chip");
@@ -797,7 +819,7 @@ await page.locator(".receiptCard").focus();
 await page.keyboard.press("Enter");
 assert.equal(await page.locator(".receiptHeld").count(), 0, "and nothing to hold for");
 await tapOutside();
-console.log("legacy: a pre-v6 shelf is one counted card per stock, and he owns the gap");
+console.log("legacy: a copy with no receipt is one counted card per stock");
 
 // 10.7 a v2 blob is wiped once, with a line about it, and keeps its characters
 await page.evaluate(() => {
@@ -816,7 +838,7 @@ await page.evaluate(() => {
 });
 await page.goto(URL);
 await page.waitForSelector(".deckRow");
-assert.equal(await said(), "home.wiped.01", "he owns the wipe on the way in");
+assert.match(await said(), /^home\.wiped\.0[12]$/, "he owns the wipe on the way in");
 await page.click(".deckRow:has-text('HIRAGANA')"); // reading it spends it
 await page.click("button:has-text('Start session')");
 assert.equal(await charCount(), "3", "the characters the v2 blob earned are still there");

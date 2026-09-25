@@ -3,6 +3,7 @@
 // the shape can change later without wiping the count.
 
 import type { Script } from "./kana";
+import { clearReceipts } from "./receipts";
 
 export type SetChoice = "all" | "base";
 
@@ -62,7 +63,9 @@ export function isSilent(a: AudioPrefs): boolean {
 }
 
 const KEY = "kanahero:v1";
-const VERSION = 3;
+// v4 (SPEC-v6 §2): every copy from before receipts goes, so every card that
+// ever shows from here on has the ink that earned it behind it
+const VERSION = 4;
 
 interface Stored {
   v: number;
@@ -72,7 +75,9 @@ interface Stored {
   // default below rather than a version bump — the count carries over intact
   script?: Script;
   // v2 held one card per word ({tries, rarity, earnedAt}); v3 holds copy
-  // counts per rarity. The shapes do not convert — v3 wipes (v5a §2).
+  // counts per rarity. The shapes do not convert — v3 wipes (v5a §2). v4
+  // holds the same counts but every copy has a receipt; v3's do not — v4
+  // wipes again (SPEC-v6 §2), the receipts store with it.
   joker?: JokerProgress;
   wiped?: boolean;
   // added with the meaning toggle (design v5 Meaning Toggle); absent before it
@@ -153,10 +158,12 @@ export function loadProgress(): Progress {
     if (!raw) return fallback;
     const data = JSON.parse(raw) as Stored;
     if (data.v > VERSION || !Array.isArray(data.earned)) return fallback;
-    // v2 → v3: the cards go, the characters stay (v5a §2). The wipe is
-    // written back at once, so the line he owes is owed exactly once even if
-    // the tab is closed before anything else is saved.
+    // v2 → v3 → v4: the cards go, the characters stay (v5a §2, v6 §2). The
+    // wipe is written back at once, so the line he owes is owed exactly once
+    // even if the tab is closed before anything else is saved. Whatever the
+    // receipts store held belonged to the cards that just went.
     const stale = (data.v ?? 1) < VERSION;
+    if (stale) void clearReceipts();
     const loaded: Progress = {
       earned: new Set(data.earned.filter((s) => typeof s === "string")),
       setChoice: data.setChoice === "base" ? "base" : "all",

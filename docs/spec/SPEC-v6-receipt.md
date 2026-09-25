@@ -53,10 +53,14 @@ or graded.
 3. **A receipt is provisional exactly as its card is** (v5a §1.1). It rides in the run's state
    and is written when the run finishes, after the counts. Abandon, reload and close discard it
    with the hand. Nothing about a receipt is on S7; §1.6's truth rule holds unchanged.
-4. **Counts stay the source of truth.** `kanahero:v1` is not touched by this build — no version
-   bump, no new key. A copy with no receipt is a full copy: every copy earned before v6, and any
-   copy whose receipt failed to write. A receipt with no copy behind it is ignored by every
-   screen and never deleted.
+4. **Counts stay the source of truth, and they start again.** `kanahero:v1` goes to **version
+   4** with the same shape; the migration **wipes `joker`** the way v3 did (v5a §2), and empties
+   the receipts store with it, so every copy that exists from here on has the ink that earned it
+   (creator decision 2026-09-25: *scrub all earned cards, we'll start fresh*). Characters,
+   set choice, script, meaning and audio carry over. If the old blob held cards, the `wiped`
+   flag is set and he says so once on S1 — `home.wiped` gains a second line for it, because a
+   browser that heard the first for the v3 wipe has spent it. After the wipe a copy with no
+   receipt can only be one whose write failed; it is still a full copy.
 5. **The receipt write failing costs nothing the user can see on S8.** The reveal is not the
    place. The copy is a legacy card in S6d's stack (§5.3), which is the same card a pre-v6 copy
    is, and is true of both.
@@ -185,9 +189,8 @@ A shelf slot opens every copy of that stock, one card each, newest first.
 - One card per receipt, newest first — you open the shelf after a run to see the card you just
   earned, so `1` is the newest, the bank's own rule. Then, if the stock's copy count exceeds its
   receipt count, **one legacy card** last: the current shelf face with `SHINY · ×k`, where `k` is
-  the copies with no receipt, no hold, no date. A stock with no receipts is that one card alone,
-  and no pager — which is every stock in the app the day this ships, and the copy whose write
-  failed (§2.5), which the screen cannot tell apart and does not try to.
+  the copies with no receipt, no hold, no date. After the v4 wipe (§2.4) that is only a copy
+  whose write failed (§2.5), so in practice the stack is receipts all the way down.
 - Swiping is scoped to the stock tapped. Three slots stay three overlays.
 - **The chip on a receipted card reads `<STOCK> · <date>`** — `SHINY · 9-18-26`: month, day,
   two-digit year, local time, no leading zero on the month or the day (the day is assumed from
@@ -230,20 +233,17 @@ unchanged.
 
 ## 7. Joker
 
-One new screen key, `collection.unreceipted`, chosen by `Collection.tsx` when the shelf has at
-least one copy and `receiptCount(set.id) === 0` — i.e. every card here predates v6. It is a pool,
-not a once-line: it is true on every visit until the first receipted run, and then it is never
-true again. Precedence and eligibility per v5b §4–5, unchanged. Add the key to `JokerScreen`; the
-audit will demand a pool for it.
-
-Wording belongs to the corpus (`docs/design/joker-corpus.md`, under `joker-character.md`'s laws —
-information first, under twelve words). Interim, until the corpus owner replaces it:
+No new screen key. The wipe (§2.4) is said where wipes are said: one more once-line in
+`home.wiped`, eligible on `wiped`, needing `feature.receipts`, so a browser that spent the v3
+line still hears this one. Wording belongs to the corpus (`joker/corpus.md`, under
+`joker-character.md`'s laws — information first, under twelve words):
 
 | key | line |
 | :-- | :-- |
-| `collection.unreceipted` | These predate receipts. Your next run keeps its ink. |
+| `home.wiped.02` | Cards keep their ink now. The old ones are gone. |
 
-No `{receipts}` token, no line in the card overlay, no line on S8 about the ink.
+No `{receipts}` token, no line in the card overlay, no line on S8 about the ink, and nothing on
+S6d — after the wipe there is no shelf that predates receipts.
 
 ## 8. The seam this leaves for later
 
@@ -266,9 +266,10 @@ handwriting in it leaves the phone only in the user's own export.
   3. replay the set → that stock shows `1 / 2`; `›` → `2 / 2`; a tap on the backdrop closes, a
      tap on the card does not.
   4. start a run, earn one card, `✕` → `LEAVE RUN` → receipt count unchanged. Same for a reload.
-  5. a v3 blob with copies and an empty receipts DB → S6d's line id is `collection.unreceipted.*`;
-     any slot opens one legacy card with `×k` on the chip, no legend, no pager, and Enter does
-     nothing.
+  5. a v3 blob with copies → wiped on load: S1 says a `home.wiped.*` line once, the characters
+     stay, the shelf is empty, and the receipts store is empty too. A v4 blob with copies and an
+     empty receipts store (a failed write) → any slot opens one legacy card with `×k` on the
+     chip, no legend, no pager, Enter does nothing, and his S6d line is the ordinary one.
   6. S8 after a run: tap a card → the overlay holds the face with its tries chip; Enter → ink.
   7. export → the ZIP has `receipts.json` with `n` entries and a manifest at version 2; with no
      captures and receipts present, export is not `"empty"`.
@@ -313,8 +314,10 @@ spec left a choice.
   track's native swipe cancels it; Enter/Space toggle for keyboards and for e2e.
 - **The opening flash is lazy initial state**, not an effect (React's set-state-in-effect rule),
   and skipped under reduced motion.
-- **His new pool sits in the two-line depth tier** (`joker-audit.mjs` `DEPTH`), and its line
-  `needs:feature.receipts`, a fact added to `joker/facts.json`.
+- **The v4 wipe (same day, creator's call):** `VERSION = 4` in `lib/progress.ts`, the same
+  `stale` path v3 used, plus `clearReceipts()`. The `collection.unreceipted` pool built earlier
+  that day was removed with it — nothing can predate receipts any more — and `home.wiped.02`
+  took its place, `needs:feature.receipts` (`joker/facts.json`).
 - **Verification as measured:** lint, build, `e2e-bank`, `e2e-joker`, `e2e-offline` clean;
   `e2e-loop` passes every §9 step and fails only 10.8, which predates this build — the word
   `foil` in a comment in `scripts/build-sfx.mjs` (v5d). With that check skipped the rest of the

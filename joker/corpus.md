@@ -47,6 +47,8 @@ one when the meaning does. Tokens: `{bank}` `{shiny}` `{earned}` `{words}` `{cha
 
 ## home.wiped
 - [home.wiped.01] New rules, so I reshuffled. Your old cards are gone. ·· when:wiped ·· once ·· status:ship
+<!-- SPEC-v6 §2: the v4 wipe. A browser that saw .01 for the v3 wipe has spent it; this one is what it hears -->
+- [home.wiped.02] Cards keep their ink now. The old ones are gone. ·· when:wiped ·· once ·· needs:feature.receipts ·· subj:app ·· status:ship
 
 ## home.hiragana
 - [home.hiragana.01] Native words, particles, endings. The first script. ·· status:ship
@@ -89,10 +91,6 @@ one when the meaning does. Tokens: `{bank}` `{shiny}` `{earned}` `{words}` `{cha
 
 ## collection.empty
 - [collection.empty.01] まだ nothing here. Finish a run. ·· ja:まだ ·· needs:rule.allOrNothing ·· status:ship
-
-## collection.unreceipted
-<!-- SPEC-v6 §7: every copy on this shelf predates receipts; true on every visit until the first receipted run, then never again -->
-- [collection.unreceipted.01] These predate receipts. Your next run keeps its ink. ·· needs:feature.receipts ·· subj:app ·· status:ship
 
 ## abandon
 - [abandon.01] Leave now and the cards stay with me. ·· needs:rule.allOrNothing ·· status:ship

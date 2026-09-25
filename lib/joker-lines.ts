@@ -69,7 +69,6 @@ export type JokerScreen =
   | "bank"
   | "collection"
   | "collection.empty"
-  | "collection.unreceipted"
   | "abandon"
   | "round.kana"
   | "round.kanji"
