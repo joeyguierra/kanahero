@@ -13,8 +13,16 @@
 
 import type { Rarity } from "./progress";
 
-/** cards to a row; 21 words is the ceiling, so three rows is the ceiling */
-export const COLS = 7;
+/** Cards to a row for a hand of `n` (design: v6 "S6b Deal Animation", V6.1).
+    Two rows at most, so DEAL stays above the fold on a short phone: up to seven
+    is one row, and eight or more split across both, the top row taking the odd
+    card — an eleven-word set is 6 + 5, never one row of eleven. 21 words is the
+    ceiling, so eleven columns is. The overlap stretches to fit (`--cols` in
+    globals.css), and S6b and S8 share this so the deal and the reveal are one
+    layout. */
+export function colsFor(n: number): number {
+  return n <= 7 ? n : Math.ceil(n / 2);
+}
 /** One card, twice the old grid card. The box itself is `.revealSlot` — 84 by
     118, five by seven — and the row overlaps them there; this is here because
     the face sizes its word and its romaji against the card's own width. */
@@ -74,10 +82,11 @@ export function revealOrder<T extends { card: { rarity: Rarity } }>(hand: T[]): 
   return ORDER.flatMap((rarity) => hand.filter((c) => c.card.rarity === rarity));
 }
 
-/** the same order, cut into rows of at most seven */
+/** the same order, cut into at most two rows of `colsFor` cards */
 export function revealRows<T>(order: T[]): T[][] {
+  const cols = Math.max(1, colsFor(order.length));
   const rows: T[][] = [];
-  for (let i = 0; i < order.length; i += COLS) rows.push(order.slice(i, i + COLS));
+  for (let i = 0; i < order.length; i += cols) rows.push(order.slice(i, i + cols));
   return rows;
 }
 

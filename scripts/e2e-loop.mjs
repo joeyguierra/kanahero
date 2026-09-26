@@ -586,11 +586,11 @@ assert.equal(
 assert.match(await page.locator(".resultCount").innerText(), /^10\s*EARNED$/);
 assert.equal(await page.locator(".resultShiny").innerText(), "9 SHINY");
 assert.equal(await page.locator(".resultRest").innerText(), "1 BASE · 0 WORN");
-assert.equal(await page.locator(".resultRow").count(), 2, "ten cards is seven and three");
+assert.equal(await page.locator(".resultRow").count(), 2, "ten cards is two rows of five");
 assert.deepEqual(
   await page.locator(".resultRow").evaluateAll((rows) => rows.map((r) => r.children.length)),
-  [7, 3],
-  "seven to a row, the short row left-aligned",
+  [5, 5],
+  "eight or more split across both rows, the top row taking any odd card",
 );
 assert.equal(
   await page.locator(".resultNote").innerText(),
@@ -1125,6 +1125,48 @@ const lineAfter = async (pg, was) => {
   assert.equal(await lineOn(pg), "result.01", "and he speaks as the last one lands");
   await ctx.close();
   console.log("S8: mounts face down at zero, and one tap hurries the rest over");
+}
+
+// --- 13. S6b in the S8 rows, two at most (design: v6 "S6b Deal Animation",
+// V6.1): eight words or more split across both rows, the top row taking the
+// odd card; a full row spans the phone's width inside its 12px gutter, and
+// DEAL stays above the fold. (The sheet promises 700px; the MEANING switch it
+// does not draw costs 76px, so the app holds from 754px.) The split is read off the
+// set's own file, so a set that grows or shrinks does not break the check.
+{
+  const { words } = JSON.parse(
+    await readFile(path.join(import.meta.dirname, "..", "public", "sets", "countries-katakana.json"), "utf8"),
+  );
+  assert.ok(words.length >= 8, "COUNTRIES is big enough to need both rows");
+  const top = Math.ceil(words.length / 2);
+  const ctx = await browser.newContext({
+    viewport: { width: 390, height: 754 },
+    reducedMotion: "reduce",
+  });
+  const pg = await ctx.newPage();
+  pg.setDefaultTimeout(15000);
+  await pg.goto(URL);
+  await pg.click(".deckRow:has-text('KATAKANA')");
+  await pg.click("button:has-text('Start session')");
+  await pg.click(".setRow:has-text('COUNTRIES')");
+  await pg.waitForSelector(".setHandRow");
+  assert.deepEqual(
+    await pg.locator(".setHandRow").evaluateAll((rows) => rows.map((r) => r.children.length)),
+    [top, words.length - top],
+    `${words.length} words is two rows, the top row taking the odd card`,
+  );
+  const edges = await pg.locator(".setHandRow").first().evaluate((row) => {
+    const slots = [...row.children].map((el) => el.getBoundingClientRect());
+    return { left: slots[0].left, right: slots[slots.length - 1].right };
+  });
+  assert.ok(Math.abs(edges.left - 12) < 1, "the row starts on the 12px gutter");
+  assert.ok(Math.abs(edges.right - (390 - 12)) < 1, "and a full row ends on it, overlapped to fit");
+  const deal = await pg.locator("button:has-text('DEAL')").boundingBox();
+  assert.ok(deal.y + deal.height <= 754, "DEAL is above the fold on a 754px phone");
+  await ctx.close();
+  console.log(
+    `S6b: ${words.length} words deal as ${top} + ${words.length - top}, DEAL above the fold at 754px`,
+  );
 }
 
 await browser.close();

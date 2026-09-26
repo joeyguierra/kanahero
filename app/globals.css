@@ -1726,32 +1726,50 @@ button:not(:disabled):active {
   color: #000;
 }
 
-.setMeaning + .setGrid {
+/* ---- S6b: the set, in the S8 rows (design: v6 "S6b Deal Animation", V6.1) ----
+   84×118 backs, `--cols` to a row (lib/reveal colsFor: n up to seven, else
+   half, rounded up — two rows at most, eleven wide at most), overlapped so the
+   rightmost sits on top, rows bleeding to the phone's edge with a 12px gutter
+   of their own — the S8 result row verbatim, because DEAL hands this exact
+   layout on and S8 turns the cards in place. Two rows of 118 and a 10px gap
+   keep DEAL above the fold down to a 700px viewport. The rows are centred in
+   the space between the switch and the totals. */
+.setHand {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  margin: 14px calc(var(--gutter) * -1) 0;
+  padding: 0 12px;
+}
+
+.setHand + .setTotals {
   margin-top: 14px;
 }
 
-.setGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 9px;
-  margin-top: 18px;
+.setHandRow {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
 }
 
-/* the slot: what the grid is before the deal, and what a card sits in after.
-   The perspective is the card's own, so its float tilts in depth without the
-   grid itself becoming a 3D scene. */
+/* one back's slot: the box it is dealt into. No ghost — there are no empty
+   slots, the row fills from the left as cards land. No perspective either:
+   the float is a bob, not a tilt. */
 .setSlot {
   position: relative;
-  aspect-ratio: 5 / 7;
-  width: 100%;
-  perspective: 520px;
+  flex: none;
+  width: 84px;
+  height: 118px;
 }
 
-.setSlotGhost {
-  position: absolute;
-  inset: 0;
-  border: 1px dashed var(--seam);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+/* a full row overflows the gutter, so the cards overlap to fit — the overlap
+   stretches with the column count; a short row keeps the same overlap and
+   left-aligns, it does not spread. A lone card has no sibling, so `--cols: 1`
+   never divides by zero. */
+.setHandRow .setSlot + .setSlot {
+  margin-left: min(0px, calc((100% - var(--cols) * 84px) / (var(--cols) - 1)));
 }
 
 /* SetScreen.tsx deals it in: opacity 0 until its flight, then a float loop
@@ -2611,11 +2629,12 @@ button:not(:disabled):active {
   will-change: transform;
 }
 
-/* A full row of seven overflows the gutter, so the cards overlap to fit: each
-   one covers the right edge of the one before it. A short row keeps the same
-   overlap and left-aligns — it does not spread. */
+/* A full row overflows the gutter, so the cards overlap to fit: each one
+   covers the right edge of the one before it. `--cols` is S6b's (lib/reveal
+   colsFor), so the reveal turns the cards in the layout they were dealt in. A
+   short row keeps the same overlap and left-aligns — it does not spread. */
 .resultRow .revealSlot + .revealSlot {
-  margin-left: min(0px, calc((100% - 7 * 84px) / 6));
+  margin-left: min(0px, calc((100% - var(--cols) * 84px) / (var(--cols) - 1)));
 }
 
 .revealInner {

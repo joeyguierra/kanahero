@@ -25,13 +25,12 @@
 // was graded, before this screen existed (SPEC-v5a §1.1, §9.3.9) — leaving
 // mid-reveal costs nothing, which is exactly why a tap may skip to the end.
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useJokerLine } from "@/lib/joker-lines";
 import { play, schedule } from "@/lib/sfx";
 import { hurryCues, revealCues } from "@/lib/sfx-schedule";
 import type { Rarity } from "@/lib/progress";
 import {
-  COLS,
   DEAL_GAP_MS,
   FAST_FLIP_MS,
   FAST_STEP_MS,
@@ -43,6 +42,7 @@ import {
   SPEAK_AFTER_MS,
   fastSchedule,
   revealOrder,
+  colsFor,
   revealRows,
   turnEnd,
   turnSchedule,
@@ -318,13 +318,13 @@ export default function Result({
 
       <Joker line={line.text} lineId={line.id} markRef={jokerRef} className="jokerDeck" />
 
-      <div className="resultRows">
+      <div className="resultRows" style={{ "--cols": colsFor(order.length) } as CSSProperties}>
         {rows.map((row, r) => (
           <div className="resultRow" key={r}>
             {row.map(({ word, card }, j) => {
               // its place in the whole hand: the deal, the turn and the shine
               // stagger all count in reveal order, not per row
-              const index = r * COLS + j;
+              const index = r * colsFor(order.length) + j;
               return (
                 <RevealCard
                   key={word.word}

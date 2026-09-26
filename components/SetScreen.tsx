@@ -10,21 +10,25 @@
 // prompt cards with their English line; OFF deals kana and romaji only. His
 // line answers the choice. Nothing else on the screen moves when it flips.
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { setTotals } from "@/lib/joker";
 import { useJokerLine } from "@/lib/joker-lines";
 import { play, schedule, TOGGLE_OFF } from "@/lib/sfx";
 import { dealCues } from "@/lib/sfx-schedule";
+import { colsFor, revealRows } from "@/lib/reveal";
 import type { WordSet } from "@/lib/sets";
 import { CardBack } from "./Card";
 import Joker from "./Joker";
 
-// ---- the deal (v5a anims, S6b) ----
-// The grid mounts as nine empty slots and the Joker throws the backs into
-// them, one per release, in reading order — the order the run will deal them
-// face up. This is the third animation on the board: the two-animation budget
-// in globals.css is the v3 number, and the v5a anim sheets supersede it.
+// ---- the deal (v6 anims, S6b) ----
+// The backs sit in the S8 rows — two at most, up to eleven wide, overlapped
+// to fit (lib/reveal colsFor) — and
+// the Joker throws them in one per release, in reading order: the order the
+// run will deal them face up, into the very same layout. There are no empty
+// slots; the row fills from the left as cards land. This is the third
+// animation on the board: the two-animation budget in globals.css is the v3
+// number, and the anim sheets supersede it.
 
 // Exported because the sound follows the picture and must not carry a second
 // copy of these numbers: lib/sfx-schedule's dealCues() is handed the clock the
@@ -55,34 +59,33 @@ export const LAND = Math.round(FLIGHT * LAND_AT);
 const ARC_LIFT = 26;
 /** his wrist, per card: one flick and back before the next one leaves */
 const FLICK_DEG = -7;
-/** reduced motion: all nine seat at once, no flight, no float */
+/** reduced motion: the whole set seats at once, no flight, no float */
 export const FADE = 120;
 /** his fist inside the mark's square box, measured off `assets/joker-mascot-open.png` —
     the element is the whole 1080² square, transparent margins included */
 const HAND = { x: 0.36, y: 0.75 };
 
-/** a seated card never sits still: its own slow tilt-and-bob, on its own
-    phase, so no two of the nine ever move together */
+/** a seated card never sits still: its own slow bob, on its own phase, so no
+    two ever move together. Bob only — the old ±5–8° X/Y tilt read as jitter
+    once the cards overlapped, because each one moves its neighbour's edge */
 function float(el: HTMLElement, i: number): Animation {
   const seed = (i * 0.618) % 1;
-  const tx = 5 + seed * 3;
-  const ty = 4 + ((i * 0.37) % 1) * 3;
   const bob = 2 + seed * 1.5;
   const dur = 3600 + ((i * 731) % 1400);
   return el.animate(
     [
-      { transform: `translateY(0px) rotateX(${ty * 0.3}deg) rotateY(${-tx}deg)` },
-      { transform: `translateY(${-bob}px) rotateX(${-ty}deg) rotateY(${-tx * 0.2}deg)` },
-      { transform: `translateY(${bob * 0.4}px) rotateX(${ty * 0.5}deg) rotateY(${tx}deg)` },
-      { transform: `translateY(${-bob * 0.6}px) rotateX(${ty}deg) rotateY(${tx * 0.3}deg)` },
-      { transform: `translateY(0px) rotateX(${ty * 0.3}deg) rotateY(${-tx}deg)` },
+      { transform: "translateY(0px)" },
+      { transform: `translateY(${-bob}px)` },
+      { transform: `translateY(${bob * 0.4}px)` },
+      { transform: `translateY(${-bob * 0.6}px)` },
+      { transform: "translateY(0px)" },
     ],
     {
       duration: dur,
       iterations: Infinity,
       easing: "ease-in-out",
-      // a negative delay starts the loop part-way in, so the nine are already
-      // out of step on the first frame they are seated
+      // a negative delay starts the loop part-way in, so the set is already
+      // out of step on the first frame it is seated
       delay: -((i * 0.31) % 1) * dur,
     },
   );
@@ -108,6 +111,7 @@ export default function SetScreen({
   onCollection: () => void;
 }) {
   const totals = setTotals(set);
+  const cols = colsFor(set.words.length);
   /** the last back has landed: he deals first and talks after, never both */
   const [dealt, setDealt] = useState(false);
   // Null until the deal is done — the same gate S8 puts on the reveal — so the
@@ -142,7 +146,7 @@ export default function SetScreen({
 
     // One land per back as it seats, laid out once against the audio clock:
     // 90 ms apart is the tightest cue in the app, and setTimeout's jitter
-    // under the mount of a nine-card grid is audible where it is invisible.
+    // under the mount of a 21-card hand is audible where it is invisible.
     const cues = schedule(
       dealCues({ count: cards.length, gap: DEAL_INTERVAL, land: LAND, reduced, fade: FADE }),
     );
@@ -158,15 +162,17 @@ export default function SetScreen({
       const dx = hx - (cr.left + cr.width / 2);
       const dy = hy - (cr.top + cr.height / 2);
       const delay = reduced ? 0 : i * DEAL_INTERVAL;
-      // a card in flight sits above every card already seated
-      el.style.zIndex = String(2 + i);
+      // a card in flight sits above every card already seated; once down it
+      // takes its place in the row's overlap, the rightmost on top
+      const seated = String((i % cols) + 1);
+      el.style.zIndex = String(cols + 2 + i);
 
       const last = i === cards.length - 1;
 
       if (reduced) {
         const fade = el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: FADE, fill: "both" });
         anims.push(fade);
-        el.style.zIndex = "1";
+        el.style.zIndex = seated;
         if (last) fade.onfinish = () => setDealt(true);
         return;
       }
@@ -213,10 +219,10 @@ export default function SetScreen({
       // the float takes over `transform`, which composes on top of the
       // translate/rotate/scale the flight leaves behind
       flight.onfinish = () => {
-        el.style.zIndex = "1";
+        el.style.zIndex = seated;
         el.style.opacity = "1";
         anims.push(float(el, i));
-        // the ninth card down is the cue: his line waits on it
+        // the last card down is the cue: his line waits on it
         if (last) setDealt(true);
       };
     });
@@ -226,7 +232,7 @@ export default function SetScreen({
       // leaving mid-deal takes the rest of the hand's sound with it
       cues();
     };
-  }, [set]);
+  }, [set, cols]);
 
   return (
     <main className="frame">
@@ -281,22 +287,28 @@ export default function SetScreen({
         </span>
       </div>
 
-      <div className="setGrid">
-        {set.words.map((word, i) => (
-          <div key={word.word} className="setSlot">
-            <span className="setSlotGhost" aria-hidden />
-            <CardBack
-              set={set}
-              className="setSlotCard"
-              ref={(el) => {
-                cardRefs.current[i] = el;
-              }}
-            />
+      {/* the S8 rows, verbatim: the set and the result are the same object
+          at two moments, and DEAL hands this exact layout on */}
+      <div className="setHand" style={{ "--cols": cols } as CSSProperties}>
+        {revealRows(set.words).map((row, r) => (
+          <div className="setHandRow" key={r}>
+            {row.map((word, j) => {
+              const i = r * cols + j;
+              return (
+                <div key={word.word} className="setSlot">
+                  <CardBack
+                    set={set}
+                    className="setSlotCard"
+                    ref={(el) => {
+                      cardRefs.current[i] = el;
+                    }}
+                  />
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>
-
-      <div className="grow" />
 
       <div className="setTotals">
         <div className="setTotalsRow">
@@ -323,8 +335,8 @@ export default function SetScreen({
           The category rule must NOT now hand DEAL ui.primary in its place
           (sfx-defaults.mjs, tier 3): the objection is to a cue landing on the
           next screen at all, not to which cue it was, and ui.primary is longer
-          still. Neither screen is left silent — S6b already deals nine lands
-          on mount, and S7 opens on prompt.melt. */}
+          still. Neither screen is left silent — S6b already deals a land per
+          card on mount, and S7 opens on prompt.melt. */}
       <button type="button" className="btnStrike actionBar" onClick={onDeal}>
         DEAL
       </button>
