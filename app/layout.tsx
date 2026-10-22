@@ -40,10 +40,29 @@ const jp = Noto_Sans_JP({
   display: "swap",
 });
 
+const DESCRIPTION =
+  "Write Japanese from memory: hiragana, katakana and kanji, by hand, with the real stroke order drawn over your attempt. Offline, free, no account.";
+
 export const metadata: Metadata = {
+  // share previews need absolute URLs; the image itself is app/opengraph-image.png
+  // (scripts/gen-og.mjs), which Next turns into the og:image and twitter:image tags
+  metadataBase: new URL("https://kanahero.joeyguierra.com"),
   title: "kanahero",
-  description: "Write hiragana and katakana from memory — prompt, write, reveal, self-grade — and bank photos of the characters you can't read yet.",
+  description: DESCRIPTION,
   applicationName: "kanahero",
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: "kanahero",
+    title: "kanahero — write Japanese from memory",
+    description: DESCRIPTION,
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "kanahero — write Japanese from memory",
+    description: DESCRIPTION,
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
