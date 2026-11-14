@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "kanahero",
     short_name: "kanahero",
-    description: "Write hiragana, katakana and kanji from memory — prompt, write, reveal, self-grade — and bank photos of the characters you can't read yet.",
+    description: "Write Japanese from memory — prompt, write, reveal, self-grade — on a schedule that brings each word back when it is due.",
     start_url: "/",
     display: "standalone",
     orientation: "portrait",

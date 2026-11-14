@@ -1,14 +1,11 @@
 "use client";
 
-// S9 — what ships, and whose work it is.
+// Credits — what ships, and whose work it is.
 //
 // Only the lines the licenses actually require: KanjiVG's CC BY-SA asks for a
 // visible credit with the license name and a link, so it gets one. The rest
 // are satisfied by the texts in public/licenses, and are named here because
 // naming them costs one line each.
-
-import { useJokerLine } from "@/lib/joker-lines";
-import Joker from "./Joker";
 
 const CREDITS = [
   {
@@ -32,17 +29,14 @@ const CREDITS = [
 ];
 
 export default function Credits({ onBack }: { onBack: () => void }) {
-  const line = useJokerLine("credits");
   return (
     <main className="frame">
       <div className="screenHead">
         <button type="button" className="backLink" onClick={onBack}>
-          ← HOME
+          ← SETS
         </button>
         <span className="screenTitle">CREDITS</span>
       </div>
-
-      <Joker line={line.text} lineId={line.id} className="jokerDeck" />
 
       <div className="legend legendSpaced">SHIPPED WITH THIS APP</div>
       <ul className="creditList">

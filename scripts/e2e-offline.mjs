@@ -1,56 +1,30 @@
-// The plane test, headless. Run: node scripts/e2e-offline.mjs
+// The plane test, headless. Run: npm run build && node scripts/e2e-offline.mjs
 //
-// Everything here happens with the network switched off at the browser, so a
-// pass means the service worker's precache is genuinely carrying the app:
+// Everything after step 1 happens with the network switched off at the
+// browser, so a pass means the service worker's precache is carrying the app:
 //   1. The SW installs and takes control of the page
-//   2. Offline cold reload: home renders from cache
-//   3. Offline: a session starts and the stroke SVG animates (fetched, not
-//      bundled — the precache is what makes it arrive)
-//   3b. Offline: a word set deals, reveals the whole word, and earns a card —
-//      the set JSON and every character's stroke file came from the precache
-//   4. Offline: a capture saves, the count ticks, and it survives a reload
+//   2. Offline cold reload: the set list renders from cache, sets and all
+//   3. Offline: a whole session — study trials draw, the word reveals over
+//      the ink, the session finishes and the schedule and ledger are written.
+//      The set JSON and every character's stroke file came from the precache.
+//   4. Offline reload: the state is still there
 //   5. Only one cache exists, and it is the current content hash
 //   6. A URL the host does not serve costs that URL, not the whole install
 
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
-import os from "node:os";
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import sharp from "sharp";
 import { chromium } from "playwright";
-
-const PORT = 3214;
-const URL = `http://localhost:${PORT}`;
-
-const tmp = await mkdtemp(path.join(os.tmpdir(), "kanahero-offline-"));
-const fixture = path.join(tmp, "sign.jpg");
-await sharp({
-  create: { width: 2000, height: 1500, channels: 3, background: { r: 20, g: 20, b: 24 } },
-})
-  .jpeg()
-  .toFile(fixture);
+import { counts, ledger, row, serveOut } from "./e2e-lib.mjs";
 
 const generated = await readFile(path.join(import.meta.dirname, "..", "out", "sw.js"), "utf8");
 const cacheName = generated.match(/const CACHE = "(kanahero-[0-9a-f]+)"/)?.[1];
 assert.ok(cacheName, "out/sw.js carries a content-hash cache name — run the build first");
 
-const server = spawn("npx", ["-y", "serve", "-l", String(PORT), "out"], { stdio: "ignore" });
-const kill = () => server.kill();
-process.on("exit", kill);
-
-for (let i = 0; i < 40; i++) {
-  try {
-    if ((await fetch(URL)).ok) break;
-  } catch {}
-  await new Promise((r) => setTimeout(r, 250));
-}
-
+const { url: URL, kill } = await serveOut(3214);
 const browser = await chromium.launch();
 const context = await browser.newContext({
   viewport: { width: 390, height: 844 },
-  // the round's animations all have a reduced-motion path to the same end
-  // state; nothing offline should be waiting on a clock (SPEC-v5a §9.6)
   reducedMotion: "reduce",
 });
 const page = await context.newPage();
@@ -58,186 +32,55 @@ page.setDefaultTimeout(60000);
 
 // --- 1. install and take control ---
 await page.goto(URL);
-await page.waitForSelector(".deckRow:has-text('HIRAGANA')");
+await page.waitForSelector(".v7SetRow");
 // `ready` resolves once the SW is activated, which is after cache.addAll has
 // pulled the entire export down
 await page.evaluate(() => navigator.serviceWorker.ready);
 await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
 const cached = await page.evaluate(async (name) => (await (await caches.open(name)).keys()).length, cacheName);
-assert.ok(cached > 500, `the whole export is precached, got ${cached} entries`);
+assert.ok(cached > 200, `the whole export is precached, got ${cached} entries`);
 console.log(`1. service worker installed and controlling: ${cached} URLs in ${cacheName}`);
-// Every one-shot the app can ask for is a static file under public/, so the walk
-// in gen-sw.mjs carries them like everything else — checked BY NAME because a
-// count cannot tell a missing sound from a missing stroke, and because a cue
-// wired into lib/sfx.ts with no file behind it is silent rather than broken.
-// This list must match FILES in lib/sfx.ts. deal.press is deliberately not in
-// it: the file is still baked, but nothing plays it (SPEC-v5d §2c).
-const sfx = [
-  "hand.tick", "flip.worn", "flip.base", "flip.shiny", "reveal.end", "reveal.skip",
-  "deal.land", "prompt.melt",
-  "ui.nav", "drawer.open", "ui.primary", "ui.toggle",
-];
-const sfxCached = await page.evaluate(
-  async ([name, names]) => {
-    const cache = await caches.open(name);
-    const hits = await Promise.all(names.map((n) => cache.match(`/sfx/${n}.m4a`)));
-    return names.filter((_, i) => hits[i]);
-  },
-  [cacheName, sfx],
-);
-assert.deepEqual(sfxCached, sfx, `all ${sfx.length} sfx files are in the precache`);
-console.log(`   and all ${sfx.length} sfx files with it`);
 
 // --- 2. offline cold reload ---
 await context.setOffline(true);
 await page.reload();
-await page.waitForSelector(".deckRow:has-text('HIRAGANA')");
-// the row counts the sets it holds, and those are precached JSON — if the
-// set files had not survived the trip this would read "—"
-assert.equal(
-  await page.locator(".deckRow:has-text('HIRAGANA') .deckCount").innerText(),
-  "1 SET",
-  "home renders offline, from cache, with its set count",
-);
-// He talks in a tunnel. The corpus is imported, not fetched, so it rides in
-// the JS bundle and the precache carries it — confirmed here rather than
-// assumed (SPEC-v5b §6).
-await page.waitForSelector(".jokerPanel[data-line]");
-assert.match(
-  await page.getAttribute(".jokerPanel", "data-line"),
-  /^(home\.\d+|home\.32)$/,
-  "he has a line with no network: the corpus is in the bundle, not behind a fetch",
-);
-assert.ok(
-  (await page.locator(".jokerLine").textContent()).trim().length > 0,
-  "and it has words in it",
-);
-console.log("2. offline: the shell boots, home renders, and he still has a line");
+await page.waitForSelector(".v7SetRow");
+assert.equal(await page.locator(".v7SetRow").count(), 6, "all six sets load offline");
+assert.equal(await counts(page, "STATION", "kanji"), "0 due · 9 new");
+console.log("2. offline: the shell boots and the set list renders with its counts");
 
-// --- 3. offline: the writing loop, including the stroke data ---
-// S1 selects, the CTA commits, the deck's characters card opens the drill
-await page.click(".deckRow:has-text('HIRAGANA')");
-await page.click("button:has-text('Start session')");
-await page.click(".deckCharacters");
-const box = await page.locator("canvas.ink").boundingBox();
-await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.3);
-await page.mouse.down();
-await page.mouse.move(box.x + box.width * 0.7, box.y + box.height * 0.55, { steps: 5 });
-await page.mouse.up();
-await page.click("button:has-text('Show')");
-await page.waitForSelector(".canvasOverlay svg path");
-const running = await page.evaluate(
-  () =>
-    document
-      .getAnimations()
-      .filter((a) => a.effect?.target?.closest?.(".canvasOverlay")).length,
-);
-assert.ok(running > 0, "the stroke animation runs offline — its SVG came from the precache");
-console.log("3. offline: a session starts and the stroke SVG animates");
-
-// --- 3b. offline: two whole runs, dealt, earned and collected with no network ---
-// The kana sets need their JSON and one stroke file per character; if any of
-// that were a runtime fetch rather than precache, this is where it would show.
-// A run is all-or-nothing, so nothing is proved until one finishes offline.
-await page.goto(URL);
-await page.click(".deckRow:has-text('HIRAGANA')");
-await page.click("button:has-text('Start session')");
-await page.click(".setRow");
-await page.waitForSelector("button:has-text('DEAL')");
-assert.equal(
-  await page.locator(".cardBackMark").count(),
-  10,
-  "the set shows its ten words face-down offline",
-);
-
-const sum = (xs) => xs.reduce((a, b) => a + b, 0);
-const totals = async () =>
-  (await page.locator(".setTotal").allInnerTexts()).map((t) => parseInt(t, 10));
-const rowSums = async () =>
-  Promise.all(
-    (await page.locator(".collectionRow").all()).map(async (row) =>
-      sum(
-        (await row.locator(".collectionTimes").allInnerTexts()).map((t) => parseInt(t.slice(1), 10)),
-      ),
-    ),
-  );
-
-async function round(grade) {
+// --- 3. offline: a whole session ---
+await row(page, "STATION", "kanji").click();
+await page.click("button:has-text('New to these')");
+await page.click("button:has-text('DEAL')");
+await page.waitForSelector(".v7TrialForm svg path");
+let widest = 0;
+for (let i = 0; i < 9; i++) {
+  await page.waitForSelector(".v7Prompt");
+  await page.waitForSelector("canvas.ink");
   const box = await page.locator("canvas.ink").boundingBox();
-  await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.3);
+  await page.mouse.move(box.x + 80, box.y + 80);
   await page.mouse.down();
-  await page.mouse.move(box.x + box.width * 0.7, box.y + box.height * 0.6, { steps: 5 });
+  await page.mouse.move(box.x + 200, box.y + 200, { steps: 4 });
   await page.mouse.up();
-  const word = await page.locator(".cardPromptRomaji").innerText();
-  await page.click("button:has-text('FLIP')");
-  await page.waitForSelector(".wordReveal svg path");
-  const cells = await page.locator(".wordRevealCell").count();
-  await page.click(`button:has-text('${grade}')`);
-  return { word, cells };
+  await page.click("button:has-text('DONE')");
+  await page.waitForSelector(".wordRevealCell svg path");
+  widest = Math.max(widest, await page.locator(".wordRevealCell svg").count());
+  await page.click("button:has-text('GOT IT')");
 }
+assert.ok(widest >= 3, `the whole word reveals one cell per character offline, got ${widest}`);
+await page.waitForSelector(".v7Done");
+assert.equal(await page.locator(".v7DoneRow").count(), 9);
+const rows = await ledger(page);
+assert.equal(rows.filter((r) => r.type === "item").length, 9, "the ledger is written offline");
+await page.click("button:has-text('CLOSE')");
+console.log("3. offline: a session deals, draws its strokes, finishes and is logged");
 
-async function playRun(missFirst) {
-  await page.click("button:has-text('DEAL')");
-  let missed = null;
-  let seen = 0;
-  if (missFirst) missed = (await round("MISSED")).word;
-  let guard = 0;
-  while (!(await page.locator(".resultCount").count())) {
-    assert.ok(++guard < 16, "a run should finish inside its own deck offline");
-    const { cells } = await round("GOT IT");
-    seen = Math.max(seen, cells);
-  }
-  void missed;
-  return seen;
-}
-
-// 3b.i a whole run, one word missed once
-const widest = await playRun(true);
-assert.ok(widest >= 2, `the whole word reveals one cell per character offline, got ${widest}`);
-assert.match(await page.locator(".resultCount").innerText(), /^10\s*EARNED$/);
-// the receipt, offline: the card holds for its ink, and the model laid over
-// it is the same stroke SVG the reveal drew from the precache (SPEC-v6 §9)
-await page.locator(".resultRows .revealSlot").first().click();
-await page.locator(".receiptCard").focus();
-await page.keyboard.press("Enter");
-await page.waitForSelector(".receiptHeld .receiptInk");
-await page.waitForSelector(".receiptHeld .wordRevealCell svg");
-assert.match(await page.locator(".receiptHeld .cardKind").innerText(), /^ATTEMPT \d+$/);
-await page.keyboard.press("Enter");
-await page.mouse.click(8, 8);
-assert.equal(await page.locator(".cardView").count(), 0, "the receipt shows and puts away offline");
-await page.click("button:has-text('BACK TO DECK')");
-await page.click(".setRow");
-const afterOne = await totals();
-assert.equal(sum(afterOne), 10, "a finished offline run earns one copy per word");
-assert.ok(afterOne[1] >= 1, "and the missed word is base");
-await page.click("button:has-text('VIEW COLLECTION')");
-assert.deepEqual(await rowSums(), Array(10).fill(1), "S6d shows every word, one copy deep");
-console.log("3b. offline: a run deals, finishes and earns ten copies");
-
-// 3b.ii and the set replays, offline, onto the same shelf
-await page.click(".backLink"); // ← back to the set
-await playRun(false);
-await page.click("button:has-text('BACK TO DECK')");
-await page.click(".setRow");
-assert.equal(sum(await totals()), 20, "the offline replay stacks a second copy on each word");
-await page.click("button:has-text('VIEW COLLECTION')");
-assert.deepEqual(await rowSums(), Array(10).fill(2));
-console.log("3b. offline: the set replays and the copies stack");
-
-// --- 4. offline: capture, the whole point of the trip ---
-// a second offline reload gets back to home, and re-proves the shell boots
+// --- 4. offline reload: still there ---
 await page.reload();
-await page.waitForSelector(".bankStrip");
-await page.click(".bankStrip");
-await page.click("button:has-text('Open bank')");
-await page.setInputFiles(".bankInput", fixture);
-await page.waitForSelector(".thumb");
-assert.equal(await page.locator(".bankHeadCount").innerText(), "1", "the count ticks offline");
-await page.reload();
-await page.waitForSelector(".bankStrip");
-assert.equal(await page.locator(".bankStripCount").innerText(), "1", "capture survives an offline reload");
-console.log("4. offline: capture saves, count ticks, and it is still there after a reload");
+await page.waitForSelector(".v7Counts");
+assert.match(await page.locator(".v7Counts").innerText(), /^next: .+ · 9 due$/, "the schedule survives an offline reload");
+console.log("4. offline: the schedule is still there after a reload");
 
 // --- 5. one cache, the current one ---
 const keys = await page.evaluate(() => caches.keys());
@@ -267,10 +110,10 @@ try {
     async (name) => (await (await caches.open(name)).keys()).length,
     cacheName,
   );
-  assert.ok(survived > 500, `the rest of the export still installed, got ${survived}`);
+  assert.ok(survived > 200, `the rest of the export still installed, got ${survived}`);
   await hostile.setOffline(true);
   await page2.reload();
-  await page2.waitForSelector(".deckRow:has-text('HIRAGANA')");
+  await page2.waitForSelector(".v7SetRow");
   await hostile.setOffline(false);
   await hostile.close();
   console.log(`6. one unserved URL costs one URL: ${survived} cached, the app still boots offline`);

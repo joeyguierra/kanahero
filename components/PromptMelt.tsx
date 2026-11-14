@@ -146,3 +146,55 @@ export function meltIn(card: HTMLElement, joker: HTMLElement | null): () => void
     hard();
   };
 }
+
+/** ms, hard prompt to nothing */
+const MELT_OUT_MS = 600;
+
+/**
+ * v7: the prompt melts away before the pen goes down (SPEC-v7 §6). The same
+ * filter run backwards — the displacement and blur build while the opacity
+ * drains. `done` fires once, when the element is gone; the returned cancel
+ * stops the melt without firing it.
+ */
+export function meltOut(el: HTMLElement, done: () => void): () => void {
+  const filter = document.getElementById(MELT_ID);
+  const turb = filter?.querySelector("feTurbulence");
+  const disp = filter?.querySelector("feDisplacementMap");
+  const blur = filter?.querySelector("feGaussianBlur");
+
+  const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  if (reduced || !turb || !disp || !blur || typeof el.animate !== "function") {
+    if (typeof el.animate !== "function") {
+      el.style.opacity = "0";
+      done();
+      return () => {};
+    }
+    const fade = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: FADE_MS, fill: "both" });
+    fade.onfinish = done;
+    return () => {
+      fade.onfinish = null;
+      fade.cancel();
+    };
+  }
+
+  turb.setAttribute("seed", String(Math.floor(Math.random() * 100)));
+  el.style.filter = `url(#${MELT_ID})`;
+
+  let raf = 0;
+  const t0 = performance.now();
+  const step = (now: number) => {
+    const p = Math.min(1, (now - t0) / MELT_OUT_MS);
+    const e = p * p;
+    disp.setAttribute("scale", (STRENGTH * e).toFixed(2));
+    blur.setAttribute("stdDeviation", (BLUR * e).toFixed(2));
+    turb.setAttribute(
+      "baseFrequency",
+      `${(0.012 + 0.03 * e).toFixed(4)} ${(0.03 + 0.05 * e).toFixed(4)}`,
+    );
+    el.style.opacity = (1 - e).toFixed(3);
+    if (p < 1) raf = requestAnimationFrame(step);
+    else done();
+  };
+  raf = requestAnimationFrame(step);
+  return () => cancelAnimationFrame(raf);
+}

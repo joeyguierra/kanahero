@@ -1,8 +1,7 @@
 // Platform sets: the word decks that ship as JSON in public/sets.
 //
 // A set is data, not code — the only things fixed here are the ids (progress
-// keys on them, forever) and the shape. User-created sets are not in this
-// build (SPEC-v5 §10).
+// keys on them, forever) and the shape.
 
 export type SetScript = "hiragana" | "katakana" | "kanji";
 
@@ -15,8 +14,6 @@ export interface SetWord {
   meaning: string;
   kind?: string;
 }
-
-import type { SetJoker } from "./joker-lines";
 
 export interface WordSet {
   id: string;
@@ -31,9 +28,15 @@ export interface WordSet {
   script: SetScript;
   origin: "platform";
   words: SetWord[];
-  /** lines only this set can say (SPEC-v5b §4). They arrive and leave with the
-      file, so a deleted set can never leave an orphaned line behind. */
-  joker?: SetJoker;
+  /** the word S0 and S1 show beside the name; defaults to the script */
+  tag?: string;
+  /** v5b's per-set Joker lines: tolerated in the file, ignored (SPEC-v7 §4) */
+  joker?: unknown;
+}
+
+/** what S0 and S1 print beside a set's name */
+export function tagOf(set: WordSet): string {
+  return set.tag ?? set.script;
 }
 
 /** every platform set, in the order the decks show them */

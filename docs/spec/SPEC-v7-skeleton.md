@@ -46,6 +46,13 @@ loop plus a scheduler plus a ledger, and the rest comes back on its own spec whe
 - v7.2 **Cards / collection**: redesigned around *done*, not all-or-nothing (a card is what you
   keep after a set stops asking). Rarity-by-tries does not return unless research says so.
 - v7.3 **Receipts** (ink kept per got-it). v7.4 **Sound**. v7.5 **Capture bank**.
+- v7.0.1 **Scrolling canvas for multi-character words** (decided 2026-11-14, built right
+  after the first drill day): one full-width box per character on a canvas N boxes wide. The
+  bottom button reads NEXT until the last box, then DONE; a strip of cells under the canvas
+  shows the position and jumps back on tap. PREVIEW shrinks the whole word onto one screen,
+  read-only; WRITE returns to the boxes. The shrink is a scale of the same canvas, so the ink
+  keeps its shape — add a minimum line width only if a phone shows it too faint. The reveal
+  lands in the preview. CLEAR clears the current box. `WritingCanvas.tsx` is not edited for it.
 - **Per-word list** (word · reading · meaning · rung mark; was S1b) — reference only, nothing in
   the loop needs it. **Script decks** (grouping sets under Hiragana / Katakana / Kanji) — only
   if six rows prove too many.
@@ -60,7 +67,8 @@ loop plus a scheduler plus a ledger, and the rest comes back on its own spec whe
 
 Copy as-is, do not refactor: `components/WritingCanvas.tsx`, `lib/strokeAnimator.ts`,
 `lib/ink.ts`, `lib/strokes.ts`, `lib/kana.ts`, `components/StrokeOverlay.tsx`,
-`components/StrokeChar.tsx`, `components/PromptMelt.tsx`, `public/strokes/**`, `public/sets/**`,
+`components/StrokeChar.tsx`, `components/WordReveal.tsx` (the whole-word reveal on S4 and the
+study trial; its tap-to-hurry, tap-again-to-finish comes with it), `components/PromptMelt.tsx`, `public/strokes/**`, `public/sets/**`,
 `scripts/verify-strokes.mjs`, `scripts/gen-sw.mjs`, `scripts/e2e-offline.mjs`,
 `components/ServiceWorker.tsx`, `app/globals.css` (THE LOG — trim dead card/bank rules only
 after v7 ships, not during), attribution/credits content.
@@ -71,7 +79,7 @@ Copy and edit: `lib/sets.ts` (§4), `lib/idb.ts` (ledger store), `lib/session.ts
 Leave behind (in git, not in the v7 tree): `Bank.tsx`, `CaptureDetail.tsx`, `Card.tsx`,
 `CardView.tsx`, `Collection.tsx`, `Deck.tsx`, `HandTick.tsx`, `InkPanel.tsx`, `Joker.tsx`,
 `Result.tsx`, `RevealCard.tsx`, `Round.tsx`, `Session.tsx`, `SetScreen.tsx`, `Settings.tsx`,
-`WordReveal.tsx`, `AbandonDialog.tsx`, `lib/bank.ts`, `lib/joker*.ts`, `lib/progress.ts`,
+`AbandonDialog.tsx`, `lib/bank.ts`, `lib/joker*.ts`, `lib/progress.ts`,
 `lib/receipts.ts`, `lib/reveal.ts`, `lib/sfx*.ts`, `lib/audio.ts`, `lib/zip.ts`, `joker/`,
 `scripts/joker-audit.mjs`, `scripts/sfx-*.mjs`, `scripts/e2e-joker.mjs`, `scripts/e2e-bank.mjs`.
 `package.json` scripts: `build` = `next build && node scripts/gen-sw.mjs`; `predev` removed.
@@ -89,7 +97,8 @@ Leave behind (in git, not in the v7 tree): `Bank.tsx`, `CaptureDetail.tsx`, `Car
 ## 4. Data: sets and items
 
 `SetWord` shape unchanged: `{ word, reading, romaji, meaning, kind? }`. `WordSet` loses `joker`
-(field tolerated, ignored). `PLATFORM_SET_IDS` becomes:
+(field tolerated, ignored) and gains an optional `tag`: the word S0 and S1 show beside the name.
+It defaults to the script; `n5-mock-words` sets `tag: "words"`. `PLATFORM_SET_IDS` becomes:
 `everyday-hiragana · countries-katakana · daily-basics-kanji · station-kanji · calendar-kanji ·
 n5-mock-words`.
 
@@ -103,7 +112,8 @@ Stroke coverage: `verify-strokes.mjs` must pass for 新 電 気 外; kana-only w
 are written one character per box on one canvas (§7 S3); the grade is for the whole word.
 
 **Prompt per script:** kana sets → romaji. kanji/word sets → meaning + reading (kana). The
-prompt never contains the written form.
+prompt never contains the written form — so a kana-only word in a kanji set (つける) prompts
+with the meaning alone, because its reading is its form.
 
 ## 5. The scheduler — `lib/schedule.ts`, pure, DOM-free
 
@@ -147,7 +157,8 @@ Rules (each one is an e2e case):
 6.1 **Pure retrieval (seen item):** S2 prompt (3 s melt) → S3 write → S4 reveal + grade.
 6.2 **Study trial (unseen):** S2 shows the written form large with its stroke animation once,
     reading + meaning beneath, then melts → S3 write → S4. The form is gone when the pen is down.
-    No ghost, no trace, no second look before writing.
+    No ghost, no trace, no second look before writing. The melt starts when the animation ends,
+    not on the 3 s timer; a tap hurries the animation, a second tap finishes it (as on S4).
 6.3 **Grade is binary and the user's.** The overlay is the evidence. The S4 copy under the
     buttons says once, small: *dots, long vowels and small kana count*. This is the one place
     the app comments on grading, because the baseline's four misses were all of that kind.
@@ -159,7 +170,9 @@ Rules (each one is an e2e case):
 - **S0 SET LIST.** One plain list, six rows: set name · script · `N due · M new`. Tap a row →
   that set's S1 (via S1a the first time). No selected state, no start button, no rungs. Footer:
   *export ledger* · *credits*.
-- **S1 TODAY.** Set name (tap → S0) · `N due · M new` · DEAL. States:
+- **S1 TODAY.** Set name + tag (tap → S0) · `N due · M new` · the spread · DEAL. The spread is a
+  picture of the deal: one small card per item, hatched = due, plain = new, due first; 1–7 in
+  one row, 8+ in two, the top row takes the odd card. States:
   1. first run — `0 due · 10 new`, DEAL;
   2. normal — `N due · M new`, DEAL;
   3. heavy — due > 20, so `N due · 0 new`, DEAL; no copy about absence, ever;
@@ -170,17 +183,21 @@ Rules (each one is an e2e case):
 - **S1a PLACEMENT** — first time a set opens: *New to these* / *I can already write some*. Two
   buttons. Stored per set. Never asked again.
 - **S2 PROMPT** — per §4; trial variant per §6.2.
-- **S3 WRITE** — canvas, one box per character, DONE. No hints, no count, no grid.
+- **S3 WRITE** — canvas, one box per character (dashed divider between boxes, all on one screen
+  until v7.0.1), CLEAR, DONE. A plain ✕ leaves the session for S1 with no confirm: every grade
+  is saved as it is made, so nothing is lost. No hints, no count, no grid.
 - **S4 REVEAL + GRADE** — strokes over ink; word · reading · meaning; GOT IT / MISSED equal
   weight; the one grading line (§6.3). Reserved 1-line slot above the reading (pitch accent),
   blank. Joker seat bottom-left, blank.
-- **S5 DONE** — list of today's items (word · ✓/✗) · minutes · "next: <n> due <day>" · CLOSE.
+- **S5 DONE** — list of today's items (word · reading where it differs from the word · ✓/✗) ·
+  minutes · "next: <n> due <day>" ("tomorrow" when it is) · CLOSE.
   Nothing else. No score, streak, share, rarity.
 
 ## 8. Storage
 
 - `kanahero:v7` localStorage — `{ version: 1, items: Record<id, ItemState>, placement:
-  Record<setId, "new"|"known">, capSpentFor?: string }`. v6's `kanahero:v1` is read **once**:
+  Record<setId, "new"|"known">, capSpent: Record<setId, { day, n }>, lastSet?, importedV6 }`.
+  The cap is per set, so it is tracked per set and counted per word. v6's `kanahero:v1` is read **once**:
   any character with v6 progress enters at `seen: true, rung: 1, due: today` so prior work is
   not thrown away and is immediately re-tested. v1 blob is left in place, never written.
 - `kanahero-ledger` IndexedDB (reuse `lib/idb.ts`) — one row per graded item:
@@ -211,6 +228,27 @@ Drill minutes today before building: baseline 2026-11-14 01:51–03:20 (measurem
 
 ## 11. Post-build audit
 *(Written after the build. Where the tree contradicts this file, say so here, not in silence.)*
+
+Built 2026-11-14 on branch `v7`. `npm run build` and all three `npm run e2e` scripts pass.
+Not yet done: iPhone Safari on the live build (§9), and nobody has looked at the screens by eye.
+
+Where the tree differs from this file:
+- **`grade()` takes a fourth argument**, `{ placed }`. §5's signature cannot tell a study trial
+  from the blind first write of a placed-known set, and rules 5 and 6 land them on different rungs.
+- **A WRITE ANYWAY got-it climbs a rung like any other** (rule 3 as written). An item can only
+  be one day early, so the ladder bends by at most a day per rung.
+- **The session queue is built in `lib/store.ts`** (`buildQueue`), not `lib/session.ts`, which
+  only keeps `requeue`, now generic.
+- **The header count is items cleared + 1**, out of the deal's size. A miss does not advance it.
+- **`e2e-offline.mjs` was rewritten**, not kept: it drove v6's screens, captures and sound.
+- **`e2e-schedule.mjs` also covers the state layer** (`lib/store.ts`): cap, queue, v6 import.
+- **A session left through ✕ still writes its ledger session row** if anything was graded.
+- **The v6 import** maps v6's two kinds of progress onto words: a word v6 held a card for, or
+  a kana word whose every character v6 counted as written from memory.
+- **Left in the tree, unused:** `public/sfx` (96 KB), `public/assets` (2.8 MB, the mascot),
+  `public/sets/test-kanji.json`, `app/verify`, `StrokeChar.tsx`, `StrokeOverlay.tsx`,
+  `lib/kana.ts`. The first three are precached for nothing; remove with the CSS trim.
+- **`components/PromptMelt.tsx` gained `meltOut`**: v6 only melted a prompt in; v7 melts it away.
 
 ## Next physical-world action
 Day 1 drill on the v7 build: open `everyday-hiragana`, answer *I can already write some*, write

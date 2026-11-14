@@ -3,6 +3,7 @@
   "name": "N5 MOCK",
   "glyph": "語",
   "script": "kanji",
+  "tag": "words",
   "origin": "platform",
   "words": [
     { "word": "新しい", "reading": "あたらしい", "romaji": "atarashii", "meaning": "new" },

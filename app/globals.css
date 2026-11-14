@@ -3584,3 +3584,357 @@ a.creditName {
     transition: none;
   }
 }
+
+/* ==== v7 — the skeleton (SPEC-v7-skeleton §7) ====
+   THE LOG's tokens and shared pieces, nothing new in the system. Everything
+   above this line that v7 does not use is dead and gets trimmed after v7
+   ships, not during (§2). */
+
+.v7Head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rail);
+  font-variant-numeric: tabular-nums;
+}
+
+.v7HeadLink {
+  text-align: left;
+  padding: 12px 0;
+  margin: -12px 0;
+}
+
+.v7HeadRight {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+}
+
+.v7Jp {
+  font-family: var(--kana);
+}
+
+/* a reserved line: blank in v7, and it holds its height so nothing moves
+   when a later version fills it */
+.v7Slot {
+  height: 22px;
+  margin-top: 10px;
+  flex: none;
+}
+
+.v7Counts {
+  margin-top: 24px;
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.v7CountsNext {
+  color: var(--rail);
+  font-size: 26px;
+}
+
+.v7Next {
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--rail);
+}
+
+/* ---- S0 ---- */
+
+.v7SetList {
+  list-style: none;
+  margin-top: 16px;
+  border-top: 1px solid var(--seam);
+}
+
+.v7SetRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  width: 100%;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--seam);
+  text-align: left;
+}
+
+.v7SetName {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.v7SetTag,
+.v7SetCounts {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--rail);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.v7SetTag {
+  margin-left: 6px;
+}
+
+.v7Foot {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--rail);
+}
+
+.v7Foot button {
+  padding: 12px 4px;
+}
+
+/* ---- S1a ---- */
+
+.v7Question {
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.v7Choices {
+  display: flex;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.v7Choice {
+  flex: 1;
+  min-height: 72px;
+  padding: 10px;
+  color: var(--bone);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.v7GrowLow {
+  flex: 1.4;
+}
+
+/* ---- S1 ---- */
+
+.v7Spread {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.v7SpreadRow {
+  display: flex;
+}
+
+.v7SpreadCard {
+  flex: none;
+  width: 60px;
+  height: 84px;
+  border: 1px solid var(--rail);
+  background: var(--plate);
+}
+
+.v7SpreadDue {
+  background: repeating-linear-gradient(45deg, var(--rail) 0 3px, var(--plate) 3px 7px);
+}
+
+.v7Outline {
+  background: none;
+  border-color: var(--rail);
+  color: var(--bone);
+  font-size: 14px;
+}
+
+/* ---- S2–S4 ---- */
+
+.v7Loop {
+  /* everything on the reveal that is not the board, added up: the board is
+     sized from this so it is the same box on S3 and S4 */
+  --chrome: calc(440px + env(safe-area-inset-top) + env(safe-area-inset-bottom));
+}
+
+.v7Prompt {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: 14vh;
+}
+
+.v7PromptMain {
+  font-size: 44px;
+  font-weight: 900;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+/* a cue with no reading under it is the whole prompt: romaji, or the meaning
+   of a kana-only word */
+.v7PromptSolo {
+  font-size: 56px;
+}
+
+.v7PromptReading {
+  margin-top: 16px;
+  font-size: 32px;
+  color: var(--rail);
+}
+
+/* the study trial: the form draws itself in bone, at the width of the screen */
+.v7TrialForm {
+  position: relative;
+  width: 100%;
+  height: 200px;
+}
+
+.v7TrialForm .wordReveal {
+  --stroke: var(--bone);
+  --shadow: transparent;
+}
+
+.v7TrialGloss {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.v7TrialGloss > span + span {
+  color: var(--rail);
+}
+
+/* no grid on the board: v6's crosshair goes, the dividers between boxes stay */
+.v7Board::before,
+.v7Board::after {
+  content: none;
+}
+
+.v7Divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed rgba(10, 10, 11, 0.28);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.v7Answer {
+  margin-top: 16px;
+}
+
+.v7AnswerWord {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.v7AnswerReading {
+  margin-top: 8px;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.v7AnswerMeaning {
+  margin-top: 8px;
+  font-size: 17px;
+  color: var(--rail);
+}
+
+/* equal weight, and no colour verdict */
+.v7Grade {
+  color: var(--bone);
+  border-color: var(--rail);
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.v7GradeNote {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--rail);
+}
+
+.v7Loop .sessionActions .v7Slot {
+  margin-top: 0;
+}
+
+/* ---- S5 ---- */
+
+.v7Done {
+  height: 100dvh;
+}
+
+.v7DoneList {
+  list-style: none;
+  margin-top: 16px;
+  border-top: 1px solid var(--seam);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.v7DoneRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 30px;
+  border-bottom: 1px solid var(--seam);
+}
+
+.v7DoneWord {
+  font-family: var(--kana);
+  font-size: 16px;
+  min-width: 46px;
+  white-space: nowrap;
+}
+
+.v7DoneReading {
+  flex: 1;
+  font-family: var(--kana);
+  font-size: 12px;
+  color: var(--rail);
+}
+
+.v7DoneMark {
+  width: 18px;
+  text-align: center;
+  color: var(--rail);
+}
+
+.v7DoneFoot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.v7DoneFoot .v7Counts {
+  margin-top: 18px;
+}
+
+.v7DoneFoot .actionBar {
+  margin-top: 16px;
+}
