@@ -1,6 +1,7 @@
 // The ledger: one row per graded item and one per session, in its own
 // IndexedDB database (SPEC-v7-skeleton §8). This is results.md's data source.
 // A failed write never blocks the loop — the drill matters more than the row.
+// Rows written before the one-queue rework carry a `setId`; rows since do not.
 
 import { idbStore } from "./idb";
 
@@ -8,7 +9,6 @@ export interface ItemRow {
   type: "item";
   day: string;
   ts: number;
-  setId: string;
   word: string;
   trial: boolean;
   ok: boolean;
@@ -19,7 +19,6 @@ export interface ItemRow {
 export interface SessionRow {
   type: "session";
   day: string;
-  setId: string;
   startTs: number;
   endTs: number;
   due: number;

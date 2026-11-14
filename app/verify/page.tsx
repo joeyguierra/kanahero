@@ -11,24 +11,24 @@
 
 import { useEffect, useState } from "react";
 import { HIRAGANA, KATAKANA } from "@/lib/kana";
-import { charsInSet, loadPlatformSets, type WordSet } from "@/lib/sets";
+import { charsInWords, loadWords, type Word } from "@/lib/words";
 import StrokeChar from "@/components/StrokeChar";
 
 const ALL = [...HIRAGANA, ...KATAKANA];
 
 export default function VerifyPage() {
   const [run, setRun] = useState(0);
-  const [sets, setSets] = useState<WordSet[] | null>(null);
-  const [setsError, setSetsError] = useState<string | null>(null);
+  const [words, setWords] = useState<Word[] | null>(null);
+  const [wordsError, setWordsError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadPlatformSets().then(setSets, (e: Error) => setSetsError(e.message));
+    loadWords().then(setWords, (e: Error) => setWordsError(e.message));
   }, []);
 
   return (
     <main className="verify" key={run}>
       <header className="verifyHeader">
-        <h1>stroke data check — {ALL.length} kana + every set character</h1>
+        <h1>stroke data check — {ALL.length} kana + every list character</h1>
         <p>
           Each tile should draw the way a pen writes: stroke by stroke, in order, each stroke
           growing from its start point. Tap a tile to replay it.
@@ -50,27 +50,26 @@ export default function VerifyPage() {
         </div>
       </section>
 
-      {setsError && <p className="strokeCharError">sets failed to load: {setsError}</p>}
-      {sets?.map((set) => (
-        <section className="verifySet" key={set.id}>
+      {wordsError && <p className="strokeCharError">word list failed to load: {wordsError}</p>}
+      {words && (
+        <section className="verifySet">
           <h2>
-            {set.name} <span className="verifySetMeta">{set.id}</span>
+            the word list <span className="verifySetMeta">n5</span>
           </h2>
           <p>
-            {set.words.length} words ·{" "}
-            {charsInSet(set).length} distinct characters · {set.script}
+            {words.length} words · {charsInWords(words).length} distinct characters
           </p>
           <div className="verifyGrid">
-            {charsInSet(set).map((char) => (
+            {charsInWords(words).map((char) => (
               <StrokeChar
                 key={char}
                 char={char}
-                label={set.words.find((w) => w.word.includes(char))!.romaji}
+                label={words.find((w) => w.write.includes(char))!.write}
               />
             ))}
           </div>
         </section>
-      ))}
+      )}
 
       <section className="verifySet">
         <h2>

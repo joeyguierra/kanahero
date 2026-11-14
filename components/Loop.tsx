@@ -2,9 +2,11 @@
 
 // S2 → S3 → S4, once per item (SPEC-v7 §6).
 //
-//   prompt  the cue, alone, for about three seconds — then it melts. A study
-//           trial (first exposure) shows the written form drawing itself
-//           instead, and melts when the drawing ends.
+//   prompt  the script being asked for and the cue, for about three seconds
+//           — then it melts. A study trial (first exposure) shows the written
+//           form drawing itself instead, and melts when the drawing ends.
+//           Nothing here has to be waited for: a tap starts the melt, and a
+//           second tap finishes it.
 //   write   a blank board, one box per character. No hint, no trace.
 //   reveal  the model strokes over your ink, and you grade yourself.
 //
@@ -12,10 +14,10 @@
 // empty. Every grade is handed up the moment it is made, so leaving through ✕
 // loses nothing.
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { requeue } from "@/lib/session";
-import { promptFor, type SetWord, type WordSet } from "@/lib/sets";
 import type { QueueItem } from "@/lib/store";
+import { promptFor, type Word } from "@/lib/words";
 import { MeltFilter, meltOut } from "./PromptMelt";
 import WordReveal from "./WordReveal";
 import WritingCanvas, { type WritingCanvasHandle } from "./WritingCanvas";
@@ -34,13 +36,13 @@ export interface LoopResult {
 type Step = "prompt" | "write" | "reveal";
 
 export default function Loop({
-  set,
+  words,
   queue: dealt,
   onGrade,
   onFinish,
   onQuit,
 }: {
-  set: WordSet;
+  words: Word[];
   queue: QueueItem[];
   /** one grade, as it is made; `ms` runs from the prompt to the tap */
   onGrade: (item: QueueItem, ok: boolean, ms: number) => void;
@@ -58,32 +60,65 @@ export default function Loop({
   const canvasRef = useRef<WritingCanvasHandle>(null);
   /** whatever the prompt is waiting on: a timer, then the melt */
   const pending = useRef<(() => void) | null>(null);
+  /** where the prompt is on its way out; "idle" while a trial is still drawing */
+  const stage = useRef<"idle" | "wait" | "melt">("idle");
+  /** when the wait was last armed, on the clock event timestamps use */
+  const armedAt = useRef(0);
 
+  const byId = useMemo(() => new Map(words.map((w) => [w.write, w])), [words]);
   const current = queue[0];
-  const word: SetWord =
-    set.words.find((w) => w.word === current.word) ??
-    ({ word: current.word, reading: current.word, romaji: "", meaning: "" } as SetWord);
-  const chars = [...word.word];
+  const word: Word = byId.get(current.id) ?? {
+    order: 0,
+    write: current.id,
+    ask: "hiragana",
+    reading: current.id,
+    kanji: null,
+    romaji: "",
+    meaning: "",
+  };
+  const chars = [...word.write];
   const total = dealt.length;
   const position = total - queue.length + 1;
-  const cue = promptFor(set, word);
+  const cue = promptFor(word);
   const reveal = step === "reveal";
+
+  /** hand over the board, whatever the prompt was in the middle of */
+  function toWrite() {
+    pending.current?.();
+    pending.current = null;
+    stage.current = "idle";
+    setStep("write");
+  }
+
+  function startMelt() {
+    pending.current?.();
+    const el = promptRef.current;
+    if (!el) {
+      toWrite();
+      return;
+    }
+    stage.current = "melt";
+    pending.current = meltOut(el, toWrite);
+  }
 
   /** after `wait`, melt the prompt away and hand over the board */
   function leavePromptAfter(wait: number) {
     pending.current?.();
-    const timer = setTimeout(() => {
-      const el = promptRef.current;
-      if (!el) {
-        setStep("write");
-        return;
-      }
-      pending.current = meltOut(el, () => {
-        pending.current = null;
-        setStep("write");
-      });
-    }, wait);
+    stage.current = "wait";
+    armedAt.current = performance.now();
+    const timer = setTimeout(startMelt, wait);
     pending.current = () => clearTimeout(timer);
+  }
+
+  /** A tap hurries the prompt: the first starts the melt, the second finishes
+      it. The word still has to be written; only the waiting is skipped. A
+      study trial's drawing takes its own taps (WordReveal), and the tap that
+      finishes the drawing must not also start the melt, so a tap older than
+      the wait it would hurry is ignored. */
+  function tapPrompt(e: MouseEvent) {
+    if (e.timeStamp < armedAt.current) return;
+    if (stage.current === "wait") startMelt();
+    else if (stage.current === "melt") toWrite();
   }
 
   useEffect(() => {
@@ -93,16 +128,15 @@ export default function Loop({
     return () => {
       pending.current?.();
       pending.current = null;
+      stage.current = "idle";
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [presented]);
 
   function grade(ok: boolean) {
     onGrade(current, ok, Math.round(performance.now() - shownAt.current));
-    results.current = [...results.current, { word: word.word, reading: word.reading, ok }];
-    const rest = ok
-      ? queue.slice(1)
-      : requeue([{ ...current, trial: false, placed: false }, ...queue.slice(1)]);
+    results.current = [...results.current, { word: word.write, reading: word.reading, ok }];
+    const rest = ok ? queue.slice(1) : requeue([{ ...current, trial: false }, ...queue.slice(1)]);
     if (rest.length === 0) {
       onFinish(results.current);
       return;
@@ -115,7 +149,7 @@ export default function Loop({
 
   if (step === "prompt") {
     return (
-      <main className="frame v7Loop">
+      <main className="frame v7Loop" onClick={tapPrompt}>
         <div className="rail" aria-hidden />
         <div className="v7Head">
           <span>PROMPT</span>
@@ -125,10 +159,11 @@ export default function Loop({
         </div>
         <MeltFilter />
         <div className="v7Prompt" ref={promptRef} key={presented}>
+          <div className="v7Script">{cue.script}</div>
           {current.trial ? (
             <>
               <div className="v7TrialForm">
-                <WordReveal word={word.word} onDone={() => leavePromptAfter(TRIAL_HOLD_MS)} />
+                <WordReveal word={word.write} onDone={() => leavePromptAfter(TRIAL_HOLD_MS)} />
               </div>
               <div className="v7TrialGloss">
                 {cue.reading && <span className="v7Jp">{cue.reading}</span>}
@@ -177,16 +212,18 @@ export default function Loop({
             />
           ))}
           <WritingCanvas ref={canvasRef} frozen={reveal} onInkChange={setHasInk} />
-          {reveal && <WordReveal word={word.word} />}
+          {reveal && <WordReveal word={word.write} />}
         </div>
       </div>
 
       {reveal && (
         <div className="v7Answer">
-          <div className="v7AnswerWord v7Jp">{word.word}</div>
+          <div className="v7AnswerWord v7Jp">{word.write}</div>
           {/* reserved: pitch accent, blank in v7 */}
           <div className="v7Slot" />
-          {word.reading !== word.word && <div className="v7AnswerReading v7Jp">{word.reading}</div>}
+          {word.reading !== word.write && <div className="v7AnswerReading v7Jp">{word.reading}</div>}
+          {/* a word asked in hiragana: the kanji it is usually written with */}
+          {word.kanji && <div className="v7AnswerReading v7AnswerKanji v7Jp">{word.kanji}</div>}
           <div className="v7AnswerMeaning">{word.meaning}</div>
         </div>
       )}

@@ -3,10 +3,10 @@
 // Everything after step 1 happens with the network switched off at the
 // browser, so a pass means the service worker's precache is carrying the app:
 //   1. The SW installs and takes control of the page
-//   2. Offline cold reload: the set list renders from cache, sets and all
+//   2. Offline cold reload: Today renders from cache, word list and all
 //   3. Offline: a whole session — study trials draw, the word reveals over
 //      the ink, the session finishes and the schedule and ledger are written.
-//      The set JSON and every character's stroke file came from the precache.
+//      The word list and every character's stroke file came from the precache.
 //   4. Offline reload: the state is still there
 //   5. Only one cache exists, and it is the current content hash
 //   6. A URL the host does not serve costs that URL, not the whole install
@@ -15,7 +15,7 @@ import assert from "node:assert/strict";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { chromium } from "playwright";
-import { counts, ledger, row, serveOut } from "./e2e-lib.mjs";
+import { big, ledger, serveOut } from "./e2e-lib.mjs";
 
 const generated = await readFile(path.join(import.meta.dirname, "..", "out", "sw.js"), "utf8");
 const cacheName = generated.match(/const CACHE = "(kanahero-[0-9a-f]+)"/)?.[1];
@@ -32,7 +32,7 @@ page.setDefaultTimeout(60000);
 
 // --- 1. install and take control ---
 await page.goto(URL);
-await page.waitForSelector(".v7SetRow");
+await page.waitForSelector(".v7Counts");
 // `ready` resolves once the SW is activated, which is after cache.addAll has
 // pulled the entire export down
 await page.evaluate(() => navigator.serviceWorker.ready);
@@ -44,18 +44,15 @@ console.log(`1. service worker installed and controlling: ${cached} URLs in ${ca
 // --- 2. offline cold reload ---
 await context.setOffline(true);
 await page.reload();
-await page.waitForSelector(".v7SetRow");
-assert.equal(await page.locator(".v7SetRow").count(), 6, "all six sets load offline");
-assert.equal(await counts(page, "STATION", "kanji"), "0 due · 9 new");
-console.log("2. offline: the shell boots and the set list renders with its counts");
+await page.waitForSelector(".v7Counts");
+assert.equal(await big(page), "0 due · 10 new", "the word list loads offline");
+console.log("2. offline: the shell boots and Today renders with its counts");
 
 // --- 3. offline: a whole session ---
-await row(page, "STATION", "kanji").click();
-await page.click("button:has-text('New to these')");
 await page.click("button:has-text('DEAL')");
 await page.waitForSelector(".v7TrialForm svg path");
 let widest = 0;
-for (let i = 0; i < 9; i++) {
+for (let i = 0; i < 10; i++) {
   await page.waitForSelector(".v7Prompt");
   await page.waitForSelector("canvas.ink");
   const box = await page.locator("canvas.ink").boundingBox();
@@ -70,16 +67,16 @@ for (let i = 0; i < 9; i++) {
 }
 assert.ok(widest >= 3, `the whole word reveals one cell per character offline, got ${widest}`);
 await page.waitForSelector(".v7Done");
-assert.equal(await page.locator(".v7DoneRow").count(), 9);
+assert.equal(await page.locator(".v7DoneRow").count(), 10);
 const rows = await ledger(page);
-assert.equal(rows.filter((r) => r.type === "item").length, 9, "the ledger is written offline");
+assert.equal(rows.filter((r) => r.type === "item").length, 10, "the ledger is written offline");
 await page.click("button:has-text('CLOSE')");
 console.log("3. offline: a session deals, draws its strokes, finishes and is logged");
 
 // --- 4. offline reload: still there ---
 await page.reload();
 await page.waitForSelector(".v7Counts");
-assert.match(await page.locator(".v7Counts").innerText(), /^next: .+ · 9 due$/, "the schedule survives an offline reload");
+assert.match(await page.locator(".v7Next").innerText(), /^next: .+ · 10 due$/, "the schedule survives an offline reload");
 console.log("4. offline: the schedule is still there after a reload");
 
 // --- 5. one cache, the current one ---
@@ -113,7 +110,7 @@ try {
   assert.ok(survived > 200, `the rest of the export still installed, got ${survived}`);
   await hostile.setOffline(true);
   await page2.reload();
-  await page2.waitForSelector(".v7SetRow");
+  await page2.waitForSelector(".v7Counts");
   await hostile.setOffline(false);
   await hostile.close();
   console.log(`6. one unserved URL costs one URL: ${survived} cached, the app still boots offline`);

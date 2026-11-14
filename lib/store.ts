@@ -1,39 +1,36 @@
 // v7 state: what the scheduler remembers between days (SPEC-v7-skeleton §8).
 // One versioned blob in localStorage. The top half is pure — state in, state
 // out — so scripts/e2e-schedule.mjs can run it without a browser.
+//
+// One queue, one pile a day (§5): every due word first, oldest first, then up
+// to NEW_CAP new words in the room left under PILE_MAX. When that deal is
+// written, MORE adds new words, NEW_CAP at a time, until the day's pile is
+// full.
 
 import {
-  DUE_CEILING,
   NEW_CAP,
+  PILE_MAX,
   addDays,
   deal,
   grade,
-  isDone,
   nextDue,
   unseen,
   type Deal,
   type ItemState,
   type Rung,
 } from "./schedule";
-import { itemId, type WordSet } from "./sets";
-
-export type Placement = "new" | "known";
 
 export interface V7State {
-  version: 1;
-  /** only items that have been graded; anything absent is unseen */
+  version: 2;
+  /** only items that have been graded; anything absent is unseen. Keyed by
+      the written word. */
   items: Record<string, ItemState>;
-  placement: Record<string, Placement>;
-  /** per set: how many new items were first written against `day`'s cap */
-  capSpent: Record<string, { day: string; n: number }>;
-  /** the set Today opens on at launch */
-  lastSet?: string;
-  /** the v6 blob has been read; it is never read again */
-  importedV6: boolean;
+  /** how many new words were first written on `day` */
+  newSpent?: { day: string; n: number };
 }
 
 export function emptyState(): V7State {
-  return { version: 1, items: {}, placement: {}, capSpent: {}, importedV6: false };
+  return { version: 2, items: {} };
 }
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
@@ -41,7 +38,8 @@ const isDay = (v: unknown): v is string => typeof v === "string" && DAY.test(v);
 const isObj = (v: unknown): v is Record<string, unknown> =>
   !!v && typeof v === "object" && !Array.isArray(v);
 
-/** trust nothing from storage: a bad entry is dropped, not thrown */
+/** Trust nothing from storage: a bad entry is dropped, not thrown. A version 1
+    blob was keyed by set and is not carried over: the queue starts clean. */
 export function parseState(raw: string | null): V7State {
   const out = emptyState();
   if (!raw) return out;
@@ -51,7 +49,7 @@ export function parseState(raw: string | null): V7State {
   } catch {
     return out;
   }
-  if (!isObj(data) || data.version !== 1) return out;
+  if (!isObj(data) || data.version !== 2) return out;
   if (isObj(data.items)) {
     for (const [id, v] of Object.entries(data.items)) {
       if (!isObj(v) || !isDay(v.due)) continue;
@@ -66,52 +64,43 @@ export function parseState(raw: string | null): V7State {
       };
     }
   }
-  if (isObj(data.placement)) {
-    for (const [id, v] of Object.entries(data.placement)) {
-      if (v === "new" || v === "known") out.placement[id] = v;
-    }
+  const spent = data.newSpent;
+  if (isObj(spent) && isDay(spent.day) && typeof spent.n === "number" && spent.n > 0) {
+    out.newSpent = { day: spent.day, n: Math.floor(spent.n) };
   }
-  if (isObj(data.capSpent)) {
-    for (const [id, v] of Object.entries(data.capSpent)) {
-      if (isObj(v) && isDay(v.day) && typeof v.n === "number" && v.n > 0) {
-        out.capSpent[id] = { day: v.day, n: Math.floor(v.n) };
-      }
-    }
-  }
-  if (typeof data.lastSet === "string") out.lastSet = data.lastSet;
-  out.importedV6 = data.importedV6 === true;
   return out;
 }
 
-/** every item of a set, in set order, seen or not */
-export function itemsFor(state: V7State, set: WordSet): ItemState[] {
-  return set.words.map((w) => {
-    const id = itemId(set.id, w.word);
-    return state.items[id] ?? unseen(id);
-  });
+/** every item of the list, in list order, seen or not */
+export function itemsFor(state: V7State, order: string[]): ItemState[] {
+  return order.map((id) => state.items[id] ?? unseen(id));
 }
 
-/** What is left of today's new-item cap. A cap already borrowed by an earlier
-    WRITE ANYWAY sits on a later day and leaves nothing for today. */
-export function capLeft(state: V7State, setId: string, today: string): number {
-  const spent = state.capSpent[setId];
-  if (!spent || spent.day < today) return NEW_CAP;
-  if (spent.day > today) return 0;
-  return Math.max(0, NEW_CAP - spent.n);
+/** How much of today's pile is left. Every word graded today has taken a
+    place in it, new or review, got or missed. */
+export function roomLeft(state: V7State, today: string): number {
+  const written = Object.values(state.items).filter((s) => s.lastDay === today).length;
+  return Math.max(0, PILE_MAX - written);
 }
 
-function dealWith(state: V7State, set: WordSet, today: string, newCap: number): Deal {
+/** what is left of the deal's new words: NEW_CAP less those first written today */
+export function newLeft(state: V7State, today: string): number {
+  const spent = state.newSpent;
+  return Math.max(0, NEW_CAP - (spent && spent.day === today ? spent.n : 0));
+}
+
+/** The day's deal, or with `more` the next batch of new words on top of it. */
+function dealWith(state: V7State, order: string[], today: string, more: boolean): Deal {
   return deal({
     today,
-    items: itemsFor(state, set),
-    setOrder: set.words.map((w) => itemId(set.id, w.word)),
-    newCap,
-    dueCeiling: DUE_CEILING,
-    placedKnown: state.placement[set.id] === "known",
+    items: itemsFor(state, order),
+    order,
+    newLeft: more ? NEW_CAP : newLeft(state, today),
+    room: roomLeft(state, today),
   });
 }
 
-export type TodayKind = "deal" | "writeAnyway" | "done";
+export type TodayKind = "deal" | "more" | "done";
 
 export interface TodayView {
   kind: TodayKind;
@@ -121,107 +110,70 @@ export interface TodayView {
   next: { day: string; count: number } | null;
 }
 
-/** S1's state, and S0's row (SPEC-v7 §7). */
-export function todayView(state: V7State, set: WordSet, today: string): TodayView {
-  const d = dealWith(state, set, today, capLeft(state, set.id, today));
-  const items = itemsFor(state, set);
-  const kind: TodayKind =
-    d.due.length + d.fresh.length > 0 ? "deal" : isDone(items, today) ? "done" : "writeAnyway";
-  return { kind, due: d.due.length, fresh: d.fresh.length, next: nextDue(items, today) };
+/** Today's state (SPEC-v7 §7):
+    deal  there is a pile to write
+    more  the deal is written, the pile has room and unseen words remain
+    done  the pile is full, or nothing is left to give */
+export function todayView(state: V7State, order: string[], today: string): TodayView {
+  const d = dealWith(state, order, today, false);
+  const items = itemsFor(state, order);
+  const dealt = d.due.length + d.fresh.length > 0;
+  const kind: TodayKind = dealt
+    ? "deal"
+    : dealWith(state, order, today, true).fresh.length > 0
+      ? "more"
+      : "done";
+  // Due words the pile had no room for slide to tomorrow and join what is due
+  // then. The line never promises more than one pile.
+  const tomorrow = addDays(today, 1);
+  const waiting = dealt ? 0 : d.held;
+  const soon = nextDue(items, today);
+  const next =
+    waiting > 0
+      ? { day: tomorrow, count: waiting + (soon && soon.day === tomorrow ? soon.count : 0) }
+      : soon;
+  return {
+    kind,
+    due: d.due.length,
+    fresh: d.fresh.length,
+    next: next && { day: next.day, count: Math.min(PILE_MAX, next.count) },
+  };
 }
 
 export interface QueueItem {
+  /** the written word */
   id: string;
-  word: string;
   /** first exposure: show the form, then melt (§6.2) */
   trial: boolean;
-  /** blind first write of a placed-known set (§5 rule 6) */
-  placed: boolean;
 }
 
-/**
- * The session queue, fixed when DEAL is tapped: due first, then new. WRITE
- * ANYWAY deals a full cap of new items and then tomorrow's (§5 rule 7).
- */
+/** The session queue, fixed when the button is tapped: due first, then new. */
 export function buildQueue(
   state: V7State,
-  set: WordSet,
+  order: string[],
   today: string,
-  writeAnyway = false,
+  more = false,
 ): QueueItem[] {
-  const d = dealWith(state, set, today, writeAnyway ? NEW_CAP : capLeft(state, set.id, today));
-  const known = state.placement[set.id] === "known";
-  const word = (id: string) => id.slice(set.id.length + 1);
-  const old = (id: string): QueueItem => ({ id, word: word(id), trial: false, placed: false });
-  const fresh = (id: string): QueueItem => ({ id, word: word(id), trial: !known, placed: known });
-  return [...d.due.map(old), ...d.fresh.map(fresh), ...(writeAnyway ? d.pulledForward.map(old) : [])];
+  const d = dealWith(state, order, today, more);
+  return [
+    ...d.due.map((id) => ({ id, trial: false })),
+    ...d.fresh.map((id) => ({ id, trial: true })),
+  ];
 }
 
-/**
- * One grade. A capped new item spends the cap of the day it was dealt for:
- * today's in a normal deal, tomorrow's under WRITE ANYWAY.
- */
-export function applyGrade(
-  state: V7State,
-  setId: string,
-  q: QueueItem,
-  today: string,
-  ok: boolean,
-  writeAnyway = false,
-): V7State {
+/** One grade. A word's first write counts against the day it was written. */
+export function applyGrade(state: V7State, q: QueueItem, today: string, ok: boolean): V7State {
   const before = state.items[q.id] ?? unseen(q.id);
-  const items = { ...state.items, [q.id]: grade(before, today, ok, { placed: q.placed }) };
-  if (before.seen || q.placed) return { ...state, items };
-  const day = writeAnyway ? addDays(today, 1) : today;
-  const spent = state.capSpent[setId];
-  const n = spent && spent.day === day ? spent.n + 1 : spent && spent.day > day ? spent.n : 1;
-  const capDay = spent && spent.day > day ? spent.day : day;
-  return { ...state, items, capSpent: { ...state.capSpent, [setId]: { day: capDay, n } } };
-}
-
-/**
- * Read v6's `kanahero:v1` once. A word v6 had a card for, or a kana word whose
- * every character v6 counted as written from memory, enters seen at rung 1,
- * due today: prior work is kept and immediately re-tested. The v6 blob itself
- * is never written.
- */
-export function importV6(
-  state: V7State,
-  sets: WordSet[],
-  v6raw: string | null,
-  today: string,
-): V7State {
-  if (state.importedV6) return state;
-  const done = { ...state, importedV6: true };
-  let data: unknown;
-  try {
-    data = v6raw ? JSON.parse(v6raw) : null;
-  } catch {
-    return done;
-  }
-  if (!isObj(data)) return done;
-  const earned = new Set(
-    Array.isArray(data.earned) ? data.earned.filter((c) => typeof c === "string") : [],
-  );
-  const cards = isObj(data.joker) ? data.joker : {};
-  const items = { ...state.items };
-  for (const set of sets) {
-    const held = cards[set.id];
-    for (const w of set.words) {
-      const id = itemId(set.id, w.word);
-      if (items[id]) continue;
-      const hadCard = isObj(held) && isObj(held[w.word]);
-      const kanaKnown = set.script !== "kanji" && [...w.word].every((ch) => earned.has(ch));
-      if (hadCard || kanaKnown) items[id] = { id, rung: 1, due: today, seen: true };
-    }
-  }
-  return { ...done, items };
+  const items = { ...state.items, [q.id]: grade(before, today, ok) };
+  if (before.seen) return { ...state, items };
+  const spent = state.newSpent;
+  const n = spent && spent.day === today ? spent.n + 1 : 1;
+  return { ...state, items, newSpent: { day: today, n } };
 }
 
 // ---- the blob, and a tiny store around it for useSyncExternalStore ----
 
 const KEY = "kanahero:v7";
-const V6_KEY = "kanahero:v1";
 
 const SERVER = emptyState(); // stable hydration snapshot
 let cache: V7State | null = null;
@@ -260,17 +212,4 @@ export function setState(next: V7State): V7State {
   }
   listeners.forEach((l) => l());
   return next;
-}
-
-/** run the one-time v6 import once the sets are loaded */
-export function importV6Once(sets: WordSet[], today: string): void {
-  const state = getState();
-  if (state.importedV6) return;
-  let raw: string | null = null;
-  try {
-    raw = window.localStorage.getItem(V6_KEY);
-  } catch {
-    // unreadable storage imports nothing
-  }
-  setState(importV6(state, sets, raw, today));
 }

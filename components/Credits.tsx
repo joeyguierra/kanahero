@@ -33,7 +33,7 @@ export default function Credits({ onBack }: { onBack: () => void }) {
     <main className="frame">
       <div className="screenHead">
         <button type="button" className="backLink" onClick={onBack}>
-          ← SETS
+          ← TODAY
         </button>
         <span className="screenTitle">CREDITS</span>
       </div>

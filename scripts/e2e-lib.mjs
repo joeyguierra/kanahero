@@ -1,4 +1,4 @@
-// Shared by e2e-loop and e2e-offline: serve `out/`, and drive one item of the
+// Shared by e2e-loop and e2e-offline: serve `out/`, and drive one word of the
 // v7 loop the way a thumb does.
 
 import { spawn } from "node:child_process";
@@ -17,10 +17,8 @@ export async function serveOut(port) {
   throw new Error(`nothing answered on ${url}`);
 }
 
-export const row = (page, name, tag) =>
-  page.locator(`.v7SetRow:has(.v7SetName:text-matches("^${name} ${tag}$"))`);
-
-export const counts = (page, name, tag) => row(page, name, tag).locator(".v7SetCounts").innerText();
+/** Today's big line: "N due · M new", or the next line when the day is done */
+export const big = (page) => page.locator(".v7Counts").innerText();
 
 export async function draw(page) {
   const box = await page.locator("canvas.ink").boundingBox();
@@ -31,30 +29,42 @@ export async function draw(page) {
   return box;
 }
 
-/**
- * One item: read the prompt, wait for it to melt, write, DONE, grade.
- * Returns what the prompt showed and what the reveal said the word was.
- */
+/** What the prompt shows: the script label, the cue, and the header. */
 export async function readPrompt(page) {
   await page.waitForSelector(".v7Prompt");
   return {
     trial: (await page.locator(".v7TrialForm").count()) > 0,
-    prompt: (await page.locator(".v7Prompt").innerText()).trim(),
+    prompt: (await page.locator(".v7Prompt").innerText()).replace(/\s+/g, " ").trim(),
     head: (await page.locator(".v7Head").innerText()).replace(/\s+/g, " ").trim(),
   };
 }
 
-/** `shown`: a prompt already read with readPrompt, when the caller looked first */
-export async function playItem(page, ok = true, shown = null) {
+/** Tap the prompt on its way: one tap starts the melt. A study trial is
+    tapped once its form has drawn, on the label, so the tap is not one of the
+    drawing's own. */
+export async function hurryPrompt(page, trial) {
+  if (trial) await page.waitForSelector(".v7TrialForm svg path");
+  await page.locator(".v7Script").click();
+}
+
+/**
+ * One word: read the prompt, tap it on its way, write, DONE, grade. Returns
+ * what the prompt showed and what the reveal said the word was.
+ * `shown`: a prompt already read with readPrompt, when the caller looked first.
+ * `wait`: leave the prompt alone and let it run its own time.
+ */
+export async function playItem(page, ok = true, shown = null, { wait = false } = {}) {
   const { trial, prompt, head } = shown ?? (await readPrompt(page));
+  if (!wait && (await page.locator(".v7Prompt").count()) > 0) await hurryPrompt(page, trial);
   await page.waitForSelector("canvas.ink");
   const board = await draw(page);
   await page.click("button:has-text('DONE')");
   await page.waitForSelector(".wordReveal");
   const word = (await page.locator(".v7AnswerWord").innerText()).trim();
+  const kanji = (await page.locator(".v7AnswerKanji").allInnerTexts()).join("");
   const revealBoard = await page.locator("canvas.ink").boundingBox();
   await page.click(`button:has-text('${ok ? "GOT IT" : "MISSED"}')`);
-  return { trial, prompt, head, word, board, revealBoard };
+  return { trial, prompt, head, word, kanji, board, revealBoard };
 }
 
 export const stored = (page) =>

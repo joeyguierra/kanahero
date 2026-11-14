@@ -1,7 +1,8 @@
 // Vendors stroke SVGs from strokesvg (github.com/zhengkyl/strokesvg) into
 // public/strokes/<hex>.svg, plus the upstream LICENSE into public/licenses/.
-// Both scripts: 71 hiragana and the 71 katakana that mirror them, plus the 20
-// small kana the word sets need (ちょっと, フィリピン) — see SMALL below.
+// Both scripts: 71 hiragana and the 71 katakana that mirror them, the
+// long-vowel mark ー, plus the 20 small kana words need (ちょっと, パーティー) —
+// see SMALL below.
 // Run once at setup: node scripts/fetch-strokes.mjs
 // Nothing is fetched at runtime — these files ship with the app.
 
@@ -22,11 +23,14 @@ const KATAKANA = [...HIRAGANA]
   .map((c) => String.fromCodePoint(c.codePointAt(0) + 0x60))
   .join("");
 
+// The long-vowel mark has no hiragana twin, so it is listed on its own:
+// loanwords need it (コーヒー, タクシー).
 const SETS = [
   { dir: "hiragana", chars: HIRAGANA },
   { dir: "katakana", chars: KATAKANA },
+  { dir: "katakana", chars: "ー" },
 ];
-const TOTAL = HIRAGANA.length + KATAKANA.length;
+const TOTAL = SETS.reduce((n, s) => n + [...s.chars].length, 0);
 
 async function fetchText(url) {
   const res = await fetch(url);

@@ -1,7 +1,6 @@
 // Vendors kanji stroke SVGs from KanjiVG (kanjivg.tagaini.net) into
 // public/strokes/<hex>.svg, plus the upstream license into public/licenses/.
-// Characters: every distinct kanji across the kanji platform sets in
-// public/sets/*.json (station: 14 characters).
+// Characters: every distinct kanji in the word list, public/words/n5.json.
 // Run once at setup: node scripts/fetch-kanjivg.mjs [weight]
 // Nothing is fetched at runtime — these files ship with the app.
 //
@@ -25,14 +24,14 @@
 // perceptual match; the kanji then sit beside the kana without looking drawn
 // by a finer pen. Retune with `node scripts/fetch-kanjivg.mjs <weight>`.
 
-import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const STROKE_WIDTH = Number(process.argv[2] ?? process.env.KANJIVG_WEIGHT ?? 58);
 
 const KVG_RAW = "https://raw.githubusercontent.com/KanjiVG/kanjivg/master/kanji";
 const ROOT = path.join(import.meta.dirname, "..");
-const SETS = path.join(ROOT, "public", "sets");
+const WORDS = path.join(ROOT, "public", "words", "n5.json");
 const OUT = path.join(ROOT, "public", "strokes");
 const LICENSES = path.join(ROOT, "public", "licenses");
 
@@ -45,15 +44,11 @@ const isKanji = (ch) => {
   return (c >= 0x4e00 && c <= 0x9fff) || (c >= 0x3400 && c <= 0x4dbf);
 };
 
-/** every distinct kanji across the kanji platform sets, in first-seen order */
-export async function kanjiInSets() {
+/** every distinct kanji the word list asks for, in first-seen order */
+export async function kanjiInWords() {
   const chars = [];
-  for (const name of (await readdir(SETS)).filter((f) => f.endsWith(".json")).sort()) {
-    const set = JSON.parse(await readFile(path.join(SETS, name), "utf8"));
-    if (set.script !== "kanji") continue;
-    for (const w of set.words) {
-      for (const ch of w.word) if (isKanji(ch) && !chars.includes(ch)) chars.push(ch);
-    }
+  for (const w of JSON.parse(await readFile(WORDS, "utf8"))) {
+    for (const ch of w.write) if (isKanji(ch) && !chars.includes(ch)) chars.push(ch);
   }
   return chars;
 }
@@ -98,7 +93,7 @@ if (import.meta.filename === process.argv[1]) {
   await mkdir(OUT, { recursive: true });
   await mkdir(LICENSES, { recursive: true });
 
-  const chars = await kanjiInSets();
+  const chars = await kanjiInWords();
   console.log(`${chars.length} distinct kanji: ${chars.join(" ")}`);
   console.log(`stroke weight ${STROKE_WIDTH} (=${INNER_WIDTH} before scale(${SCALE.toFixed(6)}))\n`);
 

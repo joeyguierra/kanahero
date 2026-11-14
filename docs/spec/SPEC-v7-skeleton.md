@@ -6,6 +6,10 @@
 Entry is Today for the last-used set, with one plain set list (S0) behind the set name; the
 per-word list (old S1b) is tabled; six sets stay as six queues, no script decks; the Joker stays
 in v7.1. Wireframe to match: `docs/design/v7/v7-wireframe-brief.md`.
+**Amended 2026-11-14 (one queue):** sets and placement are retired. The app is one ordered
+list of 210 words (`docs/research/01-n5-word-list.md`) and one pile a day, 30 words at most.
+§1, §3 D4, §4, §5, §7, §8 and §9 below are rewritten to match; §11 records what the first
+build was and what changed. Where an older line and this amendment disagree, this one stands.
 **Base:** `11ad5e5` on `main`. Build on a branch `v7`. Where this file is silent, nothing
 stands — v7 starts from zero and takes files back one by one (§2).
 **Next.js:** read `AGENTS.md` first — this is Next 16; check `node_modules/next/dist/docs/`
@@ -28,17 +32,17 @@ loop plus a scheduler plus a ledger, and the rest comes back on its own spec whe
 **In this build**
 1. The write loop, unchanged in behaviour: prompt → write → reveal strokes over ink →
    self-grade → miss requeues 5 later (§6).
-2. A per-item scheduler with due dates, a uniform rung ladder, and a new-item cap that yields
-   to due load. Pure function, `lib/`, DOM-free (§5).
+2. A per-item scheduler with due dates, a uniform rung ladder, and one daily pile: reviews
+   first, then new words in the room left. Pure function, `lib/`, DOM-free (§5).
 3. A study trial for every item's first exposure (§6.2).
-4. A placement question per set, asked once (§7 S1a).
-5. The unit is the word. Kana sets are single-character words with a romaji prompt; kanji and
-   word sets prompt with meaning + reading (§4).
+4. One queue. The app decides what is written each day; there is no set list and no
+   placement question. Nothing is assumed known.
+5. The unit is the word. The prompt names the script asked for; a kanji word prompts with
+   meaning + reading, a kana word with its meaning alone (§4).
 6. A ledger: drill days, items due/done/missed, minutes. Exportable JSON (§8).
-7. Seven screens: S0 set list, S1 Today, S1a placement, S2–S5 (§7). THE LOG as the visual
-   system, reused, not redesigned.
-8. Sets: existing JSON unchanged in shape; `calendar-kanji` wired; `test-kanji` removed from
-   `PLATFORM_SET_IDS`; one new set `n5-mock-words` seeded from the baseline's unknown list (§4).
+7. Five screens: S1 Today, S2–S5 (§7). THE LOG as the visual system, reused, not redesigned.
+8. Data: one word list, `public/words/n5.json`, 210 words in drill order (§4). The six set
+   files stay on disk, unread, until the post-ship trim.
 9. `npm run e2e` gates: e2e-loop (rewritten), e2e-schedule (new), e2e-offline (kept).
 
 **Not in this build — tabled, with return order**
@@ -93,48 +97,59 @@ Leave behind (in git, not in the v7 tree): `Bank.tsx`, `CaptureDetail.tsx`, `Car
 | D1 rung ladder | 1 · 3 · 7 · 14 · 30 days, uniform | Latimier 2021: spacing×retrieval; no clear evidence expanding > uniform | 7-day delayed production on scheduled vs unscheduled items shows no gap |
 | D2 criterion | an item advances on a got-it on a *fresh day*; "done" = two fresh-day corrects (rung ≥ 3) | Rawson & Dunlosky; Kornell & Bjork 2008 (.62 after one correct, .88 after two) | items at rung 3 miss at the same rate as rung 1 |
 | D3 unit | the word; kana = 1-char words | Guan & Perfetti 2015 (writing builds form↔meaning); baseline: gap is words + kanji | word-level drilling moves production but not the mock |
-| D4 new cap | 10/day per set; 0 when due > 20 | load arithmetic, not a finding — label as such | due pile exceeds 20 min by week 3 |
+| D4 daily pile | 30 words at most: every due word first, then up to 10 new in the room left; MORE adds new words, 10 at a time, up to 30 | load arithmetic, not a finding — label as such. 10 new a day sits inside the 6–15 studied, none with handwriting (research 01 §2) | the pile passes 20 min by week 3 |
 | D5 study trial | first exposure = show → melt → write | retrieval needs an encoding; pretesting null for novel associations | — (design necessity) |
 
-## 4. Data: sets and items
+## 4. Data: the word list
 
-`SetWord` shape unchanged: `{ word, reading, romaji, meaning, kind? }`. `WordSet` loses `joker`
-(field tolerated, ignored) and gains an optional `tag`: the word S0 and S1 show beside the name.
-It defaults to the script; `n5-mock-words` sets `tag: "words"`. `PLATFORM_SET_IDS` becomes:
-`everyday-hiragana · countries-katakana · daily-basics-kanji · station-kanji · calendar-kanji ·
-n5-mock-words`.
+`public/words/n5.json` is a straight copy of `docs/research/01-n5-week1-words.json`: an array
+of 210 words in drill order. Positions 1–70 are week one if nothing is missed.
 
-**New set `public/sets/n5-mock-words.json`** — name `N5 MOCK`, `script: "kanji"`, 9 words from the baseline:
-新しい あたらしい new · 電気 でんき electricity, the light · 外 そと outside ·
-つける つける to turn on · つとめる つとめる to work at, be employed · ゆうべ ゆうべ last night ·
-おととい おととい the day before yesterday · くらい くらい dark · のる のる to get on, ride.
-Stroke coverage: `verify-strokes.mjs` must pass for 新 電 気 外; kana-only words need none.
+```ts
+interface Word { order: number; write: string; ask: "hiragana" | "katakana" | "kanji";
+                 reading: string; kanji: string | null; romaji: string; meaning: string;
+                 pos?: string; source?: string; note?: string }
+```
 
-**Item id** = `${setId}/${word}`. One item per word, not per character. Multi-character words
-are written one character per box on one canvas (§7 S3); the grade is for the whole word.
+- `write` is exactly what is handwritten. **It is the item id.** Every `write` is unique.
+- `ask` is the script the prompt names. Kanji plus okurigana (新しい) is `kanji`.
+- `kanji` is the usual kanji form of a word asked in hiragana (のる → 乗る), shown on the answer
+  screen only; `null` when the word is normally written in kana. The six doubtful cases were
+  checked against a dictionary's usually-kana flags on 2026-11-14: つける, あげる, かかる and
+  かける stay `null`, おととい keeps 一昨日, and ゆうべ gained 昨夜.
+- Every `meaning` is unique, because a kana word is prompted by its meaning alone.
 
-**Prompt per script:** kana sets → romaji. kanji/word sets → meaning + reading (kana). The
-prompt never contains the written form — so a kana-only word in a kanji set (つける) prompts
-with the meaning alone, because its reading is its form.
+`scripts/verify-strokes.mjs` checks all of this and that every character has a stroke file.
+Kanji strokes: `node scripts/fetch-kanjivg.mjs` (reads the word list). The long-vowel mark ー
+comes from strokesvg's katakana set, like the other kana.
+
+**Prompt:** the script label, then the cue. `kanji` → meaning + reading (kana). `hiragana`
+and `katakana` → the meaning alone, because the reading is the form. The prompt never
+contains the written form. Multi-character words are written one character per box on one
+canvas (§7 S3); the grade is for the whole word.
 
 ## 5. The scheduler — `lib/schedule.ts`, pure, DOM-free
 
 ```ts
 type Rung = 0 | 1 | 2 | 3 | 4 | 5;            // 0 = never seen
 const LADDER_DAYS = [0, 1, 3, 7, 14, 30];      // days until due, by rung
+const NEW_CAP = 10;                            // new words in one deal
+const PILE_MAX = 30;                           // words in one day, reviews and new together
 interface ItemState { id: string; rung: Rung; due: string /* YYYY-MM-DD local */;
                       lastDay?: string; seen: boolean }
-interface DealInput { today: string; items: ItemState[]; setOrder: string[];
-                      newCap: number; dueCeiling: number; placedKnown: boolean }
-interface Deal { due: string[]; fresh: string[]; pulledForward: string[] }
+interface DealInput { today: string; items: ItemState[]; order: string[];
+                      newLeft: number; room: number }
+interface Deal { due: string[]; fresh: string[]; held: number }
 function deal(i: DealInput): Deal
 function grade(s: ItemState, today: string, ok: boolean): ItemState
 ```
 
 Rules (each one is an e2e case):
-1. **Due first.** `due = items where due <= today`, oldest due first, then set order.
-2. **Then new.** `fresh = unseen items in set order`, at most `newCap`; **0 if due.length >
-   dueCeiling (20).**
+1. **Due first.** `due = items where due <= today`, oldest due first, then list order, at most
+   `room`. **More due than room:** the rest are `held`. Nothing about them changes, so they
+   are older tomorrow and come first.
+2. **Then new.** `fresh = unseen items in list order`, at most `newLeft`, and only in the room
+   the reviews leave. No new words on a day reviews fill the pile.
 3. **Grade got-it:** if `lastDay !== today` → `rung = min(rung+1, 5)`, `due = today +
    LADDER_DAYS[rung]`, `lastDay = today`. If `lastDay === today` (second correct same day)
    → no change. A rung never advances twice in one day.
@@ -144,23 +159,31 @@ Rules (each one is an e2e case):
 5. **Study trial:** an item with `seen === false` is dealt with `trial: true`; after its first
    grade `seen = true`. First grade of a trial item: got-it → rung 1, due tomorrow (not rung 2;
    the write was seconds after seeing it). Miss → rung 1, due tomorrow, requeue.
-6. **Placement "already know":** `placedKnown` → all unseen items dealt once, blind, no trial,
-   no cap; got-it → rung 2, due today+3; miss → rung 1 with a trial on the reveal.
-7. **Write anyway** (nothing due): first `fresh` up to cap; then `pulledForward` = items with
-   `due === today+1`, nearest first; never beyond tomorrow; never items graded today. Fresh
-   items pulled on a zero-due day count against tomorrow's cap (persist `capSpentFor: tomorrow`).
-8. **Done** for a set = no due and no unseen. Today shows the next due date instead of DEAL.
-9. Confusable adjacency (kana only): new items are dealt in gojūon order; no shuffle of fresh.
-   Due items keep rule 1 order.
+6. **The day's pile** (`lib/store.ts` owns the bookkeeping). `room = 30 − words graded today`
+   (new or review, got or missed; a word counts once). DEAL passes `newLeft = 10 − new words
+   first written today`.
+7. **MORE.** When DEAL has nothing left, the pile has room and unseen words remain, MORE deals
+   new words with `newLeft = 10`, still inside `room`. It can be taken again until the pile is
+   30, never past it. Extra words cost tomorrow nothing but their reviews.
+8. **Done for today** = the pile is full, or nothing is due and nothing is unseen. Today shows
+   the next line instead of a button. Held words count toward tomorrow's line; the line never
+   names more than 30.
+9. New items are dealt in list order; no shuffle of fresh. Due items keep rule 1 order.
 10. Days are local calendar days; a session that crosses midnight keeps its start day.
+
+Gone with the sets: placement ("already know", blind first write to rung 2), the per-set cap,
+"0 new when due > 20", and WRITE ANYWAY with its pull-forward of tomorrow's reviews.
 
 ## 6. The loop
 
 6.1 **Pure retrieval (seen item):** S2 prompt (3 s melt) → S3 write → S4 reveal + grade.
+    The wait can be hurried: a tap starts the melt, a second tap finishes it. The word itself
+    cannot be skipped.
 6.2 **Study trial (unseen):** S2 shows the written form large with its stroke animation once,
     reading + meaning beneath, then melts → S3 write → S4. The form is gone when the pen is down.
     No ghost, no trace, no second look before writing. The melt starts when the animation ends,
     not on the 3 s timer; a tap hurries the animation, a second tap finishes it (as on S4).
+    Once the form is drawn, the same two taps hurry the hold and the melt.
 6.3 **Grade is binary and the user's.** The overlay is the evidence. The S4 copy under the
     buttons says once, small: *dots, long vowels and small kana count*. This is the one place
     the app comments on grading, because the baseline's four misses were all of that kind.
@@ -168,27 +191,25 @@ Rules (each one is an e2e case):
 
 ## 7. Screens (THE LOG; mobile first; no new visual system)
 
-- **Launch.** Opens S1 for the last-used set. First-ever launch (no last set) opens S0.
-- **S0 SET LIST.** One plain list, six rows: set name · script · `N due · M new`. Tap a row →
-  that set's S1 (via S1a the first time). No selected state, no start button, no rungs. Footer:
-  *export ledger* · *credits*.
-- **S1 TODAY.** Set name + tag (tap → S0) · `N due · M new` · the spread · DEAL. The spread is a
-  picture of the deal: one small card per item, hatched = due, plain = new, due first; 1–7 in
-  one row, 8+ in two, the top row takes the odd card. States:
+- **Launch.** Opens S1. There is nothing to choose.
+- **S1 TODAY.** `TODAY` + the date · `N due · M new` · the spread · the button. Footer:
+  *export ledger* · *credits*. The spread is a picture of the deal: one small card per word,
+  hatched = due, plain = new, due first; 1–7 in one row, 8–20 in two, 21–30 in three, upper
+  rows take the odd cards. States:
   1. first run — `0 due · 10 new`, DEAL;
   2. normal — `N due · M new`, DEAL;
-  3. heavy — due > 20, so `N due · 0 new`, DEAL; no copy about absence, ever;
-  4. today's deal finished, unseen items remain — `0 due · 0 new`, "next: <day> · <n> due",
-     WRITE ANYWAY (outlined, not filled; §5 rule 7);
-  5. set done — "next: <date> · <n> due", no button.
+  3. heavy — reviews fill the pile, so `30 due · 0 new`, DEAL; no copy about absence, ever;
+  4. the deal is written, the pile has room, unseen words remain — `0 due · 0 new`,
+     "next: <day> · <n> due", MORE (outlined, not filled; §5 rule 7);
+  5. done for today — "next: <date> · <n> due", no button.
   One blank line reserved under the numbers (Joker seat, v7.1).
-- **S1a PLACEMENT** — first time a set opens: *New to these* / *I can already write some*. Two
-  buttons. Stored per set. Never asked again.
-- **S2 PROMPT** — per §4; trial variant per §6.2.
+- **S2 PROMPT** — the script label above the cue, per §4; trial variant per §6.2. A tap
+  anywhere hurries it (§6.1).
 - **S3 WRITE** — canvas, one box per character (dashed divider between boxes, all on one screen
   until v7.0.1), CLEAR, UNDO (takes back the last stroke), DONE. A plain ✕ leaves the session for S1 with no confirm: every grade
   is saved as it is made, so nothing is lost. No hints, no count, no grid.
-- **S4 REVEAL + GRADE** — strokes over ink; word · reading · meaning; GOT IT / MISSED equal
+- **S4 REVEAL + GRADE** — strokes over ink; word · reading (when it differs) · the kanji form
+  of a word asked in hiragana · meaning; GOT IT / MISSED equal
   weight; the one grading line (§6.3). Reserved 1-line slot above the reading (pitch accent),
   blank. Joker seat bottom-left, blank.
 - **S5 DONE** — list of today's items (word · reading where it differs from the word · ✓/✗) ·
@@ -197,26 +218,28 @@ Rules (each one is an e2e case):
 
 ## 8. Storage
 
-- `kanahero:v7` localStorage — `{ version: 1, items: Record<id, ItemState>, placement:
-  Record<setId, "new"|"known">, capSpent: Record<setId, { day, n }>, lastSet?, importedV6 }`.
-  The cap is per set, so it is tracked per set and counted per word. v6's `kanahero:v1` is read **once**:
-  any character with v6 progress enters at `seen: true, rung: 1, due: today` so prior work is
-  not thrown away and is immediately re-tested. v1 blob is left in place, never written.
+- `kanahero:v7` localStorage — `{ version: 2, items: Record<write, ItemState>, newSpent?:
+  { day, n } }`. `newSpent` counts the new words first written on `day`. A `version: 1` blob
+  (keyed `setId/word`) is not carried over: the queue starts clean. v6's `kanahero:v1` is no
+  longer read; it is left in place, never written.
 - `kanahero-ledger` IndexedDB (reuse `lib/idb.ts`) — one row per graded item:
-  `{ day, ts, setId, word, trial, ok, ms }` + one row per session: `{ day, startTs, endTs,
-  due, fresh, done, missed }`. Export: a JSON file from S0's footer, named
+  `{ day, ts, word, trial, ok, ms }` + one row per session: `{ day, startTs, endTs,
+  due, fresh, done, missed }`. Rows written before the one-queue rework also carry a `setId`.
+  Export: a JSON file from Today's footer, named
   `kanahero-ledger-<day>.json`. This is `results.md`'s data source.
 - Receipts (`kanahero-receipts`) and bank (`kanahero-bank`) stores are untouched and unread.
 
 ## 9. Verification (build gates)
 
-- `npm run build` = `next build && gen-sw`. `verify-strokes` passes for every char in every
-  wired set, including the new one.
+- `npm run build` = `next build && gen-sw`. `verify-strokes` passes for every character in
+  the word list, and for the list's unique `write` and `meaning`.
 - `npm run e2e`:
-  - `e2e-schedule.mjs` — pure-function cases for §5 rules 1–10 with fixed dates. No browser.
-  - `e2e-loop.mjs` — Playwright against `out/`: first run → placement → trial → write → grade →
-    done; next-day (clock injected) → due dealt first; miss requeues at 5; second got-it same
-    day does not advance; write-anyway pulls tomorrow only; ledger rows written.
+  - `e2e-schedule.mjs` — pure-function cases for §5 with fixed dates, and the state layer. No
+    browser.
+  - `e2e-loop.mjs` — Playwright against `out/`: launch on Today → trial → write → grade →
+    done → MORE; next-day (clock injected) → due dealt first, then new; a tap hurries the
+    prompt; miss requeues at 5; second got-it same day does not advance; the pile stops at 30
+    and the rest slide; the kanji form on the answer; ledger rows written; old state dropped.
   - `e2e-offline.mjs` — unchanged.
 - iPhone Safari on the live build before the version is called shipped (HANDOFF debt 6).
 
@@ -252,6 +275,29 @@ Where the tree differs from this file:
   `lib/kana.ts`. The first three are precached for nothing; remove with the CSS trim.
 - **`components/PromptMelt.tsx` gained `meltOut`**: v6 only melted a prompt in; v7 melts it away.
 
+### The one-queue rework (2026-11-14, same day)
+
+The first build above was six sets with a placement question. It was replaced the same day,
+before the first drill day, by the amendment at the top of this file. `npm run build` and all
+three `npm run e2e` scripts pass on the reworked tree. Not yet done: nobody has looked at the
+reworked screens by eye or on a phone.
+
+What changed against the list above:
+- **`grade()` is back to three arguments.** Placement is gone, so there is one kind of first write.
+- **WRITE ANYWAY is gone; MORE replaced it** (§5 rule 7). Nothing is pulled forward any more.
+- **The cap is per day, not per set**, and it is derived: `room` from the words graded today,
+  `newLeft` from `newSpent`.
+- **`lib/sets.ts`, `Sets.tsx` and `Placement.tsx` are deleted; `lib/words.ts` is new.** The v6
+  import is deleted with them.
+- **`/verify` shows the word list's characters** instead of the sets'.
+- **Tap to hurry the prompt** is built (§6.1). The tap that finishes a trial's drawing does not
+  also start the melt: a tap older than the wait it would hurry is ignored.
+- **The tests' prompts are tapped through**, so `e2e-loop.mjs` runs in under a minute. One
+  prompt is left alone to check the three-second wait.
+- **Left in the tree, unused:** the six files in `public/sets/` (still precached), and the
+  `.v7Set*`, `.v7Question` and `.v7Choice*` rules in `globals.css`. Remove with the CSS trim.
+
 ## Next physical-world action
-Day 1 drill on the v7 build: open `everyday-hiragana`, answer *I can already write some*, write
-the deal, log the line in `results.md`. Then `n5-mock-words`, *New to these*, nine trials.
+Day 1 drill on the v7 build: open the app, DEAL, write the ten new words, log the line in
+`results.md`. Before it, if the workbook measure is taken up (research 01 §4.1): one official
+practice workbook's 文字・語彙 section, unseen.

@@ -3756,6 +3756,11 @@ a.creditName {
   background: repeating-linear-gradient(45deg, var(--rail) 0 3px, var(--plate) 3px 7px);
 }
 
+/* export and credits sit under the button, out of its way */
+.v7TodayFoot {
+  margin-top: 6px;
+}
+
 .v7Outline {
   background: none;
   border-color: var(--rail);
@@ -3777,6 +3782,16 @@ a.creditName {
   flex-direction: column;
   justify-content: center;
   padding-bottom: 14vh;
+}
+
+/* which script the word is to be written in */
+.v7Script {
+  margin-bottom: 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rail);
 }
 
 .v7PromptMain {

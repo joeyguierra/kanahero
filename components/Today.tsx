@@ -1,14 +1,13 @@
 "use client";
 
-// S1 — Today. The set, what it owes, one button (SPEC-v7 §7):
-//   deal        N due · M new, the spread, DEAL
-//   writeAnyway today's deal is finished and unseen items remain
-//   done        nothing due and nothing unseen: the next line, no button
+// S1 — Today, the only home. What the queue owes, one button (SPEC-v7 §7):
+//   deal  N due · M new, the spread, DEAL
+//   more  the deal is written, the pile has room and unseen words remain
+//   done  the pile is full or nothing is left: the next line, no button
 // It never comments on absence. A long gap is a bigger number.
 
 import { dayLabel } from "@/lib/days";
 import { addDays } from "@/lib/schedule";
-import { tagOf, type WordSet } from "@/lib/sets";
 import type { TodayView } from "@/lib/store";
 
 const CARD_W = 60;
@@ -18,11 +17,16 @@ function nextLine(next: NonNullable<TodayView["next"]>): string {
   return `next: ${dayLabel(next.day)} · ${next.count} due`;
 }
 
-/** One card per item, due first: 1–7 in one row, 8+ in two, the top row takes
-    the odd card. Rows tighten into an overlap when they run out of width. */
+/** One card per word, due first: 1–7 in one row, 8–20 in two, 21–30 in
+    three; upper rows take the odd cards. Rows tighten into an overlap when
+    they run out of width. */
 function Spread({ due, fresh }: { due: number; fresh: number }) {
   const n = due + fresh;
-  const rows = n <= 7 ? [n] : [Math.ceil(n / 2), Math.floor(n / 2)];
+  const rowCount = n <= 7 ? 1 : n <= 20 ? 2 : 3;
+  const rows = Array.from(
+    { length: rowCount },
+    (_, r) => Math.floor(n / rowCount) + (r < n % rowCount ? 1 : 0),
+  );
   const cols = rows[0];
   const gap = cols > 1 ? `min(8px, calc((100% - ${cols * CARD_W}px) / ${cols - 1}))` : "0px";
   let i = 0;
@@ -47,22 +51,24 @@ function Spread({ due, fresh }: { due: number; fresh: number }) {
 }
 
 export default function Today({
-  set,
+  day,
   view,
-  onSets,
   onDeal,
+  onExport,
+  onCredits,
 }: {
-  set: WordSet;
+  day: string;
   view: TodayView;
-  onSets: () => void;
-  onDeal: (writeAnyway: boolean) => void;
+  onDeal: (more: boolean) => void;
+  onExport: () => void;
+  onCredits: () => void;
 }) {
   return (
     <main className="frame v7Today">
-      <button type="button" className="v7Head v7HeadLink" onClick={onSets}>
-        <span>{set.name}</span>
-        <span>{tagOf(set)}</span>
-      </button>
+      <div className="v7Head">
+        <span>TODAY</span>
+        <span>{dayLabel(day)}</span>
+      </div>
 
       {view.kind === "done" ? (
         <div className="v7Counts v7CountsNext">{view.next ? nextLine(view.next) : "nothing scheduled"}</div>
@@ -73,7 +79,7 @@ export default function Today({
       )}
       {/* reserved: one line, blank in v7 */}
       <div className="v7Slot" />
-      {view.kind === "writeAnyway" && view.next && <div className="v7Next">{nextLine(view.next)}</div>}
+      {view.kind === "more" && view.next && <div className="v7Next">{nextLine(view.next)}</div>}
 
       <div className="grow" />
       {view.kind === "deal" && <Spread due={view.due} fresh={view.fresh} />}
@@ -84,11 +90,19 @@ export default function Today({
           DEAL
         </button>
       )}
-      {view.kind === "writeAnyway" && (
+      {view.kind === "more" && (
         <button type="button" className="btnSeam actionBar v7Outline" onClick={() => onDeal(true)}>
-          WRITE ANYWAY
+          MORE
         </button>
       )}
+      <div className="v7Foot v7TodayFoot">
+        <button type="button" onClick={onExport}>
+          export ledger
+        </button>
+        <button type="button" onClick={onCredits}>
+          credits
+        </button>
+      </div>
     </main>
   );
 }
