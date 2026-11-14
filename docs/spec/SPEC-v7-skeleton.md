@@ -53,6 +53,8 @@ loop plus a scheduler plus a ledger, and the rest comes back on its own spec whe
   read-only; WRITE returns to the boxes. The shrink is a scale of the same canvas, so the ink
   keeps its shape — add a minimum line width only if a phone shows it too faint. The reveal
   lands in the preview. CLEAR clears the current box. `WritingCanvas.tsx` is not edited for it.
+- **The user's brush** — the look of the ink the user draws (width, taper, colour) is to
+  change. Logged 2026-11-14, not designed yet; it lives in `lib/ink.ts`.
 - **Per-word list** (word · reading · meaning · rung mark; was S1b) — reference only, nothing in
   the loop needs it. **Script decks** (grouping sets under Hiragana / Katakana / Kanji) — only
   if six rows prove too many.
@@ -184,7 +186,7 @@ Rules (each one is an e2e case):
   buttons. Stored per set. Never asked again.
 - **S2 PROMPT** — per §4; trial variant per §6.2.
 - **S3 WRITE** — canvas, one box per character (dashed divider between boxes, all on one screen
-  until v7.0.1), CLEAR, DONE. A plain ✕ leaves the session for S1 with no confirm: every grade
+  until v7.0.1), CLEAR, UNDO (takes back the last stroke), DONE. A plain ✕ leaves the session for S1 with no confirm: every grade
   is saved as it is made, so nothing is lost. No hints, no count, no grid.
 - **S4 REVEAL + GRADE** — strokes over ink; word · reading · meaning; GOT IT / MISSED equal
   weight; the one grading line (§6.3). Reserved 1-line slot above the reading (pitch accent),

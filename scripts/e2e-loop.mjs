@@ -90,6 +90,17 @@ await page.mouse.up();
 assert.ok(await page.locator("button:has-text('DONE')").isEnabled());
 await page.click("button:has-text('CLEAR')");
 assert.ok(await page.locator("button:has-text('DONE')").isDisabled(), "CLEAR empties the board");
+// two strokes, UNDO twice: the last stroke goes each time, then the gate closes
+for (const y of [60, 120]) {
+  await page.mouse.move(box.x + 60, box.y + y);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 160, box.y + y + 40, { steps: 4 });
+  await page.mouse.up();
+}
+await page.click("button:has-text('UNDO')");
+assert.ok(await page.locator("button:has-text('DONE')").isEnabled(), "one stroke is still on the board");
+await page.click("button:has-text('UNDO')");
+assert.ok(await page.locator("button:has-text('DONE')").isDisabled(), "UNDO takes back the last stroke");
 assert.equal(await page.locator(".v7Divider").count(), 2, "新しい: three boxes, two dividers");
 
 const set = JSON.parse(await readFile(new URL("../public/sets/n5-mock-words.json", import.meta.url)));

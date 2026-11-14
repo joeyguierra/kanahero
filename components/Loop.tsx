@@ -218,6 +218,14 @@ export default function Loop({
             >
               CLEAR
             </button>
+            <button
+              type="button"
+              className="btnSeam"
+              onClick={() => canvasRef.current?.undo()}
+              disabled={!hasInk}
+            >
+              UNDO
+            </button>
           </div>
           <button
             type="button"
