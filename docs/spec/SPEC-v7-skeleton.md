@@ -2,6 +2,10 @@
 
 **Status: READY TO BUILD (2026-11-14, 03:30).** Written against `results.md` Baseline
 (mock 5/8 · meaning 18/20 · production 16/20 · drill days 0) and `docs/research/00-survey.md`.
+**Amended 2026-11-14 (workshop):** rule of the build is *simplest first, additions later*.
+Entry is Today for the last-used set, with one plain set list (S0) behind the set name; the
+per-word list (old S1b) is tabled; six sets stay as six queues, no script decks; the Joker stays
+in v7.1. Wireframe to match: `docs/design/v7/v7-wireframe-brief.md`.
 **Base:** `11ad5e5` on `main`. Build on a branch `v7`. Where this file is silent, nothing
 stands — v7 starts from zero and takes files back one by one (§2).
 **Next.js:** read `AGENTS.md` first — this is Next 16; check `node_modules/next/dist/docs/`
@@ -31,7 +35,8 @@ loop plus a scheduler plus a ledger, and the rest comes back on its own spec whe
 5. The unit is the word. Kana sets are single-character words with a romaji prompt; kanji and
    word sets prompt with meaning + reading (§4).
 6. A ledger: drill days, items due/done/missed, minutes. Exportable JSON (§8).
-7. Five screens + one (§7). THE LOG as the visual system, reused, not redesigned.
+7. Seven screens: S0 set list, S1 Today, S1a placement, S2–S5 (§7). THE LOG as the visual
+   system, reused, not redesigned.
 8. Sets: existing JSON unchanged in shape; `calendar-kanji` wired; `test-kanji` removed from
    `PLATFORM_SET_IDS`; one new set `n5-mock-words` seeded from the baseline's unknown list (§4).
 9. `npm run e2e` gates: e2e-loop (rewritten), e2e-schedule (new), e2e-offline (kept).
@@ -41,6 +46,9 @@ loop plus a scheduler plus a ledger, and the rest comes back on its own spec whe
 - v7.2 **Cards / collection**: redesigned around *done*, not all-or-nothing (a card is what you
   keep after a set stops asking). Rarity-by-tries does not return unless research says so.
 - v7.3 **Receipts** (ink kept per got-it). v7.4 **Sound**. v7.5 **Capture bank**.
+- **Per-word list** (word · reading · meaning · rung mark; was S1b) — reference only, nothing in
+  the loop needs it. **Script decks** (grouping sets under Hiragana / Katakana / Kanji) — only
+  if six rows prove too many.
 - **Readings task** (produce the reading; Dive B) — own spec after research.
 - **Pitch accent line** — slot reserved on S4; data + finding needed.
 - **Audio / listening via the Joker (ElevenLabs)** — blocked on the runtime posture decision.
@@ -85,7 +93,7 @@ Leave behind (in git, not in the v7 tree): `Bank.tsx`, `CaptureDetail.tsx`, `Car
 `everyday-hiragana · countries-katakana · daily-basics-kanji · station-kanji · calendar-kanji ·
 n5-mock-words`.
 
-**New set `public/sets/n5-mock-words.json`** — `script: "kanji"`, 9 words from the baseline:
+**New set `public/sets/n5-mock-words.json`** — name `N5 MOCK`, `script: "kanji"`, 9 words from the baseline:
 新しい あたらしい new · 電気 でんき electricity, the light · 外 そと outside ·
 つける つける to turn on · つとめる つとめる to work at, be employed · ゆうべ ゆうべ last night ·
 おととい おととい the day before yesterday · くらい くらい dark · のる のる to get on, ride.
@@ -147,14 +155,20 @@ Rules (each one is an e2e case):
 
 ## 7. Screens (THE LOG; mobile first; no new visual system)
 
-- **S1 TODAY.** `N due · M new` + DEAL. Set name beneath → set list (name · count · how many on
-  rung ≥ 1 · tap to open S1b). States: first run (0 due · 10 new); normal; long absence (bigger
-  number, no copy about absence); nothing due and new left → WRITE ANYWAY; set done → "next:
-  <date> · <n> due", no button. One blank line reserved under the numbers (Joker seat, v7.1).
+- **Launch.** Opens S1 for the last-used set. First-ever launch (no last set) opens S0.
+- **S0 SET LIST.** One plain list, six rows: set name · script · `N due · M new`. Tap a row →
+  that set's S1 (via S1a the first time). No selected state, no start button, no rungs. Footer:
+  *export ledger* · *credits*.
+- **S1 TODAY.** Set name (tap → S0) · `N due · M new` · DEAL. States:
+  1. first run — `0 due · 10 new`, DEAL;
+  2. normal — `N due · M new`, DEAL;
+  3. heavy — due > 20, so `N due · 0 new`, DEAL; no copy about absence, ever;
+  4. today's deal finished, unseen items remain — `0 due · 0 new`, "next: <day> · <n> due",
+     WRITE ANYWAY (outlined, not filled; §5 rule 7);
+  5. set done — "next: <date> · <n> due", no button.
+  One blank line reserved under the numbers (Joker seat, v7.1).
 - **S1a PLACEMENT** — first time a set opens: *New to these* / *I can already write some*. Two
   buttons. Stored per set. Never asked again.
-- **S1b SET LIST ITEM** — plain list: word · reading · meaning · rung as a small mark. Reference
-  only; no drilling from here.
 - **S2 PROMPT** — per §4; trial variant per §6.2.
 - **S3 WRITE** — canvas, one box per character, DONE. No hints, no count, no grid.
 - **S4 REVEAL + GRADE** — strokes over ink; word · reading · meaning; GOT IT / MISSED equal
@@ -171,7 +185,7 @@ Rules (each one is an e2e case):
   not thrown away and is immediately re-tested. v1 blob is left in place, never written.
 - `kanahero-ledger` IndexedDB (reuse `lib/idb.ts`) — one row per graded item:
   `{ day, ts, setId, word, trial, ok, ms }` + one row per session: `{ day, startTs, endTs,
-  due, fresh, done, missed }`. Export: a JSON file from S1's set-list footer, named
+  due, fresh, done, missed }`. Export: a JSON file from S0's footer, named
   `kanahero-ledger-<day>.json`. This is `results.md`'s data source.
 - Receipts (`kanahero-receipts`) and bank (`kanahero-bank`) stores are untouched and unread.
 

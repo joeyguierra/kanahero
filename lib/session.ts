@@ -1,5 +1,3 @@
-import type { Kana } from "./kana";
-
 // A missed card comes back a few positions later — far enough to clear
 // short-term memory, near enough that the session tail isn't all misses.
 export const REQUEUE_AT = 5;
@@ -14,7 +12,7 @@ export function shuffle<T>(input: T[]): T[] {
 }
 
 /** Remove the front card and reinsert it REQUEUE_AT positions in. */
-export function requeue(queue: Kana[]): Kana[] {
+export function requeue<T>(queue: T[]): T[] {
   const [head, ...rest] = queue;
   const pos = Math.min(REQUEUE_AT, rest.length);
   return [...rest.slice(0, pos), head, ...rest.slice(pos)];

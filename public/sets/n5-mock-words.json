@@ -1,0 +1,18 @@
+{
+  "id": "n5-mock-words",
+  "name": "N5 MOCK",
+  "glyph": "語",
+  "script": "kanji",
+  "origin": "platform",
+  "words": [
+    { "word": "新しい", "reading": "あたらしい", "romaji": "atarashii", "meaning": "new" },
+    { "word": "電気", "reading": "でんき", "romaji": "denki", "meaning": "electricity, the light" },
+    { "word": "外", "reading": "そと", "romaji": "soto", "meaning": "outside" },
+    { "word": "つける", "reading": "つける", "romaji": "tsukeru", "meaning": "to turn on" },
+    { "word": "つとめる", "reading": "つとめる", "romaji": "tsutomeru", "meaning": "to work at, be employed" },
+    { "word": "ゆうべ", "reading": "ゆうべ", "romaji": "yuube", "meaning": "last night" },
+    { "word": "おととい", "reading": "おととい", "romaji": "ototoi", "meaning": "the day before yesterday" },
+    { "word": "くらい", "reading": "くらい", "romaji": "kurai", "meaning": "dark" },
+    { "word": "のる", "reading": "のる", "romaji": "noru", "meaning": "to get on, ride" }
+  ]
+}

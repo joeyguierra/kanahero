@@ -40,10 +40,26 @@ export interface WordSet {
 export const PLATFORM_SET_IDS = [
   "everyday-hiragana",
   "countries-katakana",
-  "test-kanji",
   "daily-basics-kanji",
   "station-kanji",
+  "calendar-kanji",
+  "n5-mock-words",
 ] as const;
+
+/** one item per word, not per character (SPEC-v7 §4) */
+export function itemId(setId: string, word: string): string {
+  return `${setId}/${word}`;
+}
+
+/**
+ * What the prompt may show. Never the written form: a kana set prompts with
+ * romaji, a kanji set with meaning + reading — and a kana-only word inside a
+ * kanji set (つける) with the meaning alone, because its reading is its form.
+ */
+export function promptFor(set: WordSet, w: SetWord): { main: string; reading?: string } {
+  if (set.script !== "kanji") return { main: w.romaji };
+  return w.reading === w.word ? { main: w.meaning } : { main: w.meaning, reading: w.reading };
+}
 
 export async function loadSet(id: string): Promise<WordSet> {
   const res = await fetch(`/sets/${id}.json`);

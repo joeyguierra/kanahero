@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<title>KanaHero v7 — low-fi skeleton + user flow</title>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&amp;family=Noto+Sans+JP:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f0eee9;font-family:'Patrick Hand',system-ui,sans-serif;color:#1a1a1a}
+a{color:#2a78d6;text-decoration:none}a:hover{color:#1a1a1a}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 system-ui,sans-serif;color:#1a1a1a}
+.dv-sub{font:400 12px/1.5 system-ui,sans-serif;color:rgba(0,0,0,.55);max-width:900px;margin:0 0 22px}
+.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 system-ui,sans-serif;color:rgba(0,0,0,.55)}
+.dv-card{max-width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}
+.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}
+.dv-next{margin:22px 0 0;font:12px/1.5 system-ui,sans-serif;color:rgba(0,0,0,.5)}
+.wf{width:390px;height:844px;background:#fff;border:2px solid #2b2b2b;border-radius:3px;position:relative;display:flex;flex-direction:column;padding:48px 24px 24px;font-size:17px;line-height:1.3}
+.eyebrow{font-size:14px;color:#6b6b6b;letter-spacing:.06em;text-transform:uppercase}
+.big{font-size:34px;line-height:1.1}
+.btn{height:56px;border:2px solid #2b2b2b;display:flex;align-items:center;justify-content:center;font-size:20px;letter-spacing:.04em}
+.btn.solid{background:#2b2b2b;color:#fff}
+.hair{border-top:2px solid #2b2b2b}
+.res{border:2px dashed #2a78d6;color:#2a78d6;font-size:13px;display:flex;align-items:center;padding:0 8px;white-space:nowrap}
+.note{color:#2a78d6;font-size:14px;line-height:1.3}
+.jp{font-family:'Noto Sans JP',sans-serif}
+.mini{width:150px;height:300px;background:#fff;border:2px solid #2b2b2b;border-radius:2px;display:flex;flex-direction:column;padding:16px 12px 12px;gap:8px;font-size:11px;line-height:1.2;position:relative}
+.mini .t{font-size:9px;color:#6b6b6b;letter-spacing:.06em;text-transform:uppercase}
+.mini .b{height:22px;border:2px solid #2b2b2b;display:flex;align-items:center;justify-content:center;font-size:10px}
+.mini .b.solid{background:#2b2b2b;color:#fff}
+.mini .bar{height:7px;background:#d9d6cf}
+.mini .box{border:2px solid #2b2b2b;background:repeating-linear-gradient(135deg,#f3f1ec 0 6px,#fff 6px 12px)}
+.mini .r{border:1.5px dashed #2a78d6;height:10px}
+.mini .jk{display:flex;gap:4px;align-items:flex-start}
+.mini .jk .face{width:22px;height:22px;border:2px solid #2b2b2b;border-radius:50%;flex:none}
+.mini .jk .bub{flex:1;border:2px solid #2b2b2b;padding:3px 4px;font-size:9px;line-height:1.15}
+.mini .spread{display:flex;flex-direction:column;gap:3px}
+.mini .spread .row{display:flex}
+.mini .spread .cd{width:14px;height:20px;border:1.5px solid #2b2b2b;background:#fff;margin-left:-4px;flex:none}
+.mini .spread .cd.due{background:repeating-linear-gradient(45deg,#2b2b2b 0 2px,#fff 2px 4px)}
+.mini .spread .cd:first-child{margin-left:0}
+.wf .jk{display:flex;gap:10px;align-items:flex-start}
+.wf .jk .face{width:56px;height:56px;border:2px solid #2b2b2b;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b6b6b}
+.wf .jk .bub{flex:1;border:2px solid #2b2b2b;padding:8px 10px;font-size:16px;line-height:1.25;min-height:56px}
+.wf .spread{display:flex;flex-direction:column;gap:10px;margin:0 -4px}
+.wf .spread .row{display:flex}
+.wf .spread .cd{width:60px;height:84px;border:2px solid #2b2b2b;background:#fff;flex:none}
+.wf .spread .cd.due{background:repeating-linear-gradient(45deg,#2b2b2b 0 3px,#fff 3px 7px)}
+.wf .row2{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:2px solid #2b2b2b}
+.wf .row2>span{flex:none;white-space:nowrap}
+.wf .row2.sel{background:#2b2b2b;color:#fff;margin:0 -8px;padding-left:8px;padding-right:8px}
+.cap{position:absolute;left:0;right:0;top:100%;margin-top:6px;text-align:center;font-size:14px;line-height:1.2;background:#f7f6f2;z-index:1}
+.arrow{position:absolute;height:2px;background:#2b2b2b}
+.arrow::after{content:"";position:absolute;right:-2px;top:-5px;border:6px solid transparent;border-left:9px solid #2b2b2b;border-right:0}
+.arrow.left::after{right:auto;left:-2px;border-left:0;border-right:9px solid #2b2b2b}
+.varrow{position:absolute;width:2px;background:#2b2b2b}
+.varrow.up::after{content:"";position:absolute;left:-5px;top:-2px;border:6px solid transparent;border-bottom:9px solid #2b2b2b;border-top:0}
+.varrow.down::after{content:"";position:absolute;left:-5px;bottom:-2px;border:6px solid transparent;border-top:9px solid #2b2b2b;border-bottom:0}
+.alab{position:absolute;font-size:13px;line-height:1.2;text-align:center;background:#f0eee9;padding:0 4px}
+.alab.blue{color:#2a78d6}
+</style>
+</helmet>
+
+<section class="dv-turn" id="t1">
+  <div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">v7 skeleton — low fidelity. Structure and flow only; no visual design.</span></div>
+  <p class="dv-sub">Six screens, one loop. Grey = placeholder content, black = structure, <span style="color:#2a78d6">blue</span> = notes and reserved slots (blank in v7). <b>Updated to match the v7 hi-fi pass (S0, S1):</b> deck picker is its own entry screen, Joker sits on top and speaks on S0 and S1, S1 shows the spread, three decks not four.</p>
+
+  <div class="dv-opts">
+    <div class="dv-opt" id="1a">
+      <div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>User flow — screen to screen</div>
+      <div class="dv-card" style="width:1460px;padding:36px 40px 40px;background:#f7f6f2">
+        <div style="position:relative;width:1370px;height:500px">
+<div class="mini" style="position:absolute;left:0px;top:0"><div class="t">Kana Hero</div><div class="jk"><div class="face"></div><div class="bub">Pick a deck.</div></div><div style="border-bottom:2px solid #2b2b2b;padding:3px 0;display:flex;justify-content:space-between"><span>Hiragana</span><span style="color:#6b6b6b">0·10</span></div><div style="border-bottom:2px solid #2b2b2b;padding:3px 0;display:flex;justify-content:space-between"><span>Katakana</span><span style="color:#6b6b6b">3·0</span></div><div style="border-bottom:2px solid #2b2b2b;padding:3px 4px;display:flex;justify-content:space-between;background:#2b2b2b;color:#fff;margin:0 -4px"><span>Kanji</span><span>12·4</span></div><div style="flex:1"></div><div class="b solid">START SESSION</div><div class="cap"><b>S0</b> Deck picker</div></div><div class="arrow" style="left:152px;top:150px;width:66px"></div><div class="alab" style="left:146px;top:110px;width:80px">tap deck,<br>then START</div><div class="mini" style="position:absolute;left:220px;top:0"><div class="t" style="display:flex;justify-content:space-between"><span>← decks</span><span>Kanji</span></div><div class="jk"><div class="face"></div><div class="bub">Twelve back, four fresh.</div></div><div style="font-size:15px">12 due · 4 new</div><div class="r"></div><div style="flex:1"></div><div class="spread"><div class="row"><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div></div><div class="row"><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div><div class="cd"></div><div class="cd"></div><div class="cd"></div><div class="cd"></div></div></div><div style="flex:1"></div><div class="b solid">DEAL</div><div class="cap"><b>S1</b> Today</div></div><div class="arrow" style="left:372px;top:150px;width:66px"></div><div class="alab" style="left:370px;top:124px;width:70px">tap DEAL</div><div class="mini" style="position:absolute;left:440px;top:0"><div class="t">Prompt · 3/16</div><div style="flex:1"></div><div style="font-size:20px">water</div><div class="jp" style="font-size:15px;color:#6b6b6b">みず</div><div style="flex:1.4"></div><div class="cap"><b>S2</b> Prompt</div></div><div class="arrow" style="left:592px;top:150px;width:66px"></div><div class="alab" style="left:582px;top:116px;width:86px">~3 s, melts<br>(auto)</div><div class="mini" style="position:absolute;left:660px;top:0"><div class="t">Write · 3/16</div><div style="flex:1"></div><div class="box" style="height:124px;margin:0 -14px"></div><div style="flex:1"></div><div class="b solid">DONE</div><div class="cap"><b>S3</b> Write</div></div><div class="arrow" style="left:812px;top:150px;width:66px"></div><div class="alab" style="left:810px;top:124px;width:70px">tap DONE</div><div class="mini" style="position:absolute;left:880px;top:0;border-width:3px"><div class="t">Reveal · 3/16</div><div class="box" style="height:110px;margin:0 -14px"></div><div class="jp" style="font-size:16px">水</div><div class="r" style="width:40px;height:6px"></div><div class="jp" style="font-size:11px">みず · water</div><div style="flex:1"></div><div style="display:flex;gap:4px"><div class="b" style="flex:1">GOT IT</div><div class="b" style="flex:1">MISSED</div></div><div class="r" style="width:60px"></div><div class="cap"><b>S4</b> Reveal + grade</div></div><div class="arrow" style="left:1032px;top:150px;width:66px"></div><div class="alab" style="left:1020px;top:110px;width:90px">either grade,<br>queue empty</div><div class="mini" style="position:absolute;left:1100px;top:0"><div class="t">Done</div><div class="bar" style="width:90%"></div><div class="bar" style="width:80%"></div><div class="bar" style="width:85%"></div><div class="bar" style="width:75%"></div><div class="bar" style="width:88%"></div><div class="bar" style="width:70%"></div><div style="flex:1"></div><div style="font-size:16px">7 min</div><div style="color:#6b6b6b">next: 9 due tomorrow</div><div class="b solid">CLOSE</div><div class="cap"><b>S5</b> Done</div></div><div class="varrow" style="left:954px;top:302px;height:88px"></div><div class="arrow left" style="left:516px;top:390px;width:440px"></div><div class="varrow up" style="left:514px;top:302px;height:88px"></div><div class="alab" style="left:620px;top:400px;width:330px">either grade, queue not empty → next item<br><span style="color:#2a78d6">MISSED: rung → 1, same item re-enters the queue 5 positions later</span></div><div class="varrow" style="left:1174px;top:302px;height:158px"></div><div class="arrow left" style="left:296px;top:460px;width:880px"></div><div class="varrow up" style="left:294px;top:302px;height:158px"></div><div class="alab" style="left:560px;top:468px;width:400px">tap CLOSE → back to Today, now reading 0 due (or the next date). Deck stays chosen; S0 only on launch or ← decks</div>
+          <!-- set list off S1 -->
+          <div class="mini" style="position:absolute;left:0;top:0;transform:translateX(-200px);display:none"></div>
+        </div>
+
+        <div style="display:flex;gap:40px;margin-top:56px;align-items:flex-start;flex-wrap:wrap">
+          <div class="note" style="max-width:520px;font-size:15px;line-height:1.45;padding-top:4px;color:#1a1a1a">
+            <b>Rules the flow must show</b><br>
+            · Three decks: Hiragana, Katakana, Kanji. Each deck is one scheduled queue; rows show due · new. Selection is remembered — a returning day is START SESSION → DEAL.<br>
+            · Due items first, then new. Order is fixed when DEAL is tapped.<br>
+            · A missed item returns five positions later in the same session (or last, if fewer remain).<br>
+            · GOT IT on a fresh day moves the item up a rung (1 · 3 · 7 · 14 · 30 days). MISSED drops it to rung 1.<br>
+            · The user never sees rungs or dates except the "next" line on S5.<br>
+            · Self-grade is the only input besides ink. No typing anywhere.<br>
+            · Everything offline; no loading states.<br>
+            · The Joker sits on top of S0 and S1 and speaks one line per state (deck lines, count lines, a one-time intro). He never comments on absence.<br>
+            <span style="color:#2a78d6">Dashed blue slots are reserved and blank in v7: a one-line message under S1's numbers, the Joker on S4, a pitch-accent line above the kana on S4. No words deck in v7 — S2–S5 keep 水 as a kanji item; multi-character items stay specced for later.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dv-thd" style="margin-top:40px"><span class="dv-tname">Screens at size — 390 × 844</span></div>
+  <div class="dv-opts">
+
+
+    <div class="dv-opt" id="1b">
+      <div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>S0 Deck picker — nothing selected, CTA inert</div>
+      <div class="wf" data-screen-label="S0 deck picker base">
+<div class="big" style="font-size:28px">KANA HERO</div><div class="jk" style="margin-top:20px"><div class="face">joker</div><div class="bub">Pick a deck. I decide what you write today.</div></div><div class="eyebrow" style="margin-top:28px">Decks</div><div class="row2" style="border-top:2px solid #2b2b2b;margin-top:8px"><span>Hiragana</span><span style="color:#6b6b6b">0 due · 10 new</span></div><div class="row2"><span>Katakana</span><span style="color:#6b6b6b">3 due · 0 new</span></div><div class="row2"><span>Kanji</span><span style="color:#6b6b6b">12 due · 4 new</span></div><div style="flex:1"></div><div class="btn" style="color:#6b6b6b;border-color:#6b6b6b">START SESSION</div><div style="text-align:center;color:#6b6b6b;font-size:13px;margin-top:12px">credits</div><div class="note" style="position:absolute;right:24px;top:400px;width:160px;text-align:right">each row carries its own due · new, so the day is readable before a deck is picked</div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1c">
+      <div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>S0 Deck picker — Kanji selected, CTA live</div>
+      <div class="wf" data-screen-label="S0 deck picker selected">
+<div class="big" style="font-size:28px">KANA HERO</div><div class="jk" style="margin-top:20px"><div class="face">joker</div><div class="bub">Kanji. Meaning and reading, you give me the form.</div></div><div class="eyebrow" style="margin-top:28px">Decks</div><div class="row2" style="border-top:2px solid #2b2b2b;margin-top:8px"><span>Hiragana</span><span style="color:#6b6b6b">0 due · 10 new</span></div><div class="row2"><span>Katakana</span><span style="color:#6b6b6b">3 due · 0 new</span></div><div class="row2 sel"><span>Kanji</span><span>12 due · 4 new</span></div><div style="flex:1"></div><div class="btn solid">START SESSION</div><div style="text-align:center;color:#6b6b6b;font-size:13px;margin-top:12px">credits</div><div class="note" style="position:absolute;right:24px;top:400px;width:160px;text-align:right">selection remembered: next launch opens here with Kanji on and the CTA live. first-ever launch shows an intro line instead, once per device.</div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1d">
+      <div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>S1 Today — first run</div>
+      <div class="wf" data-screen-label="S1 first run">
+<div class="eyebrow" style="display:flex;justify-content:space-between"><span>← decks</span><span>Hiragana</span></div><div class="jk" style="margin-top:20px"><div class="face">joker</div><div class="bub">Nothing owed yet. Ten new. Deal.</div></div><div class="big" style="margin-top:22px">0 due · 10 new</div><div class="res" style="height:22px;margin-top:10px">reserved — one-line message — blank in v7</div><div style="flex:1"></div><div class="spread"><div class="row"><div class="cd" style="margin-left:0px"></div><div class="cd" style="margin-left:8px"></div><div class="cd" style="margin-left:8px"></div><div class="cd" style="margin-left:8px"></div><div class="cd" style="margin-left:8px"></div></div><div class="row"><div class="cd" style="margin-left:0px"></div><div class="cd" style="margin-left:8px"></div><div class="cd" style="margin-left:8px"></div><div class="cd" style="margin-left:8px"></div><div class="cd" style="margin-left:8px"></div></div></div><div style="flex:1"></div><div class="btn solid">DEAL</div><div class="note" style="position:absolute;right:24px;top:230px;width:160px;text-align:right">spread: 1–7 one row, 8+ two rows, top row takes the odd card. hatched = due, plain = new. due dealt first.</div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1e">
+      <div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>S1 Today — normal day</div>
+      <div class="wf" data-screen-label="S1 normal">
+<div class="eyebrow" style="display:flex;justify-content:space-between"><span>← decks</span><span>Kanji</span></div><div class="jk" style="margin-top:20px"><div class="face">joker</div><div class="bub">Twelve back, four fresh. Ten minutes if you don’t dawdle.</div></div><div class="big" style="margin-top:22px">12 due · 4 new</div><div class="res" style="height:22px;margin-top:10px">reserved — one-line message — blank in v7</div><div style="flex:1"></div><div class="spread"><div class="row"><div class="cd due" style="margin-left:0px"></div><div class="cd due" style="margin-left:-20px"></div><div class="cd due" style="margin-left:-20px"></div><div class="cd due" style="margin-left:-20px"></div><div class="cd due" style="margin-left:-20px"></div><div class="cd due" style="margin-left:-20px"></div><div class="cd due" style="margin-left:-20px"></div><div class="cd due" style="margin-left:-20px"></div></div><div class="row"><div class="cd due" style="margin-left:0px"></div><div class="cd due" style="margin-left:-20px"></div><div class="cd due" style="margin-left:-20px"></div><div class="cd due" style="margin-left:-20px"></div><div class="cd" style="margin-left:-20px"></div><div class="cd" style="margin-left:-20px"></div><div class="cd" style="margin-left:-20px"></div><div class="cd" style="margin-left:-20px"></div></div></div><div style="flex:1"></div><div class="btn solid">DEAL</div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1f">
+      <div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>S1 Today — long absence. Just a bigger number.</div>
+      <div class="wf" data-screen-label="S1 long absence">
+<div class="eyebrow" style="display:flex;justify-content:space-between"><span>← decks</span><span>Kanji</span></div><div class="jk" style="margin-top:20px"><div class="face">joker</div><div class="bub">Forty-seven due, four new. One at a time, same as always.</div></div><div class="big" style="margin-top:22px">47 due · 4 new</div><div class="res" style="height:22px;margin-top:10px">reserved — one-line message — blank in v7</div><div style="flex:1"></div><div class="spread"><div class="row"><div class="cd due" style="margin-left:0px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div></div><div class="row"><div class="cd due" style="margin-left:0px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div><div class="cd due" style="margin-left:-41px"></div></div></div><div style="text-align:right;color:#6b6b6b;font-size:13px;margin-top:4px">showing 32 of 51</div><div style="flex:1"></div><div class="btn solid">DEAL</div><div class="note" style="position:absolute;right:24px;top:230px;width:160px;text-align:right">no “you’ve been away” copy. ever. cap 16 cols → 32 cards; past that, one line says so.</div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1g">
+      <div class="dv-olabel"><a class="dv-oid" href="#1g">1g</a>S1 Today — nothing due</div>
+      <div class="wf" data-screen-label="S1 nothing due">
+<div class="eyebrow" style="display:flex;justify-content:space-between"><span>← decks</span><span>Kanji</span></div><div class="jk" style="margin-top:20px"><div class="face">joker</div><div class="bub">Nothing due until Thursday. Write anyway, if you like.</div></div><div class="big" style="margin-top:22px">0 due · 0 new</div><div class="res" style="height:22px;margin-top:10px">reserved — one-line message — blank in v7</div><div style="flex:1"></div><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><div style="width:60px;height:84px;border:2px dashed #2b2b2b"></div><div style="color:#6b6b6b;font-size:14px">next · Thu 30 Oct · 9 due</div></div><div style="flex:1"></div><div class="btn">WRITE ANYWAY</div><div class="note" style="position:absolute;right:24px;top:230px;width:160px;text-align:right">outlined, not filled. writing anyway drills Thursday’s items early; rungs don’t move.</div>
+      </div>
+    </div>
+    <div class="dv-opt" id="1h">
+      <div class="dv-olabel"><a class="dv-oid" href="#1h">1h</a>S2 Prompt — word set</div>
+      <div class="wf" data-screen-label="S2 prompt word">
+        <div class="eyebrow" style="display:flex;justify-content:space-between"><span>Prompt</span><span>3 / 16</span></div>
+        <div style="flex:1"></div>
+        <div style="font-size:48px;line-height:1">water</div>
+        <div class="jp" style="font-size:32px;color:#6b6b6b;margin-top:16px">みず</div>
+        <div style="flex:1.4"></div>
+        <div class="note" style="position:absolute;left:24px;right:24px;bottom:60px">meaning + reading, ~3 s, then it melts (existing melt) → S3. nothing on this screen shows the answer's form. no controls.</div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1i">
+      <div class="dv-olabel"><a class="dv-oid" href="#1i">1i</a>S2 Prompt — kana set, romaji only</div>
+      <div class="wf" data-screen-label="S2 prompt kana">
+        <div class="eyebrow" style="display:flex;justify-content:space-between"><span>Prompt</span><span>7 / 14</span></div>
+        <div style="flex:1"></div>
+        <div style="font-size:84px;line-height:1">ka</div>
+        <div style="flex:1.4"></div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1j">
+      <div class="dv-olabel"><a class="dv-oid" href="#1j">1j</a>S3 Write — kana, one box</div>
+      <div class="wf" data-screen-label="S3 write kana">
+        <div class="eyebrow" style="display:flex;justify-content:space-between"><span>Write</span><span>7 / 14</span></div>
+        <div style="flex:1"></div>
+        <div style="margin:0 -26px;height:390px;border-top:2px solid #2b2b2b;border-bottom:2px solid #2b2b2b;position:relative">
+          <svg viewBox="0 0 109 109" style="position:absolute;inset:0;width:100%;height:100%">
+            <path d="M23 37 C36 35 50 32 63 31 C65 48 60 70 53 85 C50 91 44 89 41 83" fill="none" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M39 19 C41 45 33 70 15 89" fill="none" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"></path>
+            <path d="M79 41 C85 47 89 55 90 63" fill="none" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"></path>
+          </svg>
+          <div class="note" style="position:absolute;right:28px;bottom:10px;width:160px;text-align:right">canvas, full width. user's ink. no ghost glyph, no grid, no stroke count.</div>
+        </div>
+        <div style="flex:1"></div>
+        <div class="btn solid">DONE</div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1k">
+      <div class="dv-olabel"><a class="dv-oid" href="#1k">1k</a>S3 Write — two-character word, one box per character</div>
+      <div class="wf" data-screen-label="S3 write word">
+        <div class="eyebrow" style="display:flex;justify-content:space-between"><span>Write</span><span>14 / 16</span></div>
+        <div style="flex:1"></div>
+        <div style="margin:0 -26px;height:390px;border-top:2px solid #2b2b2b;border-bottom:2px solid #2b2b2b;position:relative;display:flex">
+          <div style="flex:1;border-right:2px dashed #2b2b2b;position:relative">
+            <svg viewBox="0 0 109 109" style="position:absolute;inset:0;width:100%;height:100%">
+              <path d="M54 11 C54.5 36 54 66 54 92" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"></path>
+              <path d="M30 24 C30 34 30 44 30 50 C46 50 62 50 78 50" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path d="M78 23 C78 33 78 43 78 50" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"></path>
+              <path d="M18 60 C18 70 18 82 18 92 C42 92 66 92 90 92" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path d="M90 60 C90 70 90 82 90 92" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div style="flex:1;position:relative">
+            <svg viewBox="0 0 109 109" style="position:absolute;inset:0;width:100%;height:100%">
+              <path d="M30 30 C30 48 30 66 30 84" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"></path>
+              <path d="M30 30 C48 30 65 30 82 30 C82 48 82 66 82 84" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path d="M30 84 C48 84 65 84 82 84" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div class="note" style="position:absolute;left:50%;top:-30px;transform:translateX(-50%);white-space:nowrap">one divider per extra character · same canvas</div>
+        </div>
+        <div style="flex:1"></div>
+        <div class="btn solid">DONE</div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1l">
+      <div class="dv-olabel"><a class="dv-oid" href="#1l">1l</a>S4 Reveal + grade</div>
+      <div class="wf" data-screen-label="S4 reveal grade">
+        <div class="eyebrow" style="display:flex;justify-content:space-between"><span>Reveal</span><span>3 / 16</span></div>
+        <div style="margin:20px -26px 0;height:360px;border-top:2px solid #2b2b2b;border-bottom:2px solid #2b2b2b;position:relative">
+          <svg viewBox="0 0 109 109" style="position:absolute;inset:0;width:100%;height:100%">
+            <path d="M55 15 C56 40 56 68 54 86 C53 94 48 94 43 90" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M23 39 C31 38 40 36 47 34 C44 52 36 72 19 86" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M77 29 C71 41 65 50 59 57" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"></path>
+            <path d="M61 43 C69 57 80 73 93 84" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"></path>
+            <path d="M54 13 C54.5 38 54.5 66 54 86 C54 93 50 95 42 90" fill="none" stroke="#2a78d6" stroke-width="2" stroke-dasharray="3 2" stroke-linecap="round"></path>
+            <path d="M21 37 C30 37.5 41 35.5 49 33 C46 52 37 72 18 87" fill="none" stroke="#2a78d6" stroke-width="2" stroke-dasharray="3 2" stroke-linecap="round"></path>
+            <path d="M79 27 C72 40 66 50 58 57" fill="none" stroke="#2a78d6" stroke-width="2" stroke-dasharray="3 2" stroke-linecap="round"></path>
+            <path d="M60 42 C69 56 81 72 94 83" fill="none" stroke="#2a78d6" stroke-width="2" stroke-dasharray="3 2" stroke-linecap="round"></path>
+          </svg>
+          <div class="note" style="position:absolute;right:28px;top:10px;width:150px;text-align:right">real stroke order animates over the user's ink (existing)</div>
+        </div>
+        <div class="jp" style="font-size:40px;line-height:1;margin-top:18px">水</div>
+        <div class="res" style="height:22px;margin-top:10px;width:290px">reserved — pitch accent line, H/L per mora — blank in v7</div>
+        <div class="jp" style="font-size:26px;line-height:1;margin-top:6px">みず</div>
+        <div style="font-size:19px;color:#6b6b6b;margin-top:8px">water</div>
+        <div style="flex:1"></div>
+        <div style="display:flex;gap:10px"><div class="btn" style="flex:1">GOT IT</div><div class="btn" style="flex:1">MISSED</div></div>
+        <div class="res" style="height:22px;width:170px;margin-top:14px">reserved — Joker — blank</div>
+        <div class="note" style="position:absolute;right:24px;bottom:28px;width:150px;text-align:right">equal weight. no colour verdict.</div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1m">
+      <div class="dv-olabel"><a class="dv-oid" href="#1m">1m</a>S5 Done</div>
+      <div class="wf" data-screen-label="S5 done">
+        <div class="eyebrow" style="display:flex;justify-content:space-between"><span>Done</span><span>Thu 29 Oct</span></div>
+        <div style="margin-top:18px;border-top:2px solid #2b2b2b">
+          <sc-for list="{{ session }}" as="r" hint-placeholder-count="18">
+            <div style="display:flex;align-items:center;gap:12px;height:26px;border-bottom:1px solid #c9c5bb;font-size:14px">
+              <span class="jp" style="width:46px;font-size:15px">{{ r.w }}</span>
+              <span class="jp" style="flex:1;color:#6b6b6b;font-size:12px">{{ r.k }}</span>
+              <span style="color:{{ r.c }}">{{ r.o }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="flex:1"></div>
+        <div class="big">7 min</div>
+        <div style="color:#6b6b6b;margin-top:6px">next: 9 due tomorrow</div>
+        <div class="btn solid" style="margin-top:18px">CLOSE</div>
+        <div class="note" style="position:absolute;right:24px;top:590px;width:200px;text-align:right">山 and 出口 appear twice — missed, then back 5 later. that's the whole scheduler, visible.</div>
+      </div>
+    </div>
+
+  </div>
+  <p class="dv-next">Try next: "show <a class="dv-oid" href="#1l">1l</a> mid-reveal and after" · "carry S2–S5 into hi-fi"</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const due = [["水","みず"],["火","ひ"],["木","き"],["金","かね"],["土","つち"],["日","ひ"],["月","つき"],["山","やま"],["川","かわ"],["田","た"],["人","ひと"],["口","くち"]];
+    const nw = [["出口","でぐち"],["入口","いりぐち"],["男","おとこ"],["女","おんな"]];
+    const order = [...due, ...nw].map(x => ({ w: x[0], k: x[1] }));
+    order[7].miss = true; order.splice(12, 0, { w: "山", k: "やま" });
+    order[13].miss = true; order.push({ w: "出口", k: "でぐち" });
+    return { session: order.map(o => ({ w: o.w, k: o.k, o: o.miss ? "missed" : "got it", c: o.miss ? "#1a1a1a" : "#6b6b6b" })) };
+  }
+}
+</script>
+</body>
+</html>

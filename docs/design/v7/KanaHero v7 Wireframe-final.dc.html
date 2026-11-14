@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<title>KanaHero v7 — wireframe (final) · brief 2026-11-14</title>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&amp;family=Noto+Sans+JP:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f0eee9;font-family:'Patrick Hand',system-ui,sans-serif;color:#1a1a1a}
+a{color:#2a78d6;text-decoration:none}a:hover{color:#1a1a1a}
+.dv-turn{padding:40px 44px 32px;scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 14px;flex-wrap:wrap}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;white-space:nowrap;flex:none}
+.dv-tname{font:600 13px/1.2 system-ui,sans-serif;color:#1a1a1a}
+.dv-sub{font:400 12px/1.5 system-ui,sans-serif;color:rgba(0,0,0,.55);max-width:900px;margin:0 0 22px}
+.dv-opts{display:flex;flex-wrap:wrap;gap:28px 32px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px;width:390px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;white-space:nowrap;flex:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 system-ui,sans-serif;color:rgba(0,0,0,.55)}
+.dv-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}
+.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}
+.wf{width:390px;height:844px;background:#fff;border:2px solid #2b2b2b;border-radius:3px;position:relative;display:flex;flex-direction:column;padding:48px 24px 24px;font-size:17px;line-height:1.3}
+.eyebrow{font-size:14px;color:#6b6b6b;letter-spacing:.06em;text-transform:uppercase;display:flex;justify-content:space-between;gap:8px}
+.big{font-size:34px;line-height:1.1}
+.btn{height:56px;border:2px solid #2b2b2b;display:flex;align-items:center;justify-content:center;font-size:20px;letter-spacing:.04em;text-align:center;padding:0 10px;line-height:1.1}
+.btn.solid{background:#2b2b2b;color:#fff}
+.hair{border-top:2px solid #2b2b2b}
+.res{border:2px dashed #2a78d6;color:#2a78d6;font-size:13px;display:flex;align-items:center;padding:0 8px;white-space:nowrap}
+.note{color:#2a78d6;font-size:15px;line-height:1.35;max-width:390px}
+.jp{font-family:'Noto Sans JP',sans-serif}
+.g{color:#6b6b6b}
+.row2{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:11px 0;border-bottom:2px solid #2b2b2b}
+.row2>span{white-space:nowrap}
+.spread{display:flex;flex-direction:column;gap:10px}
+.spread .row{display:flex}
+.spread .cd{width:60px;height:84px;border:2px solid #2b2b2b;background:#fff;flex:none}
+.spread .cd.due{background:repeating-linear-gradient(45deg,#2b2b2b 0 3px,#fff 3px 7px)}
+.mini{width:150px;height:300px;background:#fff;border:2px solid #2b2b2b;border-radius:2px;display:flex;flex-direction:column;padding:16px 12px 12px;gap:7px;font-size:11px;line-height:1.2;position:absolute;top:60px}
+.mini .t{font-size:9px;color:#6b6b6b;letter-spacing:.06em;text-transform:uppercase;display:flex;justify-content:space-between}
+.mini .b{height:22px;border:2px solid #2b2b2b;display:flex;align-items:center;justify-content:center;font-size:10px;text-align:center;line-height:1;padding:0 3px}
+.mini .b.solid{background:#2b2b2b;color:#fff}
+.mini .bar{height:7px;background:#d9d6cf}
+.mini .box{border:2px solid #2b2b2b;background:repeating-linear-gradient(135deg,#f3f1ec 0 6px,#fff 6px 12px)}
+.mini .r{border:1.5px dashed #2a78d6;height:10px}
+.mini .li{display:flex;justify-content:space-between;gap:4px;border-bottom:1.5px solid #2b2b2b;padding:2px 0;font-size:8px}
+.mini .li>span{white-space:nowrap}
+.mini .li i{font-size:7px}
+.mini .sp{display:flex;flex-direction:column;gap:3px}
+.mini .sp .row{display:flex}
+.mini .sp .cd{width:14px;height:20px;border:1.5px solid #2b2b2b;background:#fff;margin-left:-4px;flex:none}
+.mini .sp .cd.due{background:repeating-linear-gradient(45deg,#2b2b2b 0 2px,#fff 2px 4px)}
+.mini .sp .cd:first-child{margin-left:0}
+.cap{position:absolute;left:0;right:0;top:100%;margin-top:6px;text-align:center;font-size:14px;line-height:1.2;background:#f7f6f2;z-index:1}
+.arrow{position:absolute;height:2px;background:#2b2b2b}
+.arrow::after{content:"";position:absolute;right:-2px;top:-5px;border:6px solid transparent;border-left:9px solid #2b2b2b;border-right:0}
+.arrow.left::after{right:auto;left:-2px;border-left:0;border-right:9px solid #2b2b2b}
+.arrow.plain::after{display:none}
+.varrow{position:absolute;width:2px;background:#2b2b2b}
+.varrow.up::after{content:"";position:absolute;left:-5px;top:-2px;border:6px solid transparent;border-bottom:9px solid #2b2b2b;border-top:0}
+.varrow.down::after{content:"";position:absolute;left:-5px;bottom:-2px;border:6px solid transparent;border-top:9px solid #2b2b2b;border-bottom:0}
+.alab{position:absolute;font-size:13px;line-height:1.2;text-align:center;background:#f7f6f2;padding:0 4px}
+.alab.blue{color:#2a78d6}
+</style>
+</helmet>
+
+<section class="dv-turn">
+  <div class="dv-thd"><span class="dv-tid">V7 · FINAL</span><span class="dv-tname">KanaHero v7 wireframe — from the 2026-11-14 brief, behaviour per SPEC-v7-skeleton. Structure and flow only.</span></div>
+  <p class="dv-sub">Seven screens, one loop, a scheduler underneath. Black = structure, grey = placeholder content, <span style="color:#2a78d6">blue</span> = notes and the three reserved slots (§5). Nothing else is drawn. Today is Sat 14 Nov 2026.</p>
+
+  <div class="dv-opts">
+    <div class="dv-opt" id="flow" style="width:auto">
+      <div class="dv-olabel"><span class="dv-oid">FLOW</span>Every screen, every transition in brief §4.1</div>
+      <div class="dv-card" style="width:1580px;padding:30px 40px 40px;background:#f7f6f2">
+        <div style="position:relative;width:1490px;height:600px">
+
+          <div class="alab" style="left:0;top:4px;width:64px;border:2px solid #2b2b2b;padding:3px 0;font-size:12px">LAUNCH</div>
+          <div class="varrow down" style="left:30px;top:30px;height:30px"></div>
+          <div class="alab" style="left:52px;top:40px;width:120px;font-size:12px">first-ever (no last set)</div>
+          <div class="arrow plain" style="left:66px;top:16px;width:450px"></div>
+          <div class="varrow down" style="left:514px;top:16px;height:44px"></div>
+          <div class="alab" style="left:230px;top:5px;width:120px;font-size:12px">last-used set</div>
+
+          <div class="mini" style="left:0">
+            <div class="t">Sets</div>
+            <div class="li"><span>DAILY BASICS <i class="g">hiragana</i></span><span class="g">0·0</span></div>
+            <div class="li"><span>COUNTRIES <i class="g">katakana</i></span><span class="g">3·8</span></div>
+            <div class="li"><span>DAILY BASICS <i class="g">kanji</i></span><span class="g">4·0</span></div>
+            <div class="li"><span>STATION <i class="g">kanji</i></span><span class="g">5·0</span></div>
+            <div class="li"><span>CALENDAR <i class="g">kanji</i></span><span class="g">10·10</span></div>
+            <div class="li"><span>N5 MOCK <i class="g">words</i></span><span class="g">9·0</span></div>
+            <div style="flex:1"></div>
+            <div class="g" style="font-size:8px;text-align:center">export ledger · credits</div>
+            <div class="cap"><b>S0</b> Set list</div>
+          </div>
+
+          <div class="arrow" style="left:152px;top:210px;width:66px"></div>
+          <div class="alab" style="left:140px;top:168px;width:90px">tap a row,<br>first time this<br>set opens</div>
+
+          <div class="mini" style="left:220px">
+            <div class="t">N5 MOCK</div>
+            <div style="flex:1"></div>
+            <div style="font-size:12px">Have you written these before?</div>
+            <div class="b">New to these</div>
+            <div class="b">I can already write some</div>
+            <div style="flex:1.4"></div>
+            <div class="cap"><b>S1a</b> Placement</div>
+          </div>
+
+          <div class="arrow" style="left:372px;top:210px;width:66px"></div>
+          <div class="alab" style="left:362px;top:184px;width:86px">either answer</div>
+
+          <div class="mini" style="left:440px">
+            <div class="t"><span>CALENDAR · kanji</span></div>
+            <div style="font-size:15px">10 due · 10 new</div>
+            <div class="r"></div>
+            <div style="flex:1"></div>
+            <div class="sp"><div class="row"><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div><div class="cd due"></div></div><div class="row"><div class="cd"></div><div class="cd"></div><div class="cd"></div><div class="cd"></div><div class="cd"></div><div class="cd"></div><div class="cd"></div><div class="cd"></div><div class="cd"></div><div class="cd"></div></div></div>
+            <div style="flex:1"></div>
+            <div class="b solid">DEAL</div>
+            <div class="cap"><b>S1</b> Today</div>
+          </div>
+
+          <div class="arrow" style="left:592px;top:210px;width:66px"></div>
+          <div class="alab" style="left:580px;top:170px;width:90px">tap DEAL or<br>WRITE ANYWAY</div>
+
+          <div class="mini" style="left:660px">
+            <div class="t"><span>Prompt</span><span>3 / 20</span></div>
+            <div style="flex:1"></div>
+            <div style="font-size:20px">water</div>
+            <div class="jp g" style="font-size:15px">みず</div>
+            <div style="flex:1.4"></div>
+            <div class="cap"><b>S2</b> Prompt</div>
+          </div>
+
+          <div class="arrow" style="left:812px;top:210px;width:66px"></div>
+          <div class="alab" style="left:802px;top:176px;width:86px">~3 s, melts<br>(auto)</div>
+
+          <div class="mini" style="left:880px">
+            <div class="t"><span>Write</span><span>3 / 20</span></div>
+            <div style="flex:1"></div>
+            <div class="box" style="height:124px;margin:0 -14px"></div>
+            <div style="flex:1"></div>
+            <div class="b solid">DONE</div>
+            <div class="cap"><b>S3</b> Write</div>
+          </div>
+
+          <div class="arrow" style="left:1032px;top:210px;width:66px"></div>
+          <div class="alab" style="left:1030px;top:184px;width:70px">tap DONE</div>
+
+          <div class="mini" style="left:1100px;border-width:3px">
+            <div class="t"><span>Reveal</span><span>3 / 20</span></div>
+            <div class="box" style="height:96px;margin:0 -14px"></div>
+            <div class="jp" style="font-size:16px">水</div>
+            <div class="r" style="width:40px;height:6px"></div>
+            <div class="jp" style="font-size:11px">みず · water</div>
+            <div style="flex:1"></div>
+            <div style="display:flex;gap:4px"><div class="b" style="flex:1">GOT IT</div><div class="b" style="flex:1">MISSED</div></div>
+            <div class="g" style="font-size:7px">dots, long vowels and small kana count</div>
+            <div class="r" style="width:60px"></div>
+            <div class="cap"><b>S4</b> Reveal + grade</div>
+          </div>
+
+          <div class="arrow" style="left:1252px;top:210px;width:66px"></div>
+          <div class="alab" style="left:1240px;top:170px;width:90px">either grade,<br>queue empty</div>
+
+          <div class="mini" style="left:1320px">
+            <div class="t"><span>Done</span><span>Sat 14 Nov</span></div>
+            <div class="bar" style="width:90%"></div><div class="bar" style="width:80%"></div><div class="bar" style="width:85%"></div><div class="bar" style="width:75%"></div><div class="bar" style="width:88%"></div><div class="bar" style="width:70%"></div>
+            <div style="flex:1"></div>
+            <div style="font-size:16px">7 min</div>
+            <div class="g">next: 9 due tomorrow</div>
+            <div class="b solid">CLOSE</div>
+            <div class="cap"><b>S5</b> Done</div>
+          </div>
+
+          <!-- S0 -> S1 direct (set already placed) -->
+          <div class="varrow" style="left:50px;top:360px;height:40px"></div>
+          <div class="arrow plain" style="left:50px;top:400px;width:422px"></div>
+          <div class="varrow up" style="left:470px;top:360px;height:40px"></div>
+          <div class="alab" style="left:150px;top:392px;width:220px">tap a row (set already placed) → S1</div>
+
+          <!-- S1 -> S0 tap set name -->
+          <div class="varrow" style="left:560px;top:360px;height:72px"></div>
+          <div class="arrow plain" style="left:100px;top:432px;width:462px"></div>
+          <div class="varrow up" style="left:100px;top:360px;height:72px"></div>
+          <div class="alab" style="left:200px;top:424px;width:140px">tap set name → S0</div>
+
+          <!-- S4 -> S2 loop -->
+          <div class="varrow" style="left:1174px;top:360px;height:120px"></div>
+          <div class="arrow plain" style="left:734px;top:480px;width:442px"></div>
+          <div class="varrow up" style="left:734px;top:360px;height:120px"></div>
+          <div class="alab" style="left:780px;top:472px;width:350px">either grade, queue not empty → next item's S2<br><span style="color:#2a78d6">MISSED: same item re-enters the queue 5 positions later (or last)</span></div>
+
+          <!-- S5 -> S1 -->
+          <div class="varrow" style="left:1394px;top:360px;height:180px"></div>
+          <div class="arrow plain" style="left:514px;top:540px;width:882px"></div>
+          <div class="varrow up" style="left:514px;top:360px;height:180px"></div>
+          <div class="alab" style="left:760px;top:532px;width:400px">tap CLOSE → S1, now in state 4 or 5</div>
+        </div>
+
+        <div class="note" style="max-width:900px;margin-top:40px;color:#1a1a1a;font-size:15px;line-height:1.45">
+          <b>Rules every frame respects (brief §7, spec §5)</b><br>
+          · Launch opens S1 for the last-used set; S0 only when there is no last set.<br>
+          · S1a is asked once per set, the first time it opens, then never again.<br>
+          · Due first (oldest first), then new, at most 10 new per set; 0 new when due &gt; 20.<br>
+          · A missed item returns tomorrow, and 5 positions later in the same session. Got it on a fresh day → next rung (1 · 3 · 7 · 14 · 30 days).<br>
+          · First exposure of any item is a study trial (S2-c): see it once, it melts, write it.<br>
+          · Self-grade is the only input besides ink. No typing. No loading. No comment on absence, effort or streaks. Rungs and dates never shown except the "next" line.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dv-thd" style="margin-top:44px"><span class="dv-tname">Screens at size — 390 × 844 — 15 frames</span></div>
+  <div class="dv-opts">
+
+    <div class="dv-opt" id="S0-a">
+      <div class="dv-olabel"><span class="dv-oid">S0-a</span>Set list — first-ever launch, nothing opened yet</div>
+      <div class="wf" data-screen-label="S0-a">
+        <div class="eyebrow"><span>Sets</span></div>
+        <div class="hair" style="margin-top:14px"></div>
+        <sc-for list="{{ s0a }}" as="r" hint-placeholder-count="6">
+          <div class="row2"><span><span>{{ r.name }}</span> <span class="g" style="font-size:14px">{{ r.script }}</span></span><span class="g">{{ r.counts }}</span></div>
+        </sc-for>
+        <div style="flex:1"></div>
+        <div class="g" style="display:flex;justify-content:center;gap:18px;font-size:14px"><span>export ledger</span><span>credits</span></div>
+      </div>
+      <p class="note">No selected state, no start button, no progress marks. Script is on every row because two sets are called DAILY BASICS.</p>
+    </div>
+
+    <div class="dv-opt" id="S0-b">
+      <div class="dv-olabel"><span class="dv-oid">S0-b</span>Set list — a normal day</div>
+      <div class="wf" data-screen-label="S0-b">
+        <div class="eyebrow"><span>Sets</span></div>
+        <div class="hair" style="margin-top:14px"></div>
+        <sc-for list="{{ s0b }}" as="r" hint-placeholder-count="6">
+          <div class="row2"><span><span>{{ r.name }}</span> <span class="g" style="font-size:14px">{{ r.script }}</span></span><span class="g">{{ r.counts }}</span></div>
+        </sc-for>
+        <div style="flex:1"></div>
+        <div class="g" style="display:flex;justify-content:center;gap:18px;font-size:14px"><span>export ledger</span><span>credits</span></div>
+      </div>
+      <p class="note">Tap a row → that set's S1 (S1a first, if the set has never been opened).</p>
+    </div>
+
+    <div class="dv-opt" id="S1a">
+      <div class="dv-olabel"><span class="dv-oid">S1a</span>Placement — once per set, first open</div>
+      <div class="wf" data-screen-label="S1a">
+        <div class="eyebrow"><span>N5 MOCK</span><span>words</span></div>
+        <div style="flex:1"></div>
+        <div class="big" style="font-size:28px">Have you written these before?</div>
+        <div style="display:flex;gap:10px;margin-top:28px"><div class="btn" style="flex:1;height:72px">New to these</div><div class="btn" style="flex:1;height:72px">I can already write some</div></div>
+        <div style="flex:1.4"></div>
+      </div>
+      <p class="note">Two equal buttons. Stored per set, never asked again. Question wording is a guess — the brief gives only the two answers.</p>
+    </div>
+
+    <div class="dv-opt" id="S1-1">
+      <div class="dv-olabel"><span class="dv-oid">S1-1</span>Today — first run</div>
+      <div class="wf" data-screen-label="S1-1">
+        <div class="eyebrow"><span>CALENDAR</span><span>kanji</span></div>
+        <div class="big" style="margin-top:22px">0 due · 10 new</div>
+        <div class="res" style="height:22px;margin-top:12px">reserved — blank in v7</div>
+        <div style="flex:1"></div>
+        <div class="spread"><sc-for list="{{ sp10 }}" as="row" hint-placeholder-count="2"><div class="row"><sc-for list="{{ row.cards }}" as="c" hint-placeholder-count="5"><div class="cd {{ c.k }}" style="margin-left:{{ c.ml }}px"></div></sc-for></div></sc-for></div>
+        <div style="flex:1"></div>
+        <div class="btn solid">DEAL</div>
+      </div>
+      <p class="note">Set name is tappable → S0. The spread is a picture of the deal: one card per item, hatched = due, plain = new, due first. 1–7 in one row, 8+ in two, top row takes the odd card.</p>
+    </div>
+
+    <div class="dv-opt" id="S1-2">
+      <div class="dv-olabel"><span class="dv-oid">S1-2</span>Today — normal</div>
+      <div class="wf" data-screen-label="S1-2">
+        <div class="eyebrow"><span>CALENDAR</span><span>kanji</span></div>
+        <div class="big" style="margin-top:22px">10 due · 10 new</div>
+        <div class="res" style="height:22px;margin-top:12px">reserved — blank in v7</div>
+        <div style="flex:1"></div>
+        <div class="spread"><sc-for list="{{ sp20 }}" as="row" hint-placeholder-count="2"><div class="row"><sc-for list="{{ row.cards }}" as="c" hint-placeholder-count="10"><div class="cd {{ c.k }}" style="margin-left:{{ c.ml }}px"></div></sc-for></div></sc-for></div>
+        <div style="flex:1"></div>
+        <div class="btn solid">DEAL</div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="S1-3">
+      <div class="dv-olabel"><span class="dv-oid">S1-3</span>Today — heavy</div>
+      <div class="wf" data-screen-label="S1-3">
+        <div class="eyebrow"><span>CALENDAR</span><span>kanji</span></div>
+        <div class="big" style="margin-top:22px">21 due · 0 new</div>
+        <div class="res" style="height:22px;margin-top:12px">reserved — blank in v7</div>
+        <div style="flex:1"></div>
+        <div class="spread"><sc-for list="{{ sp21 }}" as="row" hint-placeholder-count="2"><div class="row"><sc-for list="{{ row.cards }}" as="c" hint-placeholder-count="11"><div class="cd {{ c.k }}" style="margin-left:{{ c.ml }}px"></div></sc-for></div></sc-for></div>
+        <div style="flex:1"></div>
+        <div class="btn solid">DEAL</div>
+      </div>
+      <p class="note">Due &gt; 20 → no new items today. No copy about being away. It is just a bigger number.</p>
+    </div>
+
+    <div class="dv-opt" id="S1-4">
+      <div class="dv-olabel"><span class="dv-oid">S1-4</span>Today — today's deal finished, unseen items remain</div>
+      <div class="wf" data-screen-label="S1-4">
+        <div class="eyebrow"><span>COUNTRIES</span><span>katakana</span></div>
+        <div class="big" style="margin-top:22px">0 due · 0 new</div>
+        <div class="res" style="height:22px;margin-top:12px">reserved — blank in v7</div>
+        <div class="g" style="margin-top:16px">next: Sun 15 Nov · 10 due</div>
+        <div style="flex:1"></div>
+        <div class="btn">WRITE ANYWAY</div>
+      </div>
+      <p class="note">Outlined, not filled. No spread. Write anyway deals unseen items up to cap, then tomorrow's due — never beyond tomorrow (spec §5 rule 7).</p>
+    </div>
+
+    <div class="dv-opt" id="S1-5">
+      <div class="dv-olabel"><span class="dv-oid">S1-5</span>Today — set done</div>
+      <div class="wf" data-screen-label="S1-5">
+        <div class="eyebrow"><span>DAILY BASICS</span><span>hiragana</span></div>
+        <div class="big" style="margin-top:22px;color:#6b6b6b">next: Tue 17 Nov · 10 due</div>
+        <div class="res" style="height:22px;margin-top:12px">reserved — blank in v7</div>
+        <div style="flex:1"></div>
+      </div>
+      <p class="note">No due, no unseen. No button, no spread. Neither brief nor spec lists the count line for this state, so it is not drawn; the "next" line takes its place.</p>
+    </div>
+
+    <div class="dv-opt" id="S2-a">
+      <div class="dv-olabel"><span class="dv-oid">S2-a</span>Prompt — kana, romaji only</div>
+      <div class="wf" data-screen-label="S2-a">
+        <div class="eyebrow"><span>Prompt</span><span>7 / 10</span></div>
+        <div style="flex:1"></div>
+        <div style="font-size:84px;line-height:1">ka</div>
+        <div style="flex:1.4"></div>
+      </div>
+      <p class="note">No controls. ~3 s, then it melts → S3.</p>
+    </div>
+
+    <div class="dv-opt" id="S2-b">
+      <div class="dv-olabel"><span class="dv-oid">S2-b</span>Prompt — word: meaning + reading</div>
+      <div class="wf" data-screen-label="S2-b">
+        <div class="eyebrow"><span>Prompt</span><span>3 / 20</span></div>
+        <div style="flex:1"></div>
+        <div style="font-size:48px;line-height:1">water</div>
+        <div class="jp g" style="font-size:32px;margin-top:16px">みず</div>
+        <div style="flex:1.4"></div>
+      </div>
+      <p class="note">The prompt never contains the written form.</p>
+    </div>
+
+    <div class="dv-opt" id="S2-c">
+      <div class="dv-olabel"><span class="dv-oid">S2-c</span>Prompt — study trial, first exposure</div>
+      <div class="wf" data-screen-label="S2-c">
+        <div class="eyebrow"><span>Prompt</span><span>11 / 20</span></div>
+        <div style="flex:1"></div>
+        <div style="position:relative;width:200px;height:200px;align-self:flex-start">
+          <svg viewBox="0 0 109 109" style="position:absolute;inset:0;width:100%;height:100%">
+            <path d="M55 15 C56 40 56 68 54 86 C53 94 48 94 43 90" fill="none" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M23 39 C31 38 40 36 47 34 C44 52 36 72 19 86" fill="none" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M77 29 C71 41 65 50 59 57" fill="none" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"></path>
+            <path d="M61 43 C69 57 80 73 93 84" fill="none" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round" stroke-dasharray="40 60"></path>
+          </svg>
+        </div>
+        <div class="jp" style="font-size:32px;margin-top:16px">みず <span class="g" style="font-family:'Patrick Hand';font-size:26px">· water</span></div>
+        <div style="flex:1.4"></div>
+      </div>
+      <p class="note">The written form large, its stroke animation playing once (last stroke mid-draw here), reading and meaning beneath. Then it melts like any prompt — the form is gone before the pen goes down. Position 11 / 20 = the first new item after ten due.</p>
+    </div>
+
+    <div class="dv-opt" id="S3-a">
+      <div class="dv-olabel"><span class="dv-oid">S3-a</span>Write — one box</div>
+      <div class="wf" data-screen-label="S3-a">
+        <div class="eyebrow"><span>Write</span><span>7 / 10</span></div>
+        <div style="flex:1"></div>
+        <div style="margin:0 -26px;height:390px;border-top:2px solid #2b2b2b;border-bottom:2px solid #2b2b2b;position:relative">
+          <svg viewBox="0 0 109 109" style="position:absolute;inset:0;width:100%;height:100%">
+            <path d="M23 37 C36 35 50 32 63 31 C65 48 60 70 53 85 C50 91 44 89 41 83" fill="none" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M39 19 C41 45 33 70 15 89" fill="none" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"></path>
+            <path d="M79 41 C85 47 89 55 90 63" fill="none" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <div style="flex:1"></div>
+        <div class="btn solid">DONE</div>
+      </div>
+      <p class="note">Full-width blank canvas, the user's ink for か. No ghost glyph, no grid, no stroke count, no hint.</p>
+    </div>
+
+    <div class="dv-opt" id="S3-b">
+      <div class="dv-olabel"><span class="dv-oid">S3-b</span>Write — two boxes, one word</div>
+      <div class="wf" data-screen-label="S3-b">
+        <div class="eyebrow"><span>Write</span><span>5 / 9</span></div>
+        <div style="flex:1"></div>
+        <div style="margin:0 -26px;height:390px;border-top:2px solid #2b2b2b;border-bottom:2px solid #2b2b2b;position:relative;display:flex">
+          <div style="flex:1;border-right:2px dashed #2b2b2b;position:relative">
+            <svg viewBox="0 0 109 109" style="position:absolute;inset:0;width:100%;height:100%">
+              <path d="M54 11 C54.5 36 54 66 54 92" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"></path>
+              <path d="M30 24 C30 34 30 44 30 50 C46 50 62 50 78 50" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path d="M78 23 C78 33 78 43 78 50" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"></path>
+              <path d="M18 60 C18 70 18 82 18 92 C42 92 66 92 90 92" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path d="M90 60 C90 70 90 82 90 92" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div style="flex:1;position:relative">
+            <svg viewBox="0 0 109 109" style="position:absolute;inset:0;width:100%;height:100%">
+              <path d="M30 30 C30 48 30 66 30 84" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"></path>
+              <path d="M30 30 C48 30 65 30 82 30 C82 48 82 66 82 84" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path d="M30 84 C48 84 65 84 82 84" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"></path>
+            </svg>
+          </div>
+        </div>
+        <div style="flex:1"></div>
+        <div class="btn solid">DONE</div>
+      </div>
+      <p class="note">出口: one box per character on the same canvas, split by a dashed divider. One grade for the whole word.</p>
+    </div>
+
+    <div class="dv-opt" id="S4">
+      <div class="dv-olabel"><span class="dv-oid">S4</span>Reveal + grade</div>
+      <div class="wf" data-screen-label="S4">
+        <div class="eyebrow"><span>Reveal</span><span>3 / 20</span></div>
+        <div style="margin:18px -26px 0;height:330px;border-top:2px solid #2b2b2b;border-bottom:2px solid #2b2b2b;position:relative">
+          <svg viewBox="0 0 109 109" style="position:absolute;inset:0;width:100%;height:100%">
+            <path d="M55 15 C56 40 56 68 54 86 C53 94 48 94 43 90" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M23 39 C31 38 40 36 47 34 C44 52 36 72 19 86" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M77 29 C71 41 65 50 59 57" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"></path>
+            <path d="M61 43 C69 57 80 73 93 84" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"></path>
+            <path d="M54 13 C54.5 38 54.5 66 54 86 C54 93 50 95 42 90" fill="none" stroke="#2a78d6" stroke-width="2" stroke-dasharray="3 2" stroke-linecap="round"></path>
+            <path d="M21 37 C30 37.5 41 35.5 49 33 C46 52 37 72 18 87" fill="none" stroke="#2a78d6" stroke-width="2" stroke-dasharray="3 2" stroke-linecap="round"></path>
+            <path d="M79 27 C72 40 66 50 58 57" fill="none" stroke="#2a78d6" stroke-width="2" stroke-dasharray="3 2" stroke-linecap="round"></path>
+            <path d="M60 42 C69 56 81 72 94 83" fill="none" stroke="#2a78d6" stroke-width="2" stroke-dasharray="3 2" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <div class="jp" style="font-size:40px;line-height:1;margin-top:16px">水</div>
+        <div class="res" style="height:22px;margin-top:10px;width:290px">reserved — blank in v7</div>
+        <div class="jp" style="font-size:26px;line-height:1;margin-top:8px">みず</div>
+        <div class="g" style="font-size:19px;margin-top:8px">water</div>
+        <div style="flex:1"></div>
+        <div style="display:flex;gap:10px"><div class="btn" style="flex:1">GOT IT</div><div class="btn" style="flex:1">MISSED</div></div>
+        <div class="g" style="font-size:14px;margin-top:10px">dots, long vowels and small kana count</div>
+        <div class="res" style="height:22px;width:170px;margin-top:12px">reserved — blank in v7</div>
+      </div>
+      <p class="note">Correct strokes (blue dashed = animating) over the user's ink. Two buttons of equal weight, no colour verdict. The one grading line, once, small. Reserved: pitch accent between word and reading; bottom-left under the grading line.</p>
+    </div>
+
+    <div class="dv-opt" id="S5">
+      <div class="dv-olabel"><span class="dv-oid">S5</span>Done</div>
+      <div class="wf" data-screen-label="S5">
+        <div class="eyebrow"><span>Done</span><span>Sat 14 Nov</span></div>
+        <div style="margin-top:16px;border-top:2px solid #2b2b2b">
+          <sc-for list="{{ session }}" as="r" hint-placeholder-count="18">
+            <div style="display:flex;align-items:center;gap:12px;height:25px;border-bottom:1px solid #c9c5bb;font-size:14px">
+              <span class="jp" style="width:46px;font-size:15px">{{ r.w }}</span>
+              <span class="jp g" style="flex:1;font-size:12px">{{ r.k }}</span>
+              <span style="width:18px;text-align:center">{{ r.o }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="flex:1"></div>
+        <div class="big">7 min</div>
+        <div class="g" style="margin-top:4px">next: 9 due tomorrow</div>
+        <div class="btn solid" style="margin-top:14px">CLOSE</div>
+      </div>
+      <p class="note">Today's items in the order written, word · reading · ✓/✗. 年 and 半 appear twice — missed, then again five rows later (半 last, since fewer remained). No score, streak, share or praise.</p>
+    </div>
+
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  spread(due, nw) {
+    const w = 60, avail = 342, n = due + nw;
+    const cols = n <= 7 ? n : Math.ceil(n / 2);
+    const step = cols > 1 ? Math.min(w + 8, (avail - w) / (cols - 1)) : 0;
+    const counts = n <= 7 ? [n] : [Math.ceil(n / 2), Math.floor(n / 2)];
+    let i = 0;
+    return counts.map(c => {
+      const cards = [];
+      for (let j = 0; j < c; j++, i++) cards.push({ k: i < due ? "due" : "", ml: j === 0 ? 0 : Math.round(step - w) });
+      return { cards };
+    });
+  }
+  renderVals() {
+    const sets = [["DAILY BASICS","hiragana"],["COUNTRIES","katakana"],["DAILY BASICS","kanji"],["STATION","kanji"],["CALENDAR","kanji"],["N5 MOCK","words"]];
+    const ca = ["0 due · 10 new","0 due · 10 new","0 due · 10 new","0 due · 9 new","0 due · 10 new","0 due · 9 new"];
+    const cb = ["0 due · 0 new","3 due · 8 new","4 due · 0 new","5 due · 0 new","10 due · 10 new","9 due · 0 new"];
+    const base = [["日","ひ"],["月","つき"],["火","ひ"],["水","みず"],["木","き"],["金","かね"],["土","つち"],["年","とし"],["週","しゅう"],["曜","よう"],["時","とき"],["分","ふん"],["半","はん"],["今","いま"],["毎","まい"],["先","さき"]].map(x => ({ w: x[0], k: x[1], o: "✓" }));
+    const q = [...base]; const missAt = new Set([7, 13]);
+    for (let i = 0; i < q.length; i++) {
+      if (missAt.has(i)) { q[i] = { ...q[i], o: "✗" }; const again = { w: q[i].w, k: q[i].k, o: "✓" }; q.splice(Math.min(i + 5, q.length), 0, again); }
+    }
+    return {
+      s0a: sets.map((s, i) => ({ name: s[0], script: s[1], counts: ca[i] })),
+      s0b: sets.map((s, i) => ({ name: s[0], script: s[1], counts: cb[i] })),
+      sp10: this.spread(0, 10), sp20: this.spread(10, 10), sp21: this.spread(21, 0),
+      session: q
+    };
+  }
+}
+</script>
+</body>
+</html>
