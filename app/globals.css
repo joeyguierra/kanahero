@@ -3839,27 +3839,145 @@ a.creditName {
   color: var(--rail);
 }
 
-/* no grid on the board: v6's crosshair goes, the dividers between boxes stay */
+/* no grid on the board: v6's crosshair goes */
 .v7Board::before,
 .v7Board::after {
   content: none;
 }
 
-.v7Divider {
+/* ---- the board: one box per character, one box on screen (v7.0.1) ---- */
+
+.v7Board {
+  overflow: hidden;
+}
+
+/* the row of boxes. Each is the full board, so every character is written at
+   the same size; the row slides to bring one into view. It is only ever
+   moved, never scaled: the ink is kept in the pixels of the box. */
+.v7Strip {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.18s ease-out;
+}
+
+.v7StripHidden {
+  visibility: hidden;
+}
+
+.v7Box {
+  position: relative;
+  flex: none;
+  width: 100%;
+  height: 100%;
+}
+
+/* the whole word, redrawn smaller: PREVIEW, and under the model on the answer */
+.v7InkLayer,
+.v7ModelLayer {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 0;
-  border-left: 1px dashed rgba(10, 10, 11, 0.28);
+  inset: 0;
+}
+
+.v7InkLayer {
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
 }
 
-.v7Answer {
-  margin-top: 16px;
+.v7InkPreview {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-/* the prompt, asked for again while writing; the answer takes its place */
+/* OVERLAY: the model over the ink, the ink stepped back as it always was */
+.v7InkUnder {
+  opacity: 0.3;
+}
+
+/* SPLIT: the model above, the ink below, both at full strength */
+.v7Split .v7ModelLayer {
+  bottom: 50%;
+  border-bottom: 1px dashed rgba(10, 10, 11, 0.28);
+}
+
+.v7Split .v7InkLayer {
+  top: 50%;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v7Strip {
+    transition: none;
+  }
+}
+
+.v7ViewToggle {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--bone);
+  padding: 12px;
+  margin: -12px 0;
+}
+
+.v7CueBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+/* the boxes made so far; it grows with MORE and never shows a total */
+.v7Cells {
+  display: flex;
+  gap: 2px;
+}
+
+.v7Cell {
+  width: 30px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.v7Cell::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--rail);
+}
+
+.v7CellInk::before {
+  background: var(--rail);
+}
+
+.v7CellAt::before {
+  border-color: var(--strike);
+  box-shadow: 0 0 0 1px var(--strike);
+}
+
+/* MORE and DONE, both always there */
+.v7Finish {
+  display: flex;
+  gap: 10px;
+  height: 62px;
+  flex: none;
+}
+
+.v7Finish > .btnStrike {
+  flex: 1;
+}
+
+.v7More {
+  flex: none;
+  width: 34%;
+  color: var(--bone);
+  border-color: var(--rail);
+  font-size: 13px;
+}
+
 .v7Cue {
   margin-top: 4px;
 }

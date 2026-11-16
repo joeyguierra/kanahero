@@ -91,13 +91,55 @@ await page.click("button:has-text('UNDO')");
 assert.ok(await page.locator("button:has-text('DONE')").isEnabled(), "one stroke is still on the board");
 await page.click("button:has-text('UNDO')");
 assert.ok(await page.locator("button:has-text('DONE')").isDisabled(), "UNDO takes back the last stroke");
-assert.equal(await page.locator(".v7Divider").count(), 1, "する: two boxes, one divider");
+
+// The board never says how long the word is: one box, and MORE makes the next.
+const cells = () => page.locator(".v7Cell").count();
+const inkedCells = () => page.locator(".v7CellInk").count();
+const disabled = (name) => page.locator(`button:has-text('${name}')`).isDisabled();
+const stroke = async () => {
+  await page.mouse.move(box.x + 60, box.y + 60);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 160, box.y + 160, { steps: 4 });
+  await page.mouse.up();
+};
+assert.equal(await cells(), 1, "する is two characters, and the board shows one box");
+assert.ok(await disabled("PREVIEW"), "nothing to preview yet");
+await stroke();
+await page.click("button:has-text('MORE')");
+assert.equal(await cells(), 2, "MORE makes the next box");
+assert.ok(await page.locator(".v7Cell").nth(1).evaluate((el) => el.classList.contains("v7CellAt")));
+assert.ok(await disabled("CLEAR"), "the new box is empty");
+assert.ok(!(await disabled("DONE")), "DONE is there as soon as any box has ink");
+await page.waitForTimeout(300); // the slide
+await stroke();
+assert.equal(await inkedCells(), 2);
+await page.click("button:has-text('CLEAR')");
+assert.equal(await inkedCells(), 1, "CLEAR empties this box only");
+await stroke();
+await page.click("button:has-text('MORE')");
+assert.equal(await cells(), 3);
+// PREVIEW: the whole word on one screen, read-only
+await page.click("button:has-text('PREVIEW')");
+assert.equal(await page.locator(".v7InkPreview").getAttribute("data-boxes"), "3");
+assert.ok((await disabled("CLEAR")) && (await disabled("UNDO")) && (await disabled("MORE")), "the preview is read-only");
+await stroke();
+assert.equal(await inkedCells(), 2, "and takes no ink");
+await page.click("button:has-text('WRITE')");
+assert.equal(await page.locator(".v7InkPreview").count(), 0, "WRITE goes back to the boxes");
+// a cell jumps back to its box
+await page.locator(".v7Cell").first().click();
+assert.ok(await page.locator(".v7Cell").first().evaluate((el) => el.classList.contains("v7CellAt")));
+await page.waitForTimeout(300);
 
 const seen = [];
-const first = await playItem(page, false, shown);
+const first = await playItem(page, false, shown, { views: true });
 seen.push(first);
 for (let i = 0; i < 10; i++) seen.push(await playItem(page, true));
 assert.deepEqual(first.board, first.revealBoard, "the board does not move between S3 and S4");
+assert.equal(first.inkBoxes, 2, "an empty box at the end is not part of the word");
+assert.deepEqual(first.splitSeen, [1, 0], "the answer flips to SPLIT and back to OVERLAY");
+assert.equal(seen[1].cellsAtStart, 1, "the next word starts from one box again");
+assert.equal(seen[1].inkBoxes, 1);
 assert.deepEqual(
   seen.map((s) => s.word),
   [order[0], ...order.slice(1, 6), order[0], ...order.slice(6, 10)],

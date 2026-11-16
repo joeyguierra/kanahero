@@ -57,13 +57,23 @@ loop plus a scheduler plus a ledger, and the rest comes back on its own spec whe
   read-only; WRITE returns to the boxes. The shrink is a scale of the same canvas, so the ink
   keeps its shape — add a minimum line width only if a phone shows it too faint. The reveal
   lands in the preview. CLEAR clears the current box. `WritingCanvas.tsx` is not edited for it.
-  **Amended in workshop 2026-11-16, not yet closed.** The box count is a clue (it gives away
-  long vowels, small kana and kana endings), so the learner decides the length: the button is
-  MORE, not NEXT; MORE and DONE are both always there; the strip grows as boxes are added and
-  never shows the total. The answer gets a view toggle: the model over the ink, or the two
-  apart. Open: the toggle's two names; whether every word, short ones included, uses the
-  box-by-box flow (one extra tap per character); the view when the learner's count and the
-  word's differ.
+  **Closed and built 2026-11-16.** The box count is a clue (it gives away long vowels, small
+  kana and kana endings), so the learner decides the length, and every word uses the same flow,
+  one-character words included:
+  - The board starts as one box. MORE goes to the next box, making it if needed (8 at most);
+    MORE and DONE are both always there. DONE is live once any box has ink.
+  - The strip under the board shows the boxes made so far, which have ink and which is on
+    screen. A tap jumps to that box. It never shows the word's length.
+  - CLEAR and UNDO act on the box on screen.
+  - PREVIEW shows the whole word on one screen, read-only; WRITE returns to the boxes.
+  - A box left empty at the end is not part of the word.
+  - The answer has two views, toggled in the header and kept from word to word: OVERLAY draws
+    the model across the board over the ink, exactly as before, with no attempt to line the
+    model's characters up with the learner's boxes; SPLIT puts the model above and the ink below.
+  - **Built differently from the note above:** each box is its own canvas in a row that slides,
+    not one canvas N boxes wide. That is what lets CLEAR and UNDO act on one box without editing
+    `WritingCanvas.tsx`. The preview does not scale the live canvases; it redraws each box's ink
+    smaller through `lib/ink.ts` (`components/InkPreview.tsx`). No minimum line width yet.
 - **The user's brush** — the look of the ink the user draws (width, taper, colour) is to
   change. Logged 2026-11-14, not designed yet; it lives in `lib/ink.ts`.
 - **Per-word list** (word · reading · meaning · rung mark; was S1b) — reference only, nothing in

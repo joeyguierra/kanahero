@@ -21,7 +21,7 @@ export async function serveOut(port) {
 export const big = (page) => page.locator(".v7Counts").innerText();
 
 export async function draw(page) {
-  const box = await page.locator("canvas.ink").boundingBox();
+  const box = await page.locator(".v7Board").boundingBox();
   await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.3);
   await page.mouse.down();
   await page.mouse.move(box.x + box.width * 0.7, box.y + box.height * 0.6, { steps: 5 });
@@ -53,13 +53,14 @@ export async function hurryPrompt(page, trial) {
  * `shown`: a prompt already read with readPrompt, when the caller looked first.
  * `wait`: leave the prompt alone and let it run its own time.
  */
-export async function playItem(page, ok = true, shown = null, { wait = false } = {}) {
+export async function playItem(page, ok = true, shown = null, { wait = false, views = false } = {}) {
   const { trial, prompt, head } = shown ?? (await readPrompt(page));
   if (!wait && (await page.locator(".v7Prompt").count()) > 0) await hurryPrompt(page, trial);
   await page.waitForSelector("canvas.ink");
   // the prompt is gone from the write screen until it is asked for, and goes
   // again when the pen touches the board
   const cueAtStart = await page.locator(".v7CueBody").count();
+  const cellsAtStart = await page.locator(".v7Cell").count();
   await page.click("button:has-text('SHOW PROMPT')");
   const cue = (await page.locator(".v7CueBody").innerText()).replace(/\s+/g, " ").trim();
   const board = await draw(page);
@@ -69,9 +70,22 @@ export async function playItem(page, ok = true, shown = null, { wait = false } =
   const cueOnReveal = await page.locator(".v7Cue").count();
   const word = (await page.locator(".v7AnswerWord").innerText()).trim();
   const kanji = (await page.locator(".v7AnswerKanji").allInnerTexts()).join("");
-  const revealBoard = await page.locator("canvas.ink").boundingBox();
+  const revealBoard = await page.locator(".v7Board").boundingBox();
+  // how many boxes of ink the answer shows
+  const inkBoxes = Number(await page.locator(".v7InkPreview").getAttribute("data-boxes"));
+  // `views`: flip the answer to SPLIT and back before grading
+  let splitSeen = null;
+  if (views) {
+    await page.click("button:has-text('SPLIT')");
+    splitSeen = await page.locator(".v7Board.v7Split").count();
+    await page.click("button:has-text('OVERLAY')");
+    splitSeen = [splitSeen, await page.locator(".v7Board.v7Split").count()];
+  }
   await page.click(`button:has-text('${ok ? "GOT IT" : "MISSED"}')`);
-  return { trial, prompt, cue, cueAtStart, cueAfterInk, cueOnReveal, head, word, kanji, board, revealBoard };
+  return {
+    trial, prompt, cue, cueAtStart, cueAfterInk, cueOnReveal, head, word, kanji, board, revealBoard,
+    cellsAtStart, inkBoxes, splitSeen,
+  };
 }
 
 export const stored = (page) =>
