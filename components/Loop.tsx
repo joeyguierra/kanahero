@@ -7,7 +7,11 @@
 //           form drawing itself instead, and melts when the drawing ends.
 //           Nothing here has to be waited for: a tap starts the melt, and a
 //           second tap finishes it.
-//   write   a blank board, one box per character. No hint, no trace.
+//   write   a blank board, one box per character. The prompt is gone, and
+//           comes back on request: SHOW PROMPT puts the cue under the board
+//           (script, meaning, a kanji word's reading — never the written
+//           form), and it goes again when the pen next touches the board.
+//           Looking costs nothing; it is not a miss.
 //   reveal  the model strokes over your ink, and you grade yourself.
 //
 // A miss sends the item five places back; the session ends when the queue is
@@ -54,6 +58,8 @@ export default function Loop({
   /** counts presentations, so a requeued item is a new prompt */
   const [presented, setPresented] = useState(0);
   const [hasInk, setHasInk] = useState(false);
+  /** the prompt, asked for again on the write screen */
+  const [peek, setPeek] = useState(false);
   const results = useRef<LoopResult[]>([]);
   const shownAt = useRef(0);
   const promptRef = useRef<HTMLDivElement>(null);
@@ -143,6 +149,7 @@ export default function Loop({
     }
     setQueue(rest);
     setHasInk(false);
+    setPeek(false);
     setStep("prompt");
     setPresented((n) => n + 1);
   }
@@ -201,7 +208,7 @@ export default function Loop({
         </span>
       </div>
 
-      <div className="canvasWrap">
+      <div className="canvasWrap" onPointerDownCapture={() => setPeek(false)}>
         <div className="canvasBox v7Board">
           {chars.slice(1).map((_, i) => (
             <i
@@ -215,6 +222,26 @@ export default function Loop({
           {reveal && <WordReveal word={word.write} />}
         </div>
       </div>
+
+      {!reveal && (
+        <div className="v7Cue">
+          <button
+            type="button"
+            className="v7CueToggle"
+            aria-expanded={peek}
+            onClick={() => setPeek((p) => !p)}
+          >
+            {peek ? "HIDE PROMPT" : "SHOW PROMPT"}
+          </button>
+          {peek && (
+            <div className="v7CueBody">
+              <div className="v7CueScript">{cue.script}</div>
+              <div className="v7CueMain">{cue.main}</div>
+              {cue.reading && <div className="v7CueReading v7Jp">{cue.reading}</div>}
+            </div>
+          )}
+        </div>
+      )}
 
       {reveal && (
         <div className="v7Answer">

@@ -18,12 +18,9 @@ phone, then the scrolling canvas. Read this, then the files in §1, before chang
 
 ## 2. Where things stand
 
-- **Branch:** `v7`. Last commit `d1478f3` (UNDO and docs). `main` is v6 and untouched.
-- **Uncommitted, all passing:** the one-queue rework. That is the word list
-  (`public/words/n5.json`), 57 new stroke files, `lib/words.ts`, the rewritten `lib/schedule.ts`
-  and `lib/store.ts`, the screens, all three test scripts, the spec, the two research files
-  and this file. `lib/sets.ts`, `Sets.tsx` and `Placement.tsx` are deleted (staged by
-  `git rm`). Commit only when the creator asks.
+- **Branch:** `v7`, same commit as `main`: `e3eec5f` "v7.0 loop build" (the one-queue
+  rework), pushed and live. The last v6 commit is tagged `v6-final` (`76c2605`); read any v6
+  file with `git show v6-final:<path>`. Commit only when the creator asks.
 - **Gates:** `npm run build`, then `npm run e2e` (three scripts: scheduler and state with no
   browser, the loop in Playwright, offline). All pass on the current tree.
 - **Seen by the creator:** every screen of the first build, UNDO included.
@@ -86,8 +83,9 @@ Carried from v6 and **not to be refactored**: `components/WritingCanvas.tsx` and
    spec §1: one full-width box per character, NEXT until the last box then DONE, a PREVIEW
    button that shrinks the whole word onto one screen read-only, WRITE to return. 31 of the 210
    words are four characters or longer.
-4. **Later, logged only:** a new look for the user's brush (`lib/ink.ts`); the run timer
-   (`docs/backlog.md`); the trim of unused v6 files and the six set files.
+4. **Later, logged only:** a new look for the user's brush (`lib/ink.ts`); in
+   `docs/backlog.md`: the run timer, then audio, SFX, a hi-fi pass and the card animations
+   (each needs a workshop), then the mobile app conversion; the trim of unused v6 files and the six set files.
 
 ## 6. Things to know before you trip on them
 

@@ -202,6 +202,12 @@ await hurryPrompt(page, false);
 await page.waitForSelector("canvas.ink");
 assert.ok(Date.now() - t0 < 1500, `a tap hurries the prompt, took ${Date.now() - t0} ms`);
 day2.push(await playItem(page, true, p));
+assert.equal(day2[1].cue, "KANJI what なに", "the write screen shows the prompt again on request");
+assert.deepEqual(
+  [day2[1].cueAtStart, day2[1].cueAfterInk],
+  [0, 0],
+  "the prompt is hidden until asked for, and hidden again once the pen is down",
+);
 // two taps and it is gone at once
 p = await readPrompt(page);
 await page.locator(".v7Script").dblclick();
@@ -218,6 +224,8 @@ p = await readPrompt(page);
 assert.deepEqual([p.trial, p.head], [true, "PROMPT 13 / 22"], "then the new words");
 const firstNew = await playItem(page, true, p);
 assert.equal(firstNew.word, order[12], "the list carries on where MORE stopped");
+assert.ok(!firstNew.cue.includes(firstNew.word), "a trial's cue never shows the written form");
+assert.equal(firstNew.cueOnReveal, 0, "the answer takes the cue's place on reveal");
 await quit();
 assert.equal(await big(page), "0 due · 9 new");
 st = await stored(page);

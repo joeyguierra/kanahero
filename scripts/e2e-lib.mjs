@@ -57,14 +57,21 @@ export async function playItem(page, ok = true, shown = null, { wait = false } =
   const { trial, prompt, head } = shown ?? (await readPrompt(page));
   if (!wait && (await page.locator(".v7Prompt").count()) > 0) await hurryPrompt(page, trial);
   await page.waitForSelector("canvas.ink");
+  // the prompt is gone from the write screen until it is asked for, and goes
+  // again when the pen touches the board
+  const cueAtStart = await page.locator(".v7CueBody").count();
+  await page.click("button:has-text('SHOW PROMPT')");
+  const cue = (await page.locator(".v7CueBody").innerText()).replace(/\s+/g, " ").trim();
   const board = await draw(page);
+  const cueAfterInk = await page.locator(".v7CueBody").count();
   await page.click("button:has-text('DONE')");
   await page.waitForSelector(".wordReveal");
+  const cueOnReveal = await page.locator(".v7Cue").count();
   const word = (await page.locator(".v7AnswerWord").innerText()).trim();
   const kanji = (await page.locator(".v7AnswerKanji").allInnerTexts()).join("");
   const revealBoard = await page.locator("canvas.ink").boundingBox();
   await page.click(`button:has-text('${ok ? "GOT IT" : "MISSED"}')`);
-  return { trial, prompt, head, word, kanji, board, revealBoard };
+  return { trial, prompt, cue, cueAtStart, cueAfterInk, cueOnReveal, head, word, kanji, board, revealBoard };
 }
 
 export const stored = (page) =>

@@ -57,6 +57,13 @@ loop plus a scheduler plus a ledger, and the rest comes back on its own spec whe
   read-only; WRITE returns to the boxes. The shrink is a scale of the same canvas, so the ink
   keeps its shape — add a minimum line width only if a phone shows it too faint. The reveal
   lands in the preview. CLEAR clears the current box. `WritingCanvas.tsx` is not edited for it.
+  **Amended in workshop 2026-11-16, not yet closed.** The box count is a clue (it gives away
+  long vowels, small kana and kana endings), so the learner decides the length: the button is
+  MORE, not NEXT; MORE and DONE are both always there; the strip grows as boxes are added and
+  never shows the total. The answer gets a view toggle: the model over the ink, or the two
+  apart. Open: the toggle's two names; whether every word, short ones included, uses the
+  box-by-box flow (one extra tap per character); the view when the learner's count and the
+  word's differ.
 - **The user's brush** — the look of the ink the user draws (width, taper, colour) is to
   change. Logged 2026-11-14, not designed yet; it lives in `lib/ink.ts`.
 - **Per-word list** (word · reading · meaning · rung mark; was S1b) — reference only, nothing in
@@ -207,7 +214,11 @@ Gone with the sets: placement ("already know", blind first write to rung 2), the
   anywhere hurries it (§6.1).
 - **S3 WRITE** — canvas, one box per character (dashed divider between boxes, all on one screen
   until v7.0.1), CLEAR, UNDO (takes back the last stroke), DONE. A plain ✕ leaves the session for S1 with no confirm: every grade
-  is saved as it is made, so nothing is lost. No hints, no count, no grid.
+  is saved as it is made, so nothing is lost. The prompt is gone, and comes back on request
+  (decided 2026-11-16): SHOW PROMPT puts the cue under the board (script, meaning, and a kanji
+  word's reading — never the written form), and it goes again when the pen next touches the
+  board. Looking is free: not a miss, not counted. The answer takes its place on S4. No count,
+  no grid.
 - **S4 REVEAL + GRADE** — strokes over ink; word · reading (when it differs) · the kanji form
   of a word asked in hiragana · meaning; GOT IT / MISSED equal
   weight; the one grading line (§6.3). Reserved 1-line slot above the reading (pitch accent),
