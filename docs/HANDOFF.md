@@ -166,6 +166,9 @@ choices, not learning choices. Re-examine against research; the Joker corpus and
 
 ## 8. Open decisions for the first workshop
 
+Decisions already taken are logged in `docs/decisions.md` (from 2026-11-17). Read it before
+proposing anything those entries cover.
+
 - Where workshop state lives: repo `docs/` (recommended — specs, audit and corpus are here) vs
   project docs.
 - Runtime posture: offline-only / offline-first with online depth / online allowed for audio.

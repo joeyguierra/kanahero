@@ -27,7 +27,8 @@ a session with one deliberate pause.
 
 ## 2026-11-15 · Before the mobile app: audio, SFX, hi-fi pass, card animations
 
-Four items the creator listed, in his order. **Each needs a workshop before any building.**
+Four items the creator listed, in his order, plus the pitch accent line he added to the
+audio item on 2026-11-16. **Each needs a workshop before any building.**
 All four come before the mobile app conversion below.
 
 ### Audio — word pronunciation
@@ -42,6 +43,32 @@ API. The Joker himself is tabled as v7.1.
 **Open before building:** who speaks (Joker, characters, or the learner's pick) and what the
 character options are; where in the loop the word is heard (answer screen only, or also as a
 prompt); pre-rendered clips against a live API; 210 clips in the offline precache.
+
+### Pitch accent line
+
+**Asked for (2026-11-16):** the pitch of a word drawn on its reading, as in
+`visual-pitchmap.png` (repo root). Workshop it together with the audio above.
+
+**The reference:** 休憩 with きゅうけい under it and one stepped line: under きゅ (low), a
+step up, then over うけい (high) with no drop at the end. The line reads by mora, not by
+character: きゅ is one unit.
+
+**Already there:** spec §1 logs "Pitch accent line — slot reserved on S4; data + finding
+needed". The blank `.v7Slot` under the word on the answer screen is that slot.
+`public/words/n5.json` has no accent field.
+
+**Open before building:**
+- *Data.* One accent number per word (0 flat, 1 drop after the first mora, and so on) is
+  enough to draw the line. Source and licence to be chosen and checked; 210 words is few
+  enough to check by hand against a dictionary.
+- *The drop at the end.* The reference shows a word with no drop. A word that drops after its
+  last mora needs a mark the reference does not show (usually a down-tick at the end).
+- *Where.* The answer screen only, or also wherever a kanji word's reading is shown (prompt,
+  SHOW PROMPT).
+- *With audio.* A clip must say the pitch the line draws. A generated voice can get pitch
+  wrong, so each clip is checked against the accent data, not the other way round.
+- *Graded or not.* Shown for reference only, or something the learner is asked about. The
+  handwriting grade does not change either way.
 
 ### SFX
 
@@ -101,3 +128,37 @@ Later, perhaps once the Joker is back (v7.1).
 **Open before building:** who gives it (the Joker's seat, or plain text); what it covers
 (self-grading, SHOW PROMPT, MORE and DONE on the canvas, the answer's view toggle, MORE on
 Today); where the switch lives, since v7 has no settings screen.
+
+## 2026-11-17 · Pre-drill review (receptive check in the app)
+
+**Asked for:** the daily pre-drill check (see `decisions.md` 2026-11-17) built into the app,
+instead of run by hand in chat.
+
+**Already there:** the ledger records every graded item, per word, per day, so the app already
+has what it needs to pick the list (yesterday's new words, last misses, oldest-probed). Nothing
+in the UI asks for reading or meaning yet.
+
+**Evidence so far:** `results.md` probes 2026-11-16 and 2026-11-17. Two days, one learner;
+not enough to spec on.
+
+**Open before building:**
+- *Direction.* Shown the word → recall reading + meaning (receptive). Handwriting stays the
+  centre; this is a separate short step before the run, not a change to the writing loop.
+- *Grading.* Self-grade after reveal, same as the drill, or typed/spoken answer. Self-grade is
+  the default (house rule); honesty drift is research question 6 in HANDOFF §7.
+- *Related idea, keep separate.* Hiding the reading on kanji prompts in the drill itself. That
+  one waits for the clean drill-only number (decision step 2a) to say it is needed.
+- *Not this.* No score shown as a target, no streak for doing it (treadmill guard).
+
+**Falsified by:** the in-app check giving a different score from the paper check on the same
+words, same day, by more than one or two words.
+
+## 2026-11-19 · Undo a grade
+
+**Asked for (implied):** on day 5 the learner graded いい ✗ by mis-tap and stopped the session;
+the ledger keeps the wrong ✗ and `results.md` carries a manual correction.
+
+**Open before building:** an undo for the last grade only, within a few seconds, before the next
+card. Not an edit of history. The ledger should record that an undo happened (truth law).
+
+**Falsified by:** mis-tap corrections in `results.md` staying at zero for a month without it.

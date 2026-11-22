@@ -6,8 +6,8 @@
     "organization": null,
     "repositoryId": null,
     "repositoryName": null,
-    "createdAt": "2026-11-14T09:03:21.763Z",
-    "updatedAt": "2026-11-14T09:03:21.763Z",
+    "createdAt": "2026-11-16T11:20:08.488Z",
+    "updatedAt": "2026-11-16T11:20:08.488Z",
     "languages": [
       "CSS",
       "HTML",
@@ -2046,23 +2046,17 @@
         {
           "patternId": "Lizard_nloc-critical",
           "parameters": {
-            "threshold": "250"
+            "threshold": "140"
           }
         },
         {
-          "patternId": "Lizard_ccn-critical",
-          "parameters": {
-            "threshold": "30"
-          }
+          "patternId": "Lizard_ccn-critical"
         },
         {
           "patternId": "Lizard_ccn-medium"
         },
         {
-          "patternId": "Lizard_parameter-count-critical",
-          "parameters": {
-            "threshold": "13"
-          }
+          "patternId": "Lizard_parameter-count-critical"
         },
         {
           "patternId": "Lizard_file-nloc-critical"
