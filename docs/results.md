@@ -70,6 +70,29 @@ a doctrine test, the conflict gets surfaced, not ignored.
   う in ゆうめい reads as ラ, い in かいもの reads as じ, dakuten on デ faint,
   パーティ missing long vowel.
 
+## Baseline 2 — grammar, reading, listening — 2026-11-23
+- **Source:** official N5 sample (same set as Baseline 1): `N5-mondai.pdf` 言語知識（文法）・読解,
+  `N5Sample.mp3` 聴解, scored with `N5-seikai.pdf`. Timed, no lookup, guesses marked, audio once.
+- **文法・読解: 8 / 13** · 34:44 · 12 of 13 guessed. Learner's grading checked against the key: correct.
+  - **Grammar (もんだい1–3, items 1–9): 4 / 9.** ✓ 2 6 7 9 (all guessed) · ✗ 1 3 4 5 8.
+    Item 1 the only unguessed answer, and wrong: chose に for へや（の）そうじ.
+    Items 3–4 (★ sentence-order, もんだい2): blind — learner did not understand the instructions
+    or the ★. These measure instruction-reading, not grammar.
+  - **Reading (もんだい4–6, items 10–13): 4 / 4,** all guessed. n = 4; not read as a strength.
+  - 12 guesses → 7 right, vs ~3 expected at chance: partial knowledge (recognised words), not
+    blind guessing.
+- **聴解: 2 / 4** (sample has one item per type; ~10 min). もんだい1 1ばん ✓, もんだい2 1ばん ✓
+  (both confident, picture choices) · もんだい3 2ばん ✗ (g), もんだい4 1ばん ✗ (g) — both missed
+  where the choices are heard, not printed.
+- Learner: "I barely understand the instructions"; many words unknown, some recognised.
+- **Weakest measured: grammar (44%)**, listening close (50%, n = 4). Particles are the confident
+  miss on both mocks (Baseline 1 item 5 タクシーに のる; Baseline 2 item 1 の/に).
+- **Contamination:** the 13 items are being reviewed item by item with answers from 11-23, so this
+  sample can no longer re-measure grammar. The sealed check below is the falsifier instead.
+- **Sealed particle check, baseline (model-written, 8 items, key in `docs/sealed-particle-check.md`):
+  5 / 7** · 0 marked as guesses · item 5 **voided** (two valid answers: ホテルの / ホテルで パン —
+  item defect, not learner error). ✗ 7, 8. Retest on or after 2026-12-21, same items, same rules.
+
 ## Log
 <!-- one line per drill day: date · set · items due/done/missed · minutes -->
 <!-- source: app ledger export (kanahero-ledger-2026-11-16.json). Times UTC+7. -->
@@ -151,6 +174,16 @@ a doctrine test, the conflict gets surfaced, not ignored.
     At that pace the N5 list (`public/words/n5.json`, 210 words) takes ~6 weeks after week 1.
     A pace question for doctrine, not a build item.
   - Median per attempt ~11 s; 新しい 116 s is a pause.
+
+- **Day 9 — 2026-11-23** (week 2, Mon) · 1 session (16:39–16:50), after the day-9 check ·
+  due 12 · fresh 10 · done 28 · missed 6 · **10.4 min**
+  - **Writing recall, due words, first try: 12 / 12.** 前 そこ 電気 つとめる できる いい 多分 話 みんな
+    入れる パーティー おいしい.
+  - **New words first try: 6 / 10.** ✓ クラス ゆうめい 四 つかう もつ しる ·
+    ✗ **飲む** (3 attempts), **だいじょうぶ** (2), **聞く** (2), **先** (3).
+    New kanji: 飲む 聞く 四 先. New kana: クラス ゆうめい つかう もつ しる だいじょうぶ.
+  - All 28 attempts: 22 ✓ / 6 ✗. Median 17.2 s. Words introduced to date: 73.
+  - First fresh words since day 6 (pile had room: due 12).
 
 ## Probes
 - **2026-11-16 (day 2, after drilling) — receptive probe, cold, all 30 words**
@@ -287,6 +320,15 @@ a doctrine test, the conflict gets surfaced, not ignored.
   - Pattern: misses are now mostly *mix-ups inside a family*, not blanks — おととい/きのう,
     あの/この, 出る/外. The new words are pressing on the old ones (interference, as 入る/入れる on day 6).
 
+- **2026-11-23 (day 9, before drilling) — pre-drill check, 29 words, paper (photo)**
+  - **Time: 8:55 for 29 words (≈ 18 s / word).** Second timed check (day 8: 17 s / word).
+  - **Total 29 / 29** — first perfect check. Kanji 11 / 11 (reading + meaning), kana 18 / 18.
+  - All day-8 misses ✓: おととい 買う とる (1-day re-check after the 2-day gap), あの, 言う, 出る.
+    Leeches ✓: 来る つとめる 後 言う. Family pairs ✓: 入る/入れる, あの/この, 出る/外.
+  - Counted ✓ with notes: 入れる written じれる — ink of い leans じ (baseline pattern), learner
+    confirmed い · 出る "to go outside" (list: to go out) · できる "possible" (N5 sense: can do).
+  - Split first-probe: none today (no new words on day 8).
+
 ## Experiments
 - **Split: same-day reading check, from 2026-11-17** (`decisions.md`, same date)
   - Each day's new kanji words split in pairs (matched by type), one of each pair to A, one to B.
@@ -303,6 +345,26 @@ a doctrine test, the conflict gets surfaced, not ignored.
     (前 6 attempts, 電気 4); B has 多分 (5) and the easy 入る. Biased *against* A: if A still wins,
     the case is stronger.
     Arm A same-day check: 電気 でんき electricity ✓ · 前 まえ front ✓ (also "before"). A: 2 / 2.
+
+  - Day 9: pairs by type — verbs 飲む/聞く, other 先/四. **A = 飲む, 先 · B = 聞く, 四.**
+    A takes the two 3-attempt words (biased against A, as day 4).
+    Arm A same-day check: 飲む のむ to drink ✓ · 先 さき ✓ reading, **meaning blank** (ahead;
+    corrected in chat). A: 1 / 2 full.
+
+## Week 1 review — 2026-11-15 → 11-22
+- **Drill:** 7 of 8 days · 100.6 min · 63 words introduced · 254 attempts, 193 ✓ (76%).
+- **Writing recall, review words, first try, by day:** 11/20 · 16/19 · 13/14 · 21/22 (20 raw) ·
+  18/26 · 30/30 → 55% → 84 → 93 → 95 → 69 → 100.
+- **New words, first try:** 17/20 · 6/10 · 10/11 · 7/10 · 6/8 · 3/4 · 0/0.
+- **Checks (reading/meaning, cold):** d2 22/30 · d3 28/30 · d4 15/18 · d5 20/23 · d6 24/30 ·
+  d8 34/40 (11:11). Next-day first check of new words: 9/10 · 7/10 · 5/8 · (1/4 after 2-day gap).
+- **Split:** A 4/6 · B 3/6 — inconclusive.
+- **Mock re-measure:** none yet. No claim about JLPT score can be made from week 1.
+- Against research: testing effect (one check + correction fixed d2 misses, kanji 7→11/12) ✓ ·
+  direction-specific learning (writing ✓ predicted reading ✓ 4/7; 言う flipped d6/d8) ✓ ·
+  spacing (words at 3-day+ gaps: d8 Parts 3–5 24/26) ✓ · same-day retrieval weak (A words 前,
+  ちがう lost overnight) — consistent, n tiny · interference between similar words emerging
+  (needs: source in `research/`) · sleep, grammar, listening: untested.
 
 ## Re-measurements
 <!-- same mock, same rules, on a schedule decided in doctrine. Date · score · what changed since -->

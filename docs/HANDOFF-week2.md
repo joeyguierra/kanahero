@@ -4,7 +4,7 @@ Read with `CLAUDE.md` read order. Numbers live in `results.md`; decisions in `de
 research in `research/02-direction-and-check-scheduling.md`. This file is only the bridge.
 
 ## Where week 1 ended
-- Drill days: 7 of 8 (day 7, 11-21, missed). Week-1 list: 46 words introduced (ledger is truth).
+- Drill days: 7 of 8 (day 7, 11-21, missed). Words introduced: **63** (distinct `word` values in the 11-22 ledger).
 - Day 8 drill: 30 / 30 first try, 8.8 min, **0 new words** (pile full — see Pace below).
 - Day 8 pre-drill check: 34 / 40, **11:11** (first timed check; cap rule says decide on the median
   of the next 3).
@@ -12,6 +12,7 @@ research in `research/02-direction-and-check-scheduling.md`. This file is only t
   Bedtime routine waits on it (learner: week 2).
 
 ## Running routines (manual, in chat)
+0. **Saturday is rest** (`decisions.md` 2026-11-22): no check, no drill; log as rest. Next: 11-28.
 1. **Pre-drill check** (`decisions.md` 2026-11-17, amended 11-17, 11-18, 11-20). Learner sends the
    ledger export; agent returns ≤ 40 words, spelled exactly as the ledger `word` field; learner
    answers on paper (photo), timed; agent scores, corrects, logs under `results.md` → Probes.

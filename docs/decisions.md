@@ -83,3 +83,55 @@ overflow rolls forward and settled words drift late. Learner accepts the time. T
 **Reverses if.** Checks routinely run over ~10 minutes, or drill minutes start dropping on check
 days (build > study's cousin: check > drill). Then: cap back down, or move settled kana words to
 longer gaps.
+
+## 2026-11-22 · 6 study days a week, 1 planned rest day
+
+**Decision.** One fixed rest day a week: no check, no drill. Logged in `results.md` as
+**rest**, not **missed** (missed = an unplanned day off). **Day: Saturday** (learner, 2026-11-22). Study week = **Sunday → Friday**; weeks start Sunday
+(week 1 began Sun 11-15; Sun 11-22 = week 2, day 1). First planned rest: 2026-11-28. Day 7 (Sat 11-21)
+was unplanned, so it stays logged as missed.
+Checks and drill resume the next day with whatever is due; nothing is made up or doubled.
+
+**Why.** The learner says it feels good, and staying with this for months counts for more
+than one extra day a week. Spacing tolerates a one-day gap: after the missed day 7, day 8's
+check scored 34/40 and the drill 30/30. The cost shows up in **new words**: the words
+introduced the day before the gap scored 1/4 at a 2-day first check (vs 9/10, 7/10, 5/8 at
+1 day). And the pile refills to 30 the day after, so 0 fresh that day (`PILE_MAX`, day 8).
+Net pace: ~6/7 of the ~5 new words a day estimate.
+
+**Not this.** No streak counts, no "make-up" sessions, no guilt copy (treadmill guard).
+
+**Optional Saturday (added 2026-11-22).** Play, not study: something for fun in Japanese —
+watch or listen to something easy, or spot kana and words in the wild (menus, signs, packaging).
+Rules: optional, unscored, no app, no drill list, no check, no flashcards. If done, one line in
+`results.md` (what, minutes). Not a skill measurement: input at N5 week 2 is mostly
+incomprehensible (`research/00-survey.md` #8–9 put listening/extensive input later). Kept for
+ear and motivation; never becomes a requirement.
+
+**Reverses if.** First checks of words introduced before a rest day keep scoring well below
+the 1-day ones over ~4 weeks. Then the rest day moves, or the day before it takes no new
+words (would need an app change: spec first).
+
+## 2026-11-23 · Nightly exercise — trial (grammar, one point per night)
+
+**Decision.** A ~10-minute exercise, last thing before sleep, on paper. One grammar point per
+night, aimed at the weakest measured section (Baseline 2: grammar 4/9). Night 1: **に** (where you
+go / arrive / get on), contrasted with の between nouns. Shape:
+A. read 3 sentences aloud with English · B. cover English, say meaning (4) · C. English only →
+say and handwrite the Japanese (4) · self-grade, score on the sheet · lights out, no more review.
+Sentences use only words from before that day; **that day's new drill words never appear**
+(tomorrow's first check of them stays clean).
+**Next morning:** 2 unseen sentences on the night's point, English → Japanese, cold, before the
+drill. That is the after-sleep number.
+
+**Why.** Mazza et al. 2016: learning, sleep, relearning halved practice and improved long-term
+retention vs the same-day schedule (the sleep effect is not settled: an earlier study found no
+12 h day-vs-night difference — needs: both sources written into `research/`). Particles are the
+confident miss on both mocks. Retrieval and production over rereading (testing effect, research 02).
+
+**Falsified by.**
+- Morning recall of the night's point under ~50% for a week → change the format.
+- Sealed particle check (baseline 5/7) not up on or after 2026-12-21 → cut or redesign.
+  Never study from the sealed items.
+
+**Not this.** No streak, no make-up nights, not a requirement on rest days.
