@@ -12,6 +12,8 @@ research in `research/02-direction-and-check-scheduling.md`. This file is only t
   Bedtime routine waits on it (learner: week 2).
 
 ## Running routines (manual, in chat)
+**Before building any check or sheet:** `decisions.md` 2026-11-23, "Building check and sheet
+items" (no same-day new words, arm B untouched, sealed items fixed).
 0. **Saturday is rest** (`decisions.md` 2026-11-22): no check, no drill; log as rest. Next: 11-28.
 1. **Pre-drill check** (`decisions.md` 2026-11-17, amended 11-17, 11-18, 11-20). Learner sends the
    ledger export; agent returns ≤ 40 words, spelled exactly as the ledger `word` field; learner

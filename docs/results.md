@@ -350,6 +350,11 @@ a doctrine test, the conflict gets surfaced, not ignored.
     A takes the two 3-attempt words (biased against A, as day 4).
     Arm A same-day check: 飲む のむ to drink ✓ · 先 さき ✓ reading, **meaning blank** (ahead;
     corrected in chat). A: 1 / 2 full.
+    **Contamination (night 1, logged 2026-11-23):** 聞く (B) was used in the sealed forms check
+    (聞くません) the same night → **聞く void** for the split; its next-day check is not drill-only.
+    飲む (A) was used in the form ladder (飲みます): one extra exposure beyond the A check → kept,
+    flagged; decide keep/void when the split is read. Rule added: `decisions.md` 2026-11-23,
+    "Building check and sheet items".
 
 ## Nightly (trial, `decisions.md` 2026-11-23)
 - **Night 1 — 2026-11-23, ~22:15 · point: に (go to / arrive / get on).** Paper, self-graded, model-checked.

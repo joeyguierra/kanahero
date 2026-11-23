@@ -44,7 +44,31 @@ API. The Joker himself is tabled as v7.1.
 character options are; where in the loop the word is heard (answer screen only, or also as a
 prompt); pre-rendered clips against a live API; 210 clips in the offline precache.
 
+### Decided 2026-11-23 — first audio: tap to play on the answer screen (week of 2026-11-30)
+
+Research: `research/03-listening-beginners.md` (findings 2, 6, 7). Scope for the first build:
+- **Voice:** the phone's own TTS engine (web speech). No server, $0. If the phone has no Japanese
+  voice, the button is absent (no disabled state, no nag).
+- **Where:** answer screen only, after the grade-relevant reveal. **Never on the prompt** (write
+  before you hear it).
+- **How:** tap to play (learner's choice over autoplay). Replays on each tap.
+- **Ships with the pitch line** (below), so a wrong TTS pitch is visible against the accent data.
+  The data is the reference, never the clip.
+- **Ledger:** record `heard: true` on the graded item.
+- **Falsifiers:** tapped on fewer than ~1 in 5 reveals over two weeks → remove · median seconds per
+  word up more than ~3 s → review. Rough learning read later: morning-check reading scores, heard vs
+  not-heard words (learner-chosen, not randomised).
+- **`results.md`:** log the start date; first-probe numbers after it include audio exposure.
+- **Before the spec:** engine-switch test on the S23, then check Chrome gets the same voice.
+- Not a listening drill. The audio-only item (hear → meaning; dictation) and a sealed listening
+  check come separately (`research/03`, verdict and measurement).
+
 ### Pitch accent line
+
+**Researched 2026-11-23:** `research/04-pitch-accent.md`. Verdict: build it as a reference on the
+answer screen, with the audio. Data: Kanjium `accents.txt` (CC BY-SA 4.0). Falsifier: paper pitch
+recall check (10 known words, draw the line from memory) — baseline this week, retest ~4 weeks
+after launch.
 
 **Asked for (2026-11-16):** the pitch of a word drawn on its reading, as in
 `visual-pitchmap.png` (repo root). Workshop it together with the audio above.

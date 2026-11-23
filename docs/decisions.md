@@ -124,9 +124,11 @@ Sentences use only words from before that day; **that day's new drill words neve
 **Next morning:** 2 unseen sentences on the night's point, English → Japanese, cold, before the
 drill. That is the after-sleep number.
 
-**Why.** Mazza et al. 2016: learning, sleep, relearning halved practice and improved long-term
-retention vs the same-day schedule (the sleep effect is not settled: an earlier study found no
-12 h day-vs-night difference — needs: both sources written into `research/`). Particles are the
+**Why.** Mazza et al. 2016: learning, sleep, relearning cut relearning and improved long-term
+retention vs the same-day schedule (verified, one study, n = 40; `research/05`). The unnamed "earlier
+study, no 12 h difference" could not be found and is removed (2026-11-23). Sleep within a few hours
+of study helps vocabulary (Gais 2006), but effects are smaller than once claimed: evening is enough,
+not strictly last thing before sleep (`research/05`). Particles are the
 confident miss on both mocks. Retrieval and production over rereading (testing effect, research 02).
 
 **Falsified by.**
@@ -188,9 +190,60 @@ handwrite the form from memory, self-grade. One form set per week: polite ます
 ませんでした + the ます stem → て-form → ない/た → い-adjective past/negative → たい.
 Morning cold check becomes 3 items: 2 on the night's point, 1 form.
 **Falsified by:** sealed forms check (baseline 3/8, `docs/sealed-forms-check.md`) not up on or after
-2026-12-21. 聞く and 出る never appear in a ladder: if drilled verbs improve and those two do not,
-verbs were memorised and the rule did not transfer.
+2026-12-21. Transfer to unpractised verbs is not measured (held-out verbs dropped 2026-11-23,
+learner: simpler; the check's items may be practised like any known verb).
 
 **Fixed night shape (2026-11-23):** A 3 read · B 4 meaning · C 4 translate · D 5 forms = 16 items,
 ~13 min. The point and verbs change; the counts do not, so nights stay comparable. Changed only on
 data (e.g. nights regularly over 15 min).
+
+## 2026-11-23 · Building check and sheet items — rules for every agent
+
+**Decision.** Any item an agent gives the learner outside the app (pre-drill check, nightly sheet
+A–D, morning items, sealed checks, quick quizzes in chat) is built from the **latest ledger export**
+and passes these rules. Written after night 1 used two of that day's new drill words (聞く in the
+sealed forms check, 飲む in the form ladder; `results.md` → Experiments, day 9).
+
+1. **Spelling.** Every word exactly as the ledger's `word` field (rule from 2026-11-18).
+2. **Today's new words appear nowhere else today.** A word first graded in today's drill is not
+   used in the nightly sheet, the morning items, a sealed check or a chat quiz until after its
+   first pre-drill check (tomorrow). The only exception is the split's arm-A same-day check, which
+   *is* the experiment.
+3. **Split arm B is untouched** by every exercise until its first pre-drill check. Arm A gets its
+   one same-day check and nothing more.
+4. **Sentences use known words only:** every word introduced in the drill before today
+   (`research/03` finding 3, coverage).
+5. **Sealed items are fixed.** Never studied, never swapped after a baseline, even if one is later
+   found contaminated: log it in `results.md`, keep the item, so retests stay comparable.
+6. **Check before sending.** Before giving any sheet, the agent lists its words and states in the
+   reply that they were checked against (a) today's new words and (b) arm-B words awaiting a
+   first check.
+7. **Pool.** ~21 verbs were introduced before day 9 (する 言う 行く 来る 見る やる ある いる なる 食べる
+   つける わかる のる 出る 入る 入れる 書く 買う とる つとめる できる): enough for 5 a night with
+   reuse across nights. Reuse is fine; same-day new words are not.
+
+**Reverses if.** Never silently. If the pool runs short for a form set, the ladder shrinks; the
+rules do not bend.
+
+## 2026-11-23 · Nightly grammar sequence: Minna no Nihongo Shokyu I order
+
+**Decision.** The nightly points follow the grammar order of *Minna no Nihongo Shokyu I* (the learner
+owns it). Grammar order only: sentences are written fresh from words the drill has already taught
+(rules in "Building check and sheet items"), never copied from the book. A lesson whose points need
+words not yet taught (e.g. L4 time expressions) waits until the known-words rule allows it.
+に (night 1) came early; it returns in its Minna lesson as review, not as new.
+
+**Plan, nights 2–6:** Tue 11-24 L1 は…です · じゃありません · か · Wed 11-25 L1 の (N の N) · も ·
+Thu 11-26 L2 これ/それ · この/その/あの · Fri 11-27 L3 ここ/そこ/どこ · Sat 11-28 rest ·
+Sun 11-29 L5 へ 行きます/来ます · で (vehicle).
+
+**Why.** "Personal gap, concept fix": a standard sequence, not the learner's misses. Minna and Genki I
+teach the first points in nearly the same order (both open with N1 は N2 です, then demonstratives);
+Minna's smaller lessons fit one point per night, and the learner has the book to read the night's point.
+
+**Timing (learner, 2026-11-23).** "Nightly" means evening, not strictly last thing before sleep; the
+pre-drill check and drill are any time during the day. See `research/05` for what timing evidence says.
+
+**Reverses if.** A point repeatedly can't be written with known words (skip ahead in Minna order),
+or the learner switches books.
+
