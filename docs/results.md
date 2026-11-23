@@ -351,6 +351,34 @@ a doctrine test, the conflict gets surfaced, not ignored.
     Arm A same-day check: 飲む のむ to drink ✓ · 先 さき ✓ reading, **meaning blank** (ahead;
     corrected in chat). A: 1 / 2 full.
 
+## Nightly (trial, `decisions.md` 2026-11-23)
+- **Night 1 — 2026-11-23, ~22:15 · point: に (go to / arrive / get on).** Paper, self-graded, model-checked.
+  - **に itself: 8 / 8** understood (B) or placed (C).
+  - **B, JP → EN, full sentence: 2 / 4.** ✓ 5 タクシーにのりました ("entered/ride the taxi" — hedged
+    with はいる) · ✓ 7 へやに入りました, but furigana written はじ over 入 (actual はい) ·
+    ✗ 4 あの人はホテルに来ました → "This person went" (あの = that; 来る = come — the open "come"
+    item from day 3, still unattached) · ½ 6 何にのりますか → "What did you ride?" (ます is
+    non-past: will ride).
+  - **C, EN → JP handwritten: 2 / 4.** ✓ 10 わたしはホテルに来ました · ✓ 11 わたしのへやに行きます ·
+    ✗ 8 今はパスにのりす (バス dakuten written as handakuten パ; ます → す) ·
+    ✗ 9 その人はうちにかります (かります = borrow; target かえりました, past).
+  - Every miss is a **verb** (meaning, form or tense), none a particle. Same pattern as the week-1
+    checks (verbs collapsing into each other).
+
+  - **Sealed forms check, baseline (night 1, ~22:40; key in `docs/sealed-forms-check.md`): 3 / 8** ·
+    0 marked as guesses. ✓ わかりました · のりません · ありました.
+    ✗ 言うません (いいません) · 見ません for "didn't see" (みませんでした) · します for "did" (しました) ·
+    held-out 聞くません (ききません) · held-out 出りません (でませんでした).
+    Two separate gaps: **(a) the ます stem** — dictionary form kept before ます on u-verbs (言う, 聞く),
+    り over-applied to a drop-る verb (出る); right only on り-verbs わかる のる ある. **(b) past and
+    negative-past** — ませんでした 0 / 2, "did" given as します. Learner's romaji for 12 read
+    "wakarimasen"; the sheet says わかりました; sheet scored.
+
+  - **Form ladder (night 1, ~22:50, right after reading the rule): 5 / 5 on form.**
+    行きませんでした · 食べました · 言いました · しませんでした · 飲みます.
+    Kana slip: 食べる / 食べました written with katakana **バ** for hiragana べ (cue copied the same
+    way). Same-session, rule just read: not learning evidence; the morning form item is.
+
 ## Week 1 review — 2026-11-15 → 11-22
 - **Drill:** 7 of 8 days · 100.6 min · 63 words introduced · 254 attempts, 193 ✓ (76%).
 - **Writing recall, review words, first try, by day:** 11/20 · 16/19 · 13/14 · 21/22 (20 raw) ·

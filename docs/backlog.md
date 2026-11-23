@@ -162,3 +162,19 @@ the ledger keeps the wrong ✗ and `results.md` carries a manual correction.
 card. Not an edit of history. The ledger should record that an undo happened (truth law).
 
 **Falsified by:** mis-tap corrections in `results.md` staying at zero for a month without it.
+
+## 2026-11-23 · Listening in the nightly exercise — tabled to week of 2026-11-30
+
+**Asked for:** a listening exercise at night, as an artifact or a local-only Kana Hero feature.
+
+**Why it waits:** the nightly format changed on night 1 (particle point + form ladder); a third stream
+before 7 nights of morning numbers would make any change untraceable. `research/00-survey.md` #8
+(shadowing/listening, grade C) is parked behind the runtime posture decision for audio.
+Baseline 2 listening is 2 / 4 — misses were where the choices are heard, not printed.
+
+**Before building, in order:**
+1. **Audio posture workshop** — on-device speech synthesis (ja-JP, $0, no server; risk: wrong pitch
+   accent, see the pitch accent line above) vs pre-rendered clips vs a paid voice. Cost line written.
+2. **Sealed listening check** bigger than the 4-item sample; source to find.
+3. **Trial as an artifact, not an app feature:** nightly part B heard instead of read, same sentences.
+   Spec only if morning numbers hold for ~2 weeks.

@@ -135,3 +135,62 @@ confident miss on both mocks. Retrieval and production over rereading (testing e
   Never study from the sealed items.
 
 **Not this.** No streak, no make-up nights, not a requirement on rest days.
+
+**Amended 2026-11-23 (same day), under "Personal gap, concept fix" below.** Starting with に
+because the learner missed it is withdrawn: that picks content from one learner's misses. The
+nightly routine stays; its content follows a standard N5 grammar sequence (source to be chosen:
+Genki I proposed, not yet decided). Particles are in it because particles are core N5 grammar.
+A particle the learner keeps missing comes back sooner through per-item spacing (a general
+mechanism), not by being put first.
+
+## 2026-11-23 · Personal gap, concept fix — the balance every decision strikes
+
+**Decision.** Kana Hero is built from the creator's own roadblocks, and every fix is made at the
+level of a concept, never at the level of his specific items. In full:
+1. **Gaps come from real use.** A gap counts when it shows up in the creator's drilling,
+   checks or mocks (`results.md`). No features for imagined users.
+2. **A gap becomes a decision only once it is named as a concept** in language learning: a
+   skill (reading vs writing), a learning mechanism (spacing, retrieval, interference), a
+   category of the language (particles, verb forms), or learner psychology. Research backs it
+   where it can (`research/`).
+3. **The fix acts on the concept, never on the creator's items.** Words, particles, phrases and
+   kanji are never chosen, ordered or added because he missed them. Content comes from standard
+   lists and sequences. Adapting to a learner happens only through general mechanisms fed by
+   that learner's own history (**general rules, personal schedule**: per-item spacing, Lindsey
+   2014, `research/02`).
+4. **The fix is judged on the creator's numbers, and is not watered down for others.** A finding
+   that works for him is kept even if it may not suit every learner; it is not blocked or
+   softened to accommodate hypothetical users, and it is not claimed to work for everyone.
+
+**Test (one line).** Can the gap be named without naming one of his words, particles or phrases?
+If not, it is not yet a decision.
+
+**Examples.**
+- ✓ Pre-drill check: reading, meaning and writing are separate skills (Webb 2009, `research/02`)
+  and the drill trains only writing. Found in his day-2 probe; the fix is for the skill.
+- ✓ A particle slot in a standard grammar sequence.
+- ✓ The scheduler bringing back a word he missed sooner (mechanism, his data).
+- ✗ Starting the nightly routine with に because he missed it (withdrawn, entry above).
+- ✗ Adding つとめる or 来る to a list, or moving them earlier, because they were leeches.
+
+**Why.** Picking content from one learner's misses on a 9-item test overfits to noise and leaves
+the app tied to one person. Requiring every decision to hold for any learner would block or
+dilute real findings. This keeps discovery personal and the fix general.
+
+**Reverses if.** Never silently. Amend here, with the case that broke it.
+
+
+**Amended 2026-11-23 (night 1) — form ladder added.** Learner: forms are missing and the grammar
+items lean on them. Data agrees: every night-1 miss was a verb form or meaning, none a particle;
+mock items 2 (て), 7 (たい), 8 (adjective past negative) are forms. Each night gains a ~3-minute
+**form ladder** after the particle point (~13 min total): 5 known verbs, English cue → say and
+handwrite the form from memory, self-grade. One form set per week: polite ます/ました/ません/
+ませんでした + the ます stem → て-form → ない/た → い-adjective past/negative → たい.
+Morning cold check becomes 3 items: 2 on the night's point, 1 form.
+**Falsified by:** sealed forms check (baseline 3/8, `docs/sealed-forms-check.md`) not up on or after
+2026-12-21. 聞く and 出る never appear in a ladder: if drilled verbs improve and those two do not,
+verbs were memorised and the rule did not transfer.
+
+**Fixed night shape (2026-11-23):** A 3 read · B 4 meaning · C 4 translate · D 5 forms = 16 items,
+~13 min. The point and verbs change; the counts do not, so nights stay comparable. Changed only on
+data (e.g. nights regularly over 15 min).
