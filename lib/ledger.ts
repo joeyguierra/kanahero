@@ -27,7 +27,21 @@ export interface SessionRow {
   missed: number;
 }
 
-export type LedgerRow = ItemRow | SessionRow;
+/** A paper part's stopwatch time, typed in on /time (BRIEF-study-time-dashboard §4).
+    Append-only, latest `ts` wins for a `day` + `part`. */
+export interface TimeRow {
+  type: "time";
+  /** the study day it counts for — chosen, not taken from the clock */
+  day: string;
+  part: "check" | "morning" | "night";
+  /** null = no time: back to untimed, or with `none`, the part did not happen */
+  ms: number | null;
+  none?: true;
+  ts: number;
+  how: "manual" | "timer";
+}
+
+export type LedgerRow = ItemRow | SessionRow | TimeRow;
 
 const STORE = "rows";
 const db = idbStore({
@@ -39,9 +53,14 @@ const db = idbStore({
   },
 });
 
+/** Write one row and say so if it failed — for /time, where the row is the point. */
+export async function writeRow(row: LedgerRow): Promise<void> {
+  await db.tx("readwrite", (s) => s.add(row));
+}
+
 export async function logRow(row: LedgerRow): Promise<void> {
   try {
-    await db.tx("readwrite", (s) => s.add(row));
+    await writeRow(row);
   } catch {
     // no ledger row is worth interrupting a session for
   }

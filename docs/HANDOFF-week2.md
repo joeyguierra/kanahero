@@ -1,15 +1,33 @@
 # Handoff — end of week 1 (2026-11-15 → 11-22) → next agent
 
 Read with `CLAUDE.md` read order. Numbers live in `results.md`; decisions in `decisions.md`;
-research in `research/02-direction-and-check-scheduling.md`. This file is only the bridge.
+research in `research/` (02 check scheduling · 03 listening · 04 pitch · 05 sleep and timing ·
+06 daily study time). This file is only the bridge. **Last updated 2026-11-24 (day 10).**
 
 ## Where week 1 ended
 - Drill days: 7 of 8 (day 7, 11-21, missed). Words introduced: **63** (distinct `word` values in the 11-22 ledger).
 - Day 8 drill: 30 / 30 first try, 8.8 min, **0 new words** (pile full — see Pace below).
 - Day 8 pre-drill check: 34 / 40, **11:11** (first timed check; cap rule says decide on the median
   of the next 3).
-- Grammar + listening baseline (JLPT N5 sample, jlpt.jp/e/samples/sample09.html): **not taken**.
-  Bedtime routine waits on it (learner: week 2).
+- Grammar + listening baseline: **taken 2026-11-23** (`results.md` → Baseline 2): 文法・読解 8 / 13
+  (grammar 4 / 9, reading 4 / 4, 12 of 13 guessed), 聴解 2 / 4. The sample is now contaminated;
+  the sealed particle check (5 / 7) and sealed forms check (3 / 8) are the retests, on or after
+  2026-12-21.
+
+## Week 2 so far (through day 10, Tue 2026-11-24)
+- **Target: JLPT N5, July 2027** (learner, 2026-11-24). Date not announced; first Sunday of July
+  would be 2027-07-04 → 190 study days from 11-24 at 6 a week.
+- Day 9: check 29 / 29 (8:55) · drill 12 / 12 reviews, 6 / 10 new, 10.4 min. Day 10: check 12 / 16
+  (8:00) · drill 7 / 10 reviews, 8 / 10 new, 11.1 min. **Words introduced: 83.**
+- **Nightly trial started 11-23** (`decisions.md` 2026-11-23, three entries): evening sheet A–D,
+  16 items, one grammar point in Minna no Nihongo I order + a form ladder; 3 cold items next
+  morning. Night 1 logged; night 2 (11-24, L1 は…です · じゃありません · か) pending at this update.
+- **Study time.** Learner wants **at least 1 hour a day** combined (check + drill + night).
+  Measured days 8–10: 19–25 min with the night sheet untimed; estimate 35–40. Research:
+  `research/06-daily-study-time.md` — 60 min is defensible as a budget (≈190 h by July; inside
+  the ~1 h a day the practice literature calls productive), in blocks under ~30 min, never a
+  quota, never at the cost of sleep. **Not yet a decision**: nothing in `decisions.md`. Agent's
+  advice 11-24: add nothing before Fri 11-27, get a fully timed week first.
 
 ## Running routines (manual, in chat)
 **Before building any check or sheet:** `decisions.md` 2026-11-23, "Building check and sheet
@@ -21,19 +39,26 @@ items" (no same-day new words, arm B untouched, sealed items fixed).
    Schedule from **check history only**: ✗ → next day; consecutive ✓ → 1 · 3 · 7 · 14 days.
 2. **Split experiment** (`results.md` → Experiments). New kanji words paired by type; A gets a
    same-day reading check after the drill, B untouched. Read after ~12–14 words per arm.
-   Cumulative 1-day first-probe: **A 4 / 6 · B 3 / 6.** 買う (B, 2-day gap) excluded. No new
-   words on day 8 → nothing added.
+   Cumulative 1-day first-probe: **A 5 / 8 · B 4 / 7** (through day 9's words). 買う (B, 2-day
+   gap) excluded; 聞く (B) void, 飲む (A) flagged (night-1 contamination).
 3. Log each drill day under `results.md` → Log from the ledger (session times are UTC+7).
+4. **Time per day** (`results.md` → Time per day, learner 2026-11-24): ask for a time on every
+   part (check, morning items, split A, night sheet); drill minutes from the ledger. Update the row
+   each time a part ends; separate columns + total. Never estimate an untimed part.
 
-## Check state for the next checks (computed from all checks through 11-22)
-- **11-23 (29 words, no new words exist):** あの · 言う · 外 · 来る · やる · 出る · わたし · テレビ · どう ·
-  くらい · この · 後 · ちがう · 多分 · ここ · カメラ · その · そこ · 電気 · できる · 入る · つとめる · 入れる ·
-  けっこう · 書く · どこ · おととい · 買う · とる
-- **11-25:** 前 · 話 · みんな · パーティー · おいしい · 五
-- **11-27:** 何 · 見る · 人 · 一 · 今 · 食べる · 新しい
+## Check state for the next checks (computed from all checks through 11-24)
+The running list is the last line of the newest probe in `results.md` ("Next checks"); recompute
+from check history if in doubt.
+- **11-25 (26 words):** 先 つかう もつ しる (✗ on 11-24) · 飲む 聞く 四 クラス ゆうめい だいじょうぶ ·
+  前 話 みんな パーティー おいしい 五 · day-10 new words, first check: 先生 ゼロ こちら 日 ところ 時間
+  つくる じぶん 今日 まだ (split: A = 先生, 時間 · B = 日, 今日).
+- **11-26:** 入れる けっこう 書く 入る つとめる 後 どこ
+- **11-27:** 何 見る 人 一 今 食べる 新しい · おととい 買う とる あの 言う 出る
+- **11-28:** rest. Anything due slides to 11-29.
 - **11-29:** する パン つける いい ある もう バス これ ゆうべ ちょっと ホテル いる のる わかる · 行く 二 それ なる ·
   ほんとう 十 三
-- Plus whatever the app introduces as new from 11-23 (first check the next day; kanji → split).
+- **11-30:** わたし テレビ どう くらい この 外 来る やる ちがう 多分 ここ カメラ その そこ 電気 できる
+- Plus each day's new words (first check the next day; kanji → split).
 
 ## Findings that should shape doctrine (provisional, small n)
 - Writing recall ≠ reading recall. Kanji prompts show the reading, so the drill never retrieves it
@@ -44,18 +69,30 @@ items" (no same-day new words, arm B untouched, sealed items fixed).
 - Leech history: 来る (3 ✗, now ✓✓), つとめる (3 ✗, now ✓), 後 (✗✓✗✓), 言う (reading ✗ on day 8).
 - Recurring ink: dropped dakuten (五 → こ), め/ぬ, レ/ル, に/た. Counted ✓ when learner confirms.
 
-## Open questions for week 2 (one at a time)
-1. **Pace / target date.** `PILE_MAX = 30` (`lib/schedule.ts`) → ~5 new words/day at steady state
-   (estimate). Learner asked about 40; agent said measure a week (fresh per day, total minutes)
-   and ask: which JLPT N5 sitting (July / December)? Not decided.
-2. Check cap 40: keep or trim (move ✓✓✓ kana to 14-day gaps) on the median of the next 3 times.
-3. Grammar + listening baseline → pick the bedtime exercise (one point/night, known words only,
-   recalled in the next morning's check). Never uses that day's new drill words.
-4. Post-drill "one sentence" idea (option 1, 11-17) — offered, never accepted. Parked.
+## Open questions (one at a time)
+1. **Daily study time: decide after a fully timed week** (through Fri 11-27). Basis:
+   `research/06`. If 60 min is adopted, write it in `decisions.md` with the four falsifiers there.
+   Candidate fill, in order: the load already arriving (check and pile both grow) → hearing known
+   words (`research/03`; needs the tap-to-play audio, backlog, week of 11-30, and a sealed
+   listening check first) → more new words, only while next-day first checks hold.
+2. **Pace vs July 2027.** 717 words to the unofficial ~800 over 190 study days = 3.8 a study day,
+   4.7 if the last new word lands ~6 weeks before the test; `PILE_MAX = 30` allows ~5 (estimate,
+   `results.md` day 8). Works with almost no slack. Measure fresh words per day for two weeks
+   before touching `PILE_MAX`. The app's list ends at 210 words: the list past 210 needs its own
+   research pass (rerun `research/01`'s rule) well before it runs out (~5 weeks at this pace).
+3. Check cap 40: keep or trim on the median of timed checks (11:11 · 8:55 · 8:00 so far; the
+   ~10 min line in `decisions.md` 2026-11-20).
+4. Split experiment: A 5 / 8 · B 4 / 7, inconclusive. Read at ~12–14 words per arm.
+5. 先: reading held, meaning blank twice after correction (n = 1). Watch; no item-level fix
+   (`decisions.md` "Personal gap, concept fix").
+6. Post-drill "one sentence" idea (11-17): never accepted. Parked.
 
 ## Housekeeping
-- Repo changes this week are **uncommitted**: `docs/results.md`, `docs/decisions.md`,
-  `docs/backlog.md`, `docs/HANDOFF.md` (pointer to decisions.md), `docs/research/02-…`, this file.
+- **The learner does every commit and push** (2026-11-24). Agents write files and say which;
+  they never commit, push, or ask to. Do not remind him about uncommitted changes.
 - Project copy of `results.md` (claude.ai Project) is stale since day 3 — repo wins.
-- Suggest adding `docs/decisions.md` to the project instructions' read order (learner edits those).
-- Agent slips this week, all logged: 違う shown for ちがう (rule added), やる left off day 5.
+- Suggest adding `docs/decisions.md` and this file to the project instructions' read order
+  (learner edits those).
+- Agent slips, all logged: 違う shown for ちがう (rule added), やる left off day 5, two same-day new
+  words used on night 1 (rules added, `decisions.md` "Building check and sheet items"), "July
+  needs a faster pace" said on 11-24 before the arithmetic (corrected in `research/06`).

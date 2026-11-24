@@ -202,3 +202,26 @@ Baseline 2 listening is 2 / 4 — misses were where the choices are heard, not p
 2. **Sealed listening check** bigger than the 4-item sample; source to find.
 3. **Trial as an artifact, not an app feature:** nightly part B heard instead of read, same sentences.
    Spec only if morning numbers hold for ~2 weeks.
+
+## 2026-11-24 · Progress by script: miss rate and kanji covered
+
+**Asked for:** alongside study time, a breakdown of words learned by script (kanji, katakana,
+hiragana). Kept out of the study-time build (`spec/BRIEF-study-time-dashboard.md` §6).
+
+**Why not the plain count:** the app deals words in list order, so words-per-script only mirrors
+the list (210 = 105 hiragana · 84 kanji · 21 katakana). It can't change a decision, and the JLPT
+does not score by script.
+
+**What could be worth building:**
+- *Miss rate by script* — first-try ✗ in the drill and in the pre-drill check, by `ask`. The scripts
+  already behave differently (`results.md`, 2026-11-16 probe: kanji 7 / 12, kana 15 / 18).
+- *Distinct kanji covered* — characters, not words, against the unofficial ~100 for N5.
+
+**Open before building:** what "learned" means (introduced, or two fresh-day corrects = rung ≥ 3,
+SPEC-v7 D2); whether check results ever enter the app (today they live in chat and `results.md`);
+where it lives (not Today, not the TIME screen). Treadmill guard: a number, no bar to fill, no
+target.
+
+**Falsified by:** miss rates by script within a few points of each other over four weeks → the cut
+shows nothing; drop it.
+

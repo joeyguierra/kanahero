@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<title>KanaHero — TIME · internal study-time dashboard, desktop</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&amp;family=JetBrains+Mono:wght@400;600;800&amp;family=Noto+Sans+JP:wght@400;700;900&amp;family=Klee+One:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#151517;color:#F2F0EB;font-family:Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#FF2E88;text-decoration:none}a:hover{color:#F2F0EB}
+</style>
+</helmet>
+
+<section style="padding:44px 48px 40px;border-bottom:1px solid rgba(255,255,255,.08)">
+  <div style="display:flex;align-items:baseline;gap:11px;margin-bottom:8px">
+    <span style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.16em;padding:4px 8px;background:#FF2E88;color:#000">TIME</span>
+    <b style="font:700 14px Archivo,sans-serif">Study time — internal, local, its own route · desktop first</b>
+  </div>
+  <div style="font:400 12px/1.6 'JetBrains Mono',monospace;color:#8C8C93;max-width:940px;letter-spacing:.02em">
+    <span style="color:#F2F0EB">/time</span>, UNLINKED FROM THE APP, READS THE SAME LEDGER THIS PHONE HOLDS. THE V6 LOOK (THE LOG) FOR THIS PAGE ALONE. DESKTOP ARTBOARDS 1280×800 FOR INTERNAL USE; THE ENTRY SHEET IS DOCKED RIGHT AT 390 WIDE SO THE PHONE PORT IS THE SAME PANEL, STACKED. EVERY TOTAL SAYS MEASURED AND HOW MANY PARTS ARE UNTIMED. AN UNTIMED PART HAS NO LENGTH AND IS NEVER ZERO. DAY 7 IS ABSENT BY DEFAULT (<a href="#1b">1b</a> SHOWS THE OTHER ANSWER).
+  </div>
+</section>
+
+<section style="padding:44px 48px 40px">
+  <div style="display:flex;flex-wrap:wrap;gap:38px;align-items:flex-start">
+
+    <div id="1" style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:800 10px 'JetBrains Mono',monospace;padding:3px 7px;background:#FF2E88;color:#000">1</span>
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">TIME</span>Normal — day 10, 9 study days, day 7 absent · Joker 1
+      </div>
+      <dc-import name="TIME Frame" variant="normal" untimed-mark="{{ untimedMark }}" opened-in-chart="{{ openedInChart }}" hint-size="1280px,800px"></dc-import>
+    </div>
+
+    <div id="1b" style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:800 10px 'JetBrains Mono',monospace;padding:3px 7px;background:#FF2E88;color:#000">1b</span>
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">TIME</span>Decision 1 variant — day 7 as an empty, unmarked column; table unchanged
+      </div>
+      <dc-import name="TIME Frame" variant="even" untimed-mark="{{ untimedMark }}" opened-in-chart="{{ openedInChart }}" hint-size="1280px,800px"></dc-import>
+    </div>
+
+    <div id="2" style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:800 10px 'JetBrains Mono',monospace;padding:3px 7px;background:#FF2E88;color:#000">2</span>
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">TIME</span>Entry sheet — Tue 24, check and morning typed, night sheet focused · Joker 2
+      </div>
+      <dc-import name="TIME Frame" variant="sheet" untimed-mark="{{ untimedMark }}" opened-in-chart="{{ openedInChart }}" hint-size="1280px,800px"></dc-import>
+    </div>
+
+    <div id="3" style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:800 10px 'JetBrains Mono',monospace;padding:3px 7px;background:#FF2E88;color:#000">3</span>
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">TIME</span>Pre-check cell opened, Tue 24 — CHECK 8.0 · MORNING 5.6 = 13.6 · Joker 3
+      </div>
+      <dc-import name="TIME Frame" variant="opened" untimed-mark="{{ untimedMark }}" opened-in-chart="{{ openedInChart }}" hint-size="1280px,800px"></dc-import>
+    </div>
+
+    <div id="4" style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:800 10px 'JetBrains Mono',monospace;padding:3px 7px;background:#FF2E88;color:#000">4</span>
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">TIME</span>First open — drill minutes only, every paper part untimed · Joker 4
+      </div>
+      <dc-import name="TIME Frame" variant="first" untimed-mark="{{ untimedMark }}" opened-in-chart="{{ openedInChart }}" hint-size="1280px,800px"></dc-import>
+    </div>
+
+    <div id="5" style="flex:none;display:flex;flex-direction:column;gap:11px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 Archivo,sans-serif;color:#8C8C93">
+        <span style="font:800 10px 'JetBrains Mono',monospace;padding:3px 7px;background:#FF2E88;color:#000">5</span>
+        <span style="font:600 10.5px 'JetBrains Mono',monospace;padding:3px 7px;background:rgba(255,255,255,.11);color:#F2F0EB">TIME</span>Just saved — morning 5:36 written, the row and bar settling · Joker 5
+      </div>
+      <dc-import name="TIME Frame" variant="saved" untimed-mark="{{ untimedMark }}" opened-in-chart="{{ openedInChart }}" hint-size="1280px,800px"></dc-import>
+    </div>
+
+    <div style="flex:1;min-width:320px;max-width:600px;display:flex;flex-direction:column;gap:18px">
+      <div style="border:1px solid #2A2A2E;background:#141416;padding:20px 22px;font:400 12.5px/1.65 Archivo,sans-serif;color:#B9B6B1">
+        <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">THE DESKTOP</h4>
+        <p style="margin:0 0 14px">1280×800, the S1 header pattern (<span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">TIME · TUE 24 NOV</span>), then a 400 / fluid grid: headline, untimed line, the three part totals and the Joker on the left; the chart in a plate on the right. The table runs full width under both; <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">export ledger</span> in the S1 footer position. On the phone the same blocks stack in this order.</p>
+        <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">THE CHART</h4>
+        <p style="margin:0 0 14px">One stacked column per study day, oldest left. Pre-check at the base, drill, night on top; the measured total printed above in mono. Scale 6.5 px / min, so 24.7 is 160 px. An untimed part adds no height — the hatched tick under the date is the only sign it exists. Day 7 is not a column (<a href="#1">1</a>); in <a href="#1b">1b</a> it is an empty column with its date in carbon and nothing else.</p>
+        <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">THE TABLE</h4>
+        <p style="margin:0 0 14px">Newest first, 32 px rows. Measured = Archivo 500 bone, total 700. <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5A5F">—</span> in carbon = untimed. An empty cell = the part did not happen (nights before day 9, day 1's check), which is not the same as untimed and is never counted. Tapping the Tue 24 pre-check cell (<a href="#3">3</a>) opens an inset line: <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">CHECK 8.0 · MORNING ITEMS 5.6 = 13.6</span>; the same day's bar splits its blue into two tones (tweakable off).</p>
+        <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">THE SHEET</h4>
+        <p style="margin:0 0 14px">Docked right, 390 wide, plate on a .72 scrim (<a href="#2">2</a>). Day picker is two chips, TODAY in strike. Three <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">m:ss</span> rows, mono 22; the focused row takes a strike seam. MORNING ITEMS carries <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">NONE TODAY</span>: none happened, stored as "did not happen", not as untimed. SAVE in strike with the v6 cut corner; CLEAR is a quiet mono line and writes <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">ms: null</span>.</p>
+        <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">JUST SAVED — THE MOTION</h4>
+        <p style="margin:0 0 14px"><a href="#5">5</a> is the frame at 200 ms. The sheet slides out right (240 ms). The Tue 24 row and column take a 1 px strike ring that fades to the seam over 900 ms. The headline counts 150.2 → 155.8 over 400 ms; the pre-check total 28.1 → 33.7 with it; the day-10 bar grows its blue by 36 px, ease-out 400 ms. Untimed count drops 7 → 6 by a plain swap. Reduced motion: the final frame at once, ring held 900 ms then gone. Nothing flashes, no sound.</p>
+      </div>
+      <div style="border:1px solid #2A2A2E;background:#141416;padding:20px 22px;font:400 12.5px/1.65 Archivo,sans-serif;color:#B9B6B1">
+        <h4 style="font:800 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#F2F0EB;margin-bottom:8px">FLAGS — YOUR CALL</h4>
+        <p style="margin:0 0 10px"><b style="color:#F2F0EB">Colors.</b> Kept as proposed: pre-check blueprint, drill live, night caution. Live for the drill is right — it is the only part the app measures itself. I would swap the other two only if night should read as the quieter part; caution is the loudest color on the page and night is the newest column.</p>
+        <p style="margin:0 0 10px"><b style="color:#F2F0EB">Untimed mark.</b> Hatched tick, carbon on carbon, under the date (tweak: <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">untimedMark = dash</span> swaps it for <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5A5F">—</span>). The hatch echoes S1's due cards and the legend explains it once; the dash matches the table. I lean hatch.</p>
+        <p style="margin:0 0 10px"><b style="color:#F2F0EB">9 vs 30 days.</b> The chart plate is fluid; columns shrink to a 28 px floor (about 24 days at this width), after which the plate scrolls horizontally, newest in view, oldest off the left. No compression into weeks — a week total is an average in disguise.</p>
+        <p style="margin:0 0 10px"><b style="color:#F2F0EB">Table vs chart order.</b> Chart above, table below, as drawn: the chart answers "what did the week look like", the table is for checking against <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2E9DFF">results.md</span> column by column. On the phone the chart still comes first.</p>
+        <p style="margin:0 0 10px"><b style="color:#F2F0EB">NIGHT DRILL 0.0.</b> Drawn as briefed, but night 1 is untimed and night 2 has not happened — nothing measured sums to 0.0, so the chip is close to counting an untimed part as zero. <a href="#4">4</a> shows <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5A5F">—</span> for a part with no measured value; I would use that in <a href="#1">1</a> too.</p>
+        <p style="margin:0 0 10px"><b style="color:#F2F0EB">NOT YET.</b> Tonight's night sheet reads <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5A5F">NOT YET</span> in carbon mono and no tick, since it is neither untimed nor absent. Drop the words and leave the cell empty if that is one word too many on a screen that never comments.</p>
+        <p style="margin:0 0 10px"><b style="color:#F2F0EB">Sheet, not drawer.</b> The brief says bottom sheet; on desktop a bottom sheet over a 1280 canvas floats oddly, so it is docked right at phone width. On the phone it becomes the bottom sheet unchanged.</p>
+        <p style="margin:0"><b style="color:#F2F0EB">1b's date label.</b> "No label" read as no words about absence; the date stays so the axis reads. Remove it if you want the gap truly blank.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;untimedMark&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;hatch&quot;,&quot;options&quot;:[&quot;hatch&quot;,&quot;dash&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Chart&quot;},&quot;openedInChart&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Chart&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { untimedMark: this.props.untimedMark ?? "hatch", openedInChart: this.props.openedInChart ?? true };
+  }
+}
+</script>
+</body>
+</html>
