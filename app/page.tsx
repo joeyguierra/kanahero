@@ -7,6 +7,7 @@
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import Credits from "@/components/Credits";
+import Menu from "@/components/Menu";
 import Done from "@/components/Done";
 import Loop, { type LoopResult } from "@/components/Loop";
 import Today, { nextDueLine } from "@/components/Today";
@@ -24,7 +25,7 @@ import {
 } from "@/lib/store";
 import { loadWords, type Word } from "@/lib/words";
 
-type Phase = "today" | "loop" | "done" | "credits";
+type Phase = "today" | "loop" | "done" | "credits" | "menu";
 
 /** one deal, from DEAL or MORE to S5. The day is fixed at the start: a session that
     crosses midnight keeps its start day (§5 rule 10). */
@@ -128,6 +129,7 @@ export default function App() {
   }
 
   if (phase === "credits") return <Credits onBack={() => setPhase("today")} />;
+  if (phase === "menu") return <Menu onBack={() => setPhase("today")} />;
 
   if (phase === "loop" && session) {
     return (
@@ -167,6 +169,7 @@ export default function App() {
       onDeal={deal}
       onExport={() => void exportLedger(today)}
       onCredits={() => setPhase("credits")}
+      onMenu={() => setPhase("menu")}
     />
   );
 }

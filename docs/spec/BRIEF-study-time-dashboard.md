@@ -5,6 +5,12 @@ morning items stored as their own part (§2, §4, §7) · falsifier 2 now measur
 share timed (§9) · every total labelled "measured" (§5) · words-by-script kept out, sent to
 `backlog.md` (§6) · build order against the audio build is open decision 4 (§11).
 
+**Revised again 2026-11-24, at the build** (learner: "add a menu in the splash screen that opens
+options, one of them being /time"): the page **is now linked**, from a `menu` item in Today's
+footer (§5). This replaces "not linked from Today or any app screen". The menu is for the creator
+only and **has to be redesigned before kanahero is public** (`backlog.md` 2026-11-24, "Menu and
+internal pages before public").
+
 **Scope (learner, 2026-11-24): an internal dashboard, local only, for the creator only.** It is
 outside v7. It is not v7.1 or any v7 point release, and it supersedes **no** decision about the
 Joker or the look of the app itself. Its Joker and its v6 look are this page's alone (§5, §6).
@@ -111,11 +117,15 @@ interface TimeRow {
 
 ## 5. Screen — proposal for the design handoff
 
-- **Where:** its own route, `app/time/page.tsx`, like `/verify`. **Not linked from Today or any app
-  screen**, and nothing in `app/page.tsx` or the app's components changes. It reads the same
-  origin's `kanahero-ledger`, so it sees exactly what that phone holds. The route's code ships in the
-  public build (as `/verify` does); its data never does: a stranger opening `/time` sees an empty
-  page.
+- **Where:** its own route, `app/time/page.tsx`, like `/verify`. **Linked from Today's footer:
+  `menu` → MENU → TIME** (learner, 2026-11-24; this replaces "not linked"). MENU is one more phase
+  in `app/page.tsx` (`components/Menu.tsx`), a list of internal pages; `/insights` and others are
+  expected to join it. `/time` links back with `← kanahero`. Both links are client-side
+  (`next/link`), so they work offline from the precache. **Before kanahero is public the menu has
+  to be redesigned**: it puts creator-only pages one tap from Today. The page reads the same
+  origin's `kanahero-ledger`, so it sees exactly what that phone holds. The route's code ships in
+  the public build (as `/verify` does); its data never does: a stranger opening `/time` sees an
+  empty page.
 - **What it shows** (from the prototype): totals per part and overall · one stacked bar per day,
   three parts · a table, newest first: day · pre-check · app drill · night drill · total. Untimed
   cells read `—`. Opening a pre-check cell shows its two stored parts (check, morning).

@@ -356,14 +356,18 @@
 
 .foot {
   display: flex;
+  align-items: center;
+  gap: 28px;
   justify-content: center;
   font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: none;
 }
 
-.foot button {
+.foot button,
+.foot a {
   padding: 12px 4px;
+  text-decoration: none;
 }
 
 /* ---- entry sheet: docked right on a desk, a bottom sheet on the phone ---- */

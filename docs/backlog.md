@@ -225,3 +225,21 @@ target.
 **Falsified by:** miss rates by script within a few points of each other over four weeks → the cut
 shows nothing; drop it.
 
+## 2026-11-24 · Menu and internal pages before public
+
+**What exists:** Today's footer has `menu` (learner, 2026-11-24). It opens MENU
+(`components/Menu.tsx`), a list of internal pages on their own routes. Today that is one row,
+TIME → `/time` (`spec/BRIEF-study-time-dashboard.md`). `/insights` and others are expected to join.
+
+**Why it can't ship as is:** the pages are for the creator only. They read one person's ledger and
+were designed for no one else; a stranger gets an empty measuring screen one tap from Today. Today
+is also meant to carry one button (SPEC-v7 §7), and `menu` is a third footer link beside it.
+
+**To decide before kanahero is public:**
+- Which internal pages, if any, a public user sees, and what each shows on a device with no history.
+- Where the menu lives, or whether it is hidden (a build flag, an unlinked route as `/verify` is, a
+  gesture) and the internal pages stay creator-only.
+- The treadmill guard for anything a public user can open: `/time` passes it only as a
+  measurement instrument for one person (brief §6, §9).
+
+**Until then:** add new internal pages as rows in `PAGES` in `components/Menu.tsx`.

@@ -1,13 +1,15 @@
 "use client";
 
 // /time — study minutes per day, for the person who made the app
-// (docs/spec/BRIEF-study-time-dashboard.md). Like /verify it is its own route
-// and no app screen links to it. It reads the ledger this device holds and
-// nothing else, so anyone else opening it sees an empty page.
+// (docs/spec/BRIEF-study-time-dashboard.md). Like /verify it is its own route,
+// outside the app's screens; Today's menu links to it. It reads the ledger
+// this device holds and nothing else, so anyone else opening it sees an empty
+// page.
 //
 // It measures; it does not coach. No goal, no streak, no comparison, no word
 // about a day that is not there (brief §6).
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { dayLabel } from "@/lib/days";
 import { allRows, exportLedger, writeRow, type LedgerRow } from "@/lib/ledger";
@@ -425,6 +427,7 @@ export default function TimePage() {
       )}
 
       <div className={s.foot}>
+        <Link href="/">← kanahero</Link>
         <button type="button" onClick={() => void exportLedger(today)}>
           export ledger
         </button>

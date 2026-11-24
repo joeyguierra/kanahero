@@ -56,12 +56,14 @@ export default function Today({
   onDeal,
   onExport,
   onCredits,
+  onMenu,
 }: {
   day: string;
   view: TodayView;
   onDeal: (more: boolean) => void;
   onExport: () => void;
   onCredits: () => void;
+  onMenu: () => void;
 }) {
   return (
     <main className="frame v7Today">
@@ -101,6 +103,9 @@ export default function Today({
         </button>
         <button type="button" onClick={onCredits}>
           credits
+        </button>
+        <button type="button" onClick={onMenu}>
+          menu
         </button>
       </div>
     </main>

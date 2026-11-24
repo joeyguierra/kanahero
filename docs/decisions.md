@@ -247,3 +247,18 @@ pre-drill check and drill are any time during the day. See `research/05` for wha
 **Reverses if.** A point repeatedly can't be written with known words (skip ahead in Minna order),
 or the learner switches books.
 
+## 2026-11-24 · Time prompts at every paper exercise
+
+**Decision.** Agents prompt for time at the three paper parts — pre-check, morning items, night
+sheet — every time: `⏱ Start the stopwatch.` when giving the exercise, `⏱ Time for <part>? (m:ss)`
+when it is submitted without one, and from 2026-11-29 `⏱ Enter <m:ss> for <part> in /time (<day>).`
+after logging it in `results.md`. Exact wording and order: `HANDOFF-week2.md` routine 4.
+
+**Why.** Learner, 2026-11-24: be prompted in chat whenever these happen. /time fills the drill
+column from the phone's ledger by itself; the paper parts reach it only when typed on the phone.
+Chat exports never flow back into the app, so an agent cannot update /time. Paper week (through
+Fri 11-27) stays chat → `results.md` only (`spec/BRIEF-study-time-dashboard.md` §11, decision 5);
+in-app entry starts Sun 11-29.
+
+**Reverses if.** /time gets an import of times, or the paper parts move into the app.
+

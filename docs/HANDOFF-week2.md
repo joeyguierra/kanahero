@@ -45,6 +45,14 @@ items" (no same-day new words, arm B untouched, sealed items fixed).
 4. **Time per day** (`results.md` → Time per day, learner 2026-11-24): ask for a time on every
    part (check, morning items, split A, night sheet); drill minutes from the ledger. Update the row
    each time a part ends; separate columns + total. Never estimate an untimed part.
+   **Time prompts — every agent, every time** (`decisions.md` 2026-11-24, "Time prompts"):
+   - **When giving** the pre-check + morning items, or the night sheet: first line of the reply is
+     `⏱ Start the stopwatch.`
+   - **When the learner submits** any of the three (photo or answers): if no time came with it,
+     ask for it before or alongside scoring: `⏱ Time for <part>? (m:ss)`. One line, every time.
+   - **When logging the time:** write it to `results.md` → Time per day, then from **2026-11-29**
+     add: `⏱ Enter <m:ss> for <part> in /time (<day>).` Agents cannot write to /time: it reads only
+     the ledger on the phone, and chat exports never flow back.
 
 ## Check state for the next checks (computed from all checks through 11-24)
 The running list is the last line of the newest probe in `results.md` ("Next checks"); recompute

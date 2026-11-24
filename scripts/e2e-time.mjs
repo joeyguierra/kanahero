@@ -247,10 +247,19 @@ await page.click("text=clear");
 await page.waitForFunction((d) => document.querySelector(`[data-testid=pre-${d}]`)?.textContent.includes("—"), today);
 assert.equal((await ledger(page)).filter((r) => r.type === "time").length, 3);
 
-// the app itself is unchanged by the new rows, and never links here
+// Today's menu is the way in, and the page links back; both work with the
+// network off, from the precache
 await page.goto(BASE);
 await page.waitForSelector(".v7Counts");
-assert.equal(await page.locator("a[href*=time]").count(), 0);
+await page.evaluate(() => navigator.serviceWorker.ready);
+await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+await context.setOffline(true);
+await page.click("text=menu");
+await page.click("text=TIME");
+await page.waitForSelector(`[data-testid=row-${today}]`);
+await page.click("text=← kanahero");
+await page.waitForSelector(".v7Counts");
+await context.setOffline(false);
 assert.deepEqual(errors, []);
 
 await browser.close();

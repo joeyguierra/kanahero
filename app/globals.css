@@ -2773,6 +2773,13 @@ button:not(:disabled):active {
   padding: 13px 0;
 }
 
+/* a row of the menu is the whole link */
+.menuRow {
+  justify-content: space-between;
+  text-decoration: none;
+  padding: 18px 0;
+}
+
 .creditName {
   font-size: 15px;
   font-weight: 900;
