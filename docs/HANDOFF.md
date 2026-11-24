@@ -1,5 +1,8 @@
 # HANDOFF — Kana Hero becomes its own project (2026-10-26)
 
+> **Current state lives in `HANDOFF-week2.md`** (daily routines: pre-drill check + morning items,
+> night sheet, time prompts). Read it right after this file. This file is the 2026-10-26 bridge.
+
 **Read this first in the new project.** It is the bridge from the YouTube writers' room
 (`joeyguierra-yt/`) to a standalone app project. Everything below was verified against the
 tree at `11ad5e5` plus uncommitted `docs/` on 2026-10-26, not against the README (which still

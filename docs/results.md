@@ -215,7 +215,7 @@ a doctrine test, the conflict gets surfaced, not ignored.
 | 7 | 11-21 | missed | | | | | **0** |
 | 8 | 11-22 | 11.2 | — | 8.8 | — | — | **20.0** |
 | 9 | 11-23 | 8.9 | — | 10.4 | — | — (clock ~22:15 → after ~22:50, not timed) | **19.3** |
-| 10 | 11-24 | 8.0 | 5.6 | 11.1 | — | pending | **24.7** so far |
+| 10 | 11-24 | 8.0 | 5.6 | 11.1 | — | 17.1 | **41.8** |
 
 - Checks before day 8 were untimed; the grammar/listening baseline (day 9) is a one-off and not in
   the table. From night 2 on, time the night sheet and the split A check.
@@ -452,6 +452,20 @@ a doctrine test, the conflict gets surfaced, not ignored.
     baseline), **ます stem ✗** — き dropped after the kanji (書 = か only; 書き = かき). Same stem gap as
     言うません / 聞くません. Time: 13:34 cumulative from check start (learner
     confirmed) → **≈ 5:34 for the 3 items.**
+
+- **Night 2 — 2026-11-24, ~00:50 → 01:07 (11-25 clock) · point: Minna L1 は…です · じゃありません · か.**
+  Paper, photo, model-checked. **Time 17:06** (whole sheet, A–D) — over the ~13 min estimate and the
+  15-min line in the fixed-shape rule; one night, watch.
+  Words checked before sending against day-10 new words (先生 ゼロ こちら 日 ところ 時間 つくる じぶん
+  今日 まだ) and arm B (日, 今日); 聞く 出る kept out of D.
+  - **B, JP → EN: 4 / 4.** わたしはゆうめいじゃありません · それはテレビですか · ほんとうですか ·
+    ここはホテルじゃありません ("Here/this is not a hotel").
+  - **C, EN → JP: 4 / 4.** 11 "Is this a hotel?" → ここはホテルですか (target これは; ここ = this place —
+    natural for a building you are at; counted ✓, noted).
+  - **D, forms: 5 / 5.** 書きました · 買いません · 来ませんでした · 入りました · 食べません.
+    書きました ✓ — the stem the morning item missed (書ませんでした) ~12 h earlier. べ in 食べる now
+    hiragana (night 1: katakana バ).
+  - At ceiling: L1 is mostly words already known. The morning items are the measure, not this sheet.
 
 ## Week 1 review — 2026-11-15 → 11-22
 - **Drill:** 7 of 8 days · 100.6 min · 63 words introduced · 254 attempts, 193 ✓ (76%).

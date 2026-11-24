@@ -194,8 +194,10 @@ Morning cold check becomes 3 items: 2 on the night's point, 1 form.
 learner: simpler; the check's items may be practised like any known verb).
 
 **Fixed night shape (2026-11-23):** A 3 read · B 4 meaning · C 4 translate · D 5 forms = 16 items,
-~13 min. The point and verbs change; the counts do not, so nights stay comparable. Changed only on
-data (e.g. nights regularly over 15 min).
+~13 min. The point and verbs change; the counts do not, so nights stay comparable.
+**Amended 2026-11-24 (learner): never trimmed unless the learner says so.** He writes every question
+and answer by hand, so the time includes transcription. Agents may flag a long night (e.g. night 2,
+17:06) but do not cut items on their own.
 
 ## 2026-11-23 · Building check and sheet items — rules for every agent
 

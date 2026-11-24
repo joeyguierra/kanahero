@@ -37,6 +37,13 @@ items" (no same-day new words, arm B untouched, sealed items fixed).
    ledger export; agent returns ≤ 40 words, spelled exactly as the ledger `word` field; learner
    answers on paper (photo), timed; agent scores, corrects, logs under `results.md` → Probes.
    Schedule from **check history only**: ✗ → next day; consecutive ✓ → 1 · 3 · 7 · 14 days.
+   **Morning items come with every pre-drill check, unasked** (learner, 2026-11-24). When the learner
+   starts the day's check (sends the ledger or asks for the check), the same reply also gives the
+   morning items for the previous night's sheet: **2 unseen items on the night's point + 1 form
+   item**, English → Japanese, cold, built by the "Building check and sheet items" rules, never a
+   sealed item. Kept apart from the check on the sheet and in `results.md` (scored and timed
+   separately). No night sheet the night before (rest day, skipped night) → say so in one line and
+   give none. The learner never has to ask for them.
 2. **Split experiment** (`results.md` → Experiments). New kanji words paired by type; A gets a
    same-day reading check after the drill, B untouched. Read after ~12–14 words per arm.
    Cumulative 1-day first-probe: **A 5 / 8 · B 4 / 7** (through day 9's words). 買う (B, 2-day
