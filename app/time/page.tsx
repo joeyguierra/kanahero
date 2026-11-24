@@ -14,7 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { dayLabel } from "@/lib/days";
 import { allRows, exportLedger, writeRow, type LedgerRow } from "@/lib/ledger";
 import { addDays, localDay } from "@/lib/schedule";
-import { aggregate, fmt, parseMSS, PARTS, toMSS, type Cell, type DayTime, type Part } from "@/lib/time";
+import { aggregate, fmt, parseMSS, PARTS, toMSS, typeMSS, type Cell, type DayTime, type Part } from "@/lib/time";
 import { LINES, type JokerState } from "./lines";
 import s from "./time.module.css";
 
@@ -226,7 +226,7 @@ function Sheet({
                 value={fields[part].none ? "" : fields[part].text}
                 disabled={fields[part].none}
                 aria-invalid={bad === part}
-                onChange={(e) => edit(part, { text: e.target.value.replace(/[.\s]/, ":") })}
+                onChange={(e) => edit(part, { text: typeMSS(e.target.value) })}
               />
               <button
                 type="button"
@@ -238,7 +238,7 @@ function Sheet({
                 NONE
               </button>
             </span>
-            {bad === part && <span className={`${s.mono} ${s.note}`}>minutes:seconds, like 11:12</span>}
+            {bad === part && <span className={`${s.mono} ${s.note}`}>seconds stop at 59</span>}
           </label>
         ))}
 

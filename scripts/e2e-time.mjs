@@ -43,6 +43,19 @@ rule("m:ss: 11:12 is 11.2 min; 8:55 is 8.9; anything else is refused", () => {
   for (const bad of ["", "11", "11:1", "11:60", "1.5", "a:10"]) assert.equal(T.parseMSS(bad), null, bad);
 });
 
+rule("typing: digits only, the colon places itself, 99:59 is the ceiling", () => {
+  const typed = { "5": "0:05", "55": "0:55", "855": "8:55", "8840": "88:40", "88:40": "88:40", "0:0": "", "000": "", "0005": "0:05", "99599": "99:59", "1175": "11:75", "abc": "" };
+  for (const [raw, shown] of Object.entries(typed)) assert.equal(T.typeMSS(raw), shown, raw);
+  // one key at a time, and back again
+  let field = "";
+  for (const key of "8840") field = T.typeMSS(field + key);
+  assert.equal(field, "88:40");
+  assert.equal(T.typeMSS(field.slice(0, -1)), "8:84");
+  assert.equal(T.parseMSS("88:40"), (88 * 60 + 40) * 1000);
+  assert.equal(T.parseMSS(T.typeMSS("1175")), null); // 75 seconds is refused at save
+  assert.equal(T.typeMSS(T.toMSS(480000)), "8:00"); // a stored time reads back the same
+});
+
 rule("two sessions in a day are summed, wall clock", () => {
   const r = agg([session("2026-03-02", 6), session("2026-03-02", 4.5, 9e6)]);
   assert.equal(day(r, "2026-03-02").drill, 105);
@@ -215,10 +228,13 @@ assert.match(await page.locator(`[data-testid=row-${today}]`).innerText(), /—\
 
 // enter 11:12 for today's check; a bad value is refused first
 await page.click("[data-testid=enter]");
-await page.fill("[data-testid=in-check]", "11");
+await page.fill("[data-testid=in-check]", "1175");
+assert.equal(await page.inputValue("[data-testid=in-check]"), "11:75");
 await page.click("[data-testid=save]");
 assert.equal(await page.locator("[data-testid=in-check]").getAttribute("aria-invalid"), "true");
-await page.fill("[data-testid=in-check]", "11:12");
+await page.fill("[data-testid=in-check]", "");
+await page.locator("[data-testid=in-check]").pressSequentially("1112"); // a number pad has no colon
+assert.equal(await page.inputValue("[data-testid=in-check]"), "11:12");
 await page.click("[data-testid=save]");
 await page.waitForSelector("[data-testid=sheet]", { state: "detached" });
 await page.waitForFunction((d) => document.querySelector(`[data-testid=pre-${d}]`)?.textContent.includes("11.2"), today);
@@ -239,7 +255,7 @@ assert.ok(file.rows.some((r) => r.type === "time" && r.ms === 672000), "export c
 
 // a correction is a second row; clear puts the dash back; nothing is deleted
 await page.click(`[data-testid=night-${today}]`);
-await page.fill("[data-testid=in-check]", "9:00");
+await page.fill("[data-testid=in-check]", "900");
 await page.click("[data-testid=save]");
 await page.waitForFunction((d) => document.querySelector(`[data-testid=pre-${d}]`)?.textContent.includes("9.0"), today);
 await page.click(`[data-testid=night-${today}]`);

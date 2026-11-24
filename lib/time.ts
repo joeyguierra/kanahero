@@ -74,6 +74,17 @@ export function parseMSS(text: string): number | null {
   return (Number(m[1]) * 60 + Number(m[2])) * 1000;
 }
 
+/** What the entry field shows for what was typed: digits only, the last two
+    are the seconds, the colon places itself. "5" → "0:05", "855" → "8:55",
+    "8840" → "88:40". Four digits at most, so 99:59 is the ceiling; all zeros
+    is an empty field. Seconds past 59 show as typed and are refused by parseMSS. */
+export function typeMSS(raw: string): string {
+  const d = raw.replace(/\D/g, "").replace(/^0+/, "").slice(0, 4);
+  if (d === "") return "";
+  const p = d.padStart(3, "0");
+  return `${p.slice(0, -2)}:${p.slice(-2)}`;
+}
+
 export function toMSS(ms: number): string {
   const s = Math.round(ms / 1000);
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
