@@ -62,6 +62,12 @@ await page.click("text=credits");
 await page.click("text=← TODAY");
 assert.equal(await big(page), "0 due · 10 new");
 console.log("1. launch lands on Today: one queue, ten new words, nothing to choose");
+assert.deepEqual(
+  await page.evaluate(() => [document.documentElement, document.body].map((el) => getComputedStyle(el).overscrollBehaviorY)),
+  ["none", "none"],
+  "pull-to-refresh is off on html and body (SPEC-fix-overscroll)",
+);
+console.log("1b. overscroll is off: a swipe at the top cannot reload the page");
 
 // --- 2. first run ---
 await page.click("button:has-text('DEAL')");

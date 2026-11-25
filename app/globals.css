@@ -40,6 +40,9 @@
 html {
   height: 100%;
   color-scheme: dark;
+  /* No pull-to-refresh / overscroll bounce: a finger tracing the reveal at the top of the page
+     reloaded mid-drill (2026-11-25). SPEC-fix-overscroll.md */
+  overscroll-behavior-y: none;
 }
 
 html,
@@ -50,6 +53,7 @@ body {
 
 body {
   min-height: 100%;
+  overscroll-behavior-y: none;
   display: flex;
   flex-direction: column;
   color: var(--bone);
