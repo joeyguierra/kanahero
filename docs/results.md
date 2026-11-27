@@ -19,6 +19,11 @@ a doctrine test, the conflict gets surfaced, not ignored.
   kana), nothing else; learner says reading + meaning aloud, scores himself, model checks.
   Kanji words scored on reading AND meaning; kana words on meaning.
 
+- **Slip:** the learner knew the answer (said it aloud or names it at once) but the hand wrote
+  something else — a wrong kana, a dropped mark, a dropped part of a form. Scored ✓ on the learner's
+  confirmation, never moved forward in the schedule, and tagged **[slip]** so slips can be counted.
+  Earlier cases logged before the tag: 五 → こ (d6), 入れる → じれる (d9), バ for べ (night 1).
+  Form slips count too: a form recognised in English but written with a part missing.
 - **Time per day:** every part timed separately (stopwatch on paper; drill from the ledger
   session `startTs`→`endTs`), then summed. "—" = not timed; totals count measured parts only and
   never fill a gap with an estimate.
@@ -200,22 +205,57 @@ a doctrine test, the conflict gets surfaced, not ignored.
     New kanji: 先生 日 時間 今日. New kana: ゼロ こちら ところ つくる じぶん まだ.
   - All 28 attempts: 20 ✓ / 8 ✗. Median 22.0 s (day 9: 17.2). Words introduced to date: 83.
 
+- **Day 11 — 2026-11-25** (week 2, Wed) · after the day-11 check · **page refreshed mid-drill.**
+  Ledger has one session row (16:31:22–16:36:24, 5.0 min: due 5 · fresh 5 · done 13 · missed 3); the
+  pre-refresh part (22 items, 16:23:32–16:30:39) has items but no session row.
+  **Drill time 12.9 min wall clock** (first item's start 16:23:32 → last item 16:36:24; includes
+  ~43 s reload gap). Writing time (sum of attempt ms) 12.2 min. Pile: 25 due + 5 new = 30.
+  /time shows **5 min** for this day (it sums session rows; the pre-refresh part has none). This
+  table's 12.9 is the corrected number. Cause: mobile pull-to-refresh while tracing the reveal
+  (learner) → fix `spec/SPEC-fix-overscroll.md`.
+  - **Writing recall, due words, first try: 21 / 25.** ✗ 言う (2 attempts) · 書く (2) · 先生 (1 — its
+    requeue was lost in the refresh, never re-attempted) · 時間 (3).
+    時間: blank in the morning check and ✗ twice in the drill — reading and writing both weak.
+  - **New words first try: 4 / 5.** ✓ 中 ページ もの 出す · ✗ あまり (2). New kanji: 中 出す.
+  - All 35 attempts: 29 ✓ / 6 ✗. Median 15.6 s (day 10: 22.0). Words introduced to date: 88.
+
+- **Day 12 — 2026-11-26** (week 2, Thu) · 1 session (21:52:59–22:00:05), after the day-12 check ·
+  due 19 · fresh 10 · done 30 · missed 1 · **7:06**
+  - **Writing recall, due words, first try: 18 / 19.** ✗ あまり (2 attempts; also blank in the check).
+    出す ✓ in writing, meaning blank in the check (writing/reading split again).
+  - **New words first try: 10 / 10** (first perfect new set). 六 ぜんぶ また 八 あそこ 上 カレー よく 多い
+    だれ. New kanji: 六 八 上 多い. Look-alike pair now both live: まだ (d10) / また (d12).
+  - All 30 attempts: 29 ✓ / 1 ✗. Median 12.1 s (fastest yet; d11 15.6). Words introduced to date: 98.
+
+- **Day 13 — 2026-11-27** (week 2, Fri) · 1 session (12:27:10–12:35:29), after the day-13 check ·
+  due 29 · fresh 1 · done 32 · missed 2 · **8:18**
+  - **Writing recall, due words, first try: 27 / 29.** ✗ ちょっと (2 attempts) · あそこ (2).
+    Writing/reading split, both directions: 八 よく あまり ✓ in writing, all three blank in the morning
+    check; あそこ ✓ in the check, ✗ in writing.
+  - **New words: 1 / 1** (高い). The pile was nearly all reviews (29 due + 1 new = 30).
+  - All 32 attempts: 30 ✓ / 2 ✗. Median 11.9 s (fastest yet). Words introduced to date: 99.
+  - /time: the learner entered today's check (9:37) and morning (3:26, corrected from 9:26) on the
+    phone — ahead of the 11-29 start in `decisions.md` 2026-11-24.
+
 ## Time per day
-<!-- added 2026-11-24 at the learner's request. Minutes. Drill = ledger sessions summed.
+<!-- added 2026-11-24 at the learner's request. All times m:ss (learner, 2026-11-26: no decimal minutes). Drill = ledger sessions summed.
      Check = pre-drill check. Morning = the nightly point's morning items. Split A = same-day
      arm-A check. Night = nightly sheet (A–D + any sealed check). — = not timed. -->
 | Day | Date | Check | Morning | Drill | Split A | Night | **Total (measured)** |
 |---|---|---|---|---|---|---|---|
-| 1 | 11-15 | — | — | 9.6 | — | — | **9.6** |
-| 2 | 11-16 | — | — | 18.5 | — | — | **18.5** |
-| 3 | 11-17 | — | — | 15.1 | — | — | **15.1** |
-| 4 | 11-18 | — | — | 14.8 | — | — | **14.8** |
-| 5 | 11-19 | — | — | 17.3 | — | — | **17.3** |
-| 6 | 11-20 | — | — | 16.5 | — | — | **16.5** |
-| 7 | 11-21 | missed | | | | | **0** |
-| 8 | 11-22 | 11.2 | — | 8.8 | — | — | **20.0** |
-| 9 | 11-23 | 8.9 | — | 10.4 | — | — (clock ~22:15 → after ~22:50, not timed) | **19.3** |
-| 10 | 11-24 | 8.0 | 5.6 | 11.1 | — | 17.1 | **41.8** |
+| 1 | 11-15 | — | — | 9:38 | — | — | **9:38** |
+| 2 | 11-16 | — | — | 18:28 | — | — | **18:28** |
+| 3 | 11-17 | — | — | 15:08 | — | — | **15:08** |
+| 4 | 11-18 | — | — | 14:49 | — | — | **14:49** |
+| 5 | 11-19 | — | — | 17:17 | — | — | **17:17** |
+| 6 | 11-20 | — | — | 16:29 | — | — | **16:29** |
+| 7 | 11-21 | missed | | | | | **0:00** |
+| 8 | 11-22 | 11:11 | — | 8:47 | — | — | **19:58** |
+| 9 | 11-23 | 8:55 | — | 10:24 | — | — (clock ~22:15 → after ~22:50, not timed) | **19:19** |
+| 10 | 11-24 | 8:00 | 5:34 | 11:05 | — | 17:06 | **41:45** |
+| 11 | 11-25 | 13:13 (check + morning combined; not split) | ↑ | 12:52 | ~0:05 (learner est. 3–6 s; not in total) | 16:26 | **42:31** |
+| 12 | 11-26 | 8:17 | 3:28 | 7:06 | 0:30 | 16:27 | **35:48** |
+| 13 | 11-27 | 9:37 | 3:26 | 8:18 | — (split ended) | pending | **21:21** so far |
 
 - Checks before day 8 were untimed; the grammar/listening baseline (day 9) is a one-off and not in
   the table. From night 2 on, time the night sheet and the split A check.
@@ -383,6 +423,74 @@ a doctrine test, the conflict gets surfaced, not ignored.
     anything due slides to 11-29. 11-30 → わたし テレビ どう くらい この 外 来る やる ちがう 多分 ここ カメラ
     その そこ 電気 できる.
 
+- **2026-11-25 (day 11, before drilling) — pre-drill check, 26 words, paper (photo)**
+  - **Time: check + morning items 13:13 combined.** Check alone not recorded (learner forgot);
+    learner estimate ~2 min for the morning items — an estimate, not logged as a split.
+  - **Part 1 — first check of day-10 new words: 9 / 10.** Kanji 3 / 4: 先生 せんせい teacher ✓ ·
+    日 ひ day ✓ · 今日 きょう today ✓ · **✗ 時間 blank** (じかん, time — ✓ in the A check ~1 day before).
+    Kana 6 / 6: ゼロ · ところ place · つくる to make · じぶん self · まだ not yet · こちら "come here"
+    (✓ with note: list = this way (polite); direction right, "come" is not in the word).
+  - **Part 2 — missed yesterday: 3 / 4.** **先 さき ahead ✓** (first ✓ after 3 misses) · もつ to hold ✓ ·
+    しる to know ✓ · **✗ つかう blank** (to use — second blank).
+  - **Part 3 — first ✓ yesterday, 1-day gap: 6 / 6.** 飲む 聞く 四 クラス ゆうめい だいじょうぶ.
+  - **Part 4 — ✓✓, 3-day gap: 6 / 6 pending 1.** 前 まえ · みんな · パーティー · おいしい · 五 ご (dakuten ✓) ·
+    話 はなし ✓ **[slip]** — written はんし; learner said "hanashi" aloud while writing, the hand
+    produced ん for な. Scheduled as ✓ (learner's call: no slot tomorrow).
+  - **Total 24 / 26** (1 slip).
+  - **Split first-probe, day 10:** A 先生 ✓ · 時間 ✗ → 1 / 2 · B 日 ✓ · 今日 ✓ → 2 / 2.
+    **Cumulative: A 6 / 10 · B 6 / 9.** 時間 is the third A word right in the same-day check and lost
+    overnight (前 d4, 時間 d10; 先 was blank in its A check).
+  - Next checks: 11-26 → 入れる けっこう 書く 入る つとめる 後 どこ · 時間 つかう (✗) · 先 もつ しる (first ✓
+    after ✗) · 先生 日 今日 ゼロ こちら ところ つくる じぶん まだ (first ✓) · + day-11 new words.
+    11-27 → 何 見る 人 一 今 食べる 新しい · おととい 買う とる あの 言う 出る. 11-28 rest → 11-29 gains
+    飲む 聞く 四 クラス ゆうめい だいじょうぶ (✓✓, 3 days). 11-30 unchanged. 12-02 → 前 話 みんな パーティー
+    おいしい 五 (✓✓✓, 7 days; 話 → 11-26 if ✗).
+
+- **2026-11-26 (day 12, before drilling) — pre-drill check, 26 words, paper (photo)**
+  - **Time: 8:17 for 26 words (≈ 19 s / word).** Morning items timed separately: 3:28.
+  - **Part 1 — first check of day-11 new words: 3 / 5.** 中 なか inside ✓ (か written with marks
+    that read as が; learner confirmed なか) · ページ page ✓ · もの thing ✓ · **✗ 出す だす ✓ reading,
+    meaning blank** (to take out — answered at once in the A check ~1 day before) · **✗ あまり blank**
+    (not very).
+  - **Part 2 — missed yesterday: 2 / 2.** 時間 じかん time · つかう to use (first ✓ after 2 blanks).
+  - **Part 3 — ✓ after a miss, 1-day gap: 3 / 3.** 先 さき ahead (✓✓ now) · もつ · しる.
+  - **Part 4 — first ✓ yesterday, 1-day gap: 9 / 9.** 先生 せんせい (い leans じ, baseline ink) · 日 ひ ·
+    今日 きょう · ゼロ · こちら "this way" · ところ · つくる · じぶん · まだ.
+  - **Part 5 — ✓✓, 3-day gap: 7 / 7.** 入れる いれる put in · けっこう fine/(no) thanks · 書く かく ·
+    入る はいる go in/enter · つとめる work for · 後 あと later · どこ. 書く and 入る had a first reading
+    crossed out and rewritten (self-corrected on paper; counted ✓).
+  - **Total 24 / 26.**
+  - **Split first-probe, day 11:** A 出す ✗ (meaning) · B 中 ✓. **Cumulative: A 6 / 11 · B 7 / 10.**
+    Third time running an A word right in the same-day check is lost by morning (時間 d10, 出す d11;
+    前 d4). B now ahead; still under the ~12–14 per arm read point.
+  - Next checks: 11-27 → 何 見る 人 一 今 食べる 新しい · おととい 買う とる あの 言う 出る · 出す あまり (✗) ·
+    中 ページ もの (first ✓) · 時間 つかう (✓ after ✗) · + day-12 new words. 11-28 rest. 11-29 → the
+    11-29 batch (21) + 飲む 聞く 四 クラス ゆうめい だいじょうぶ + 先 もつ しる + 先生 日 今日 ゼロ こちら ところ
+    つくる じぶん まだ (✓✓, 3 days) = 39 + anything due 11-28 → **over the 40 cap: oldest first, rest
+    slides to 11-30.** 12-02 → 前 話 みんな パーティー おいしい 五. 12-03 → 入れる けっこう 書く 入る
+    つとめる 後 どこ.
+
+- **2026-11-27 (day 13, before drilling) — pre-drill check, 30 words, paper (photo)**
+  - **Time: 9:37 for 30 words (≈ 19 s / word).** Morning items timed separately: 3:26.
+  - **Part 1 — first check of day-12 new words: 8 / 10.** Kanji 3 / 4: 六 ろく six ✓ · 上 うえ up ✓ ·
+    多い おおい many ✓ · **✗ 八 blank** (はち, eight). Kana 5 / 6: ぜんぶ everything · また again ·
+    あそこ that place over there · カレー curry · だれ who ✓ · **✗ よく blank** (often / well).
+  - **Part 2 — missed yesterday: 1 / 2.** 出す だす to take out ✓ · **✗ あまり blank** (third blank).
+  - **Part 3 — 1-day gap: 5 / 5.** 中 なか (か again reads as が; confirmed なか yesterday) · ページ ·
+    もの · 時間 じかん · つかう.
+  - **Part 4 — 3-day+ gap: 12 / 13.** 何 なに · 見る みる look · 人 ひと (と written like て — ink) ·
+    一 いち · 今 いま · 食べる たべる · 新しい あたらしい · おととい · 買う かう · あの "that thing … over
+    there" (✓: noun slot left as "thing"; あの used right in #31 and night 4) · 言う いう · 出る でる exit /
+    go out. **✗ とる "?"** (to take — second blank, first d8).
+  - **Total 26 / 30.**
+  - **Split first-probe, day 12:** A 六 ✓ · 多い ✓ → 2 / 2 · B 八 ✗ · 上 ✓ → 1 / 2.
+    **Final: A 8 / 13 (62%) · B 8 / 12 (67%).** Read point reached → verdict in Experiments.
+  - Next checks: 11-28 rest. **11-29:** the 11-29 batch (21) + 飲む 聞く 四 クラス ゆうめい だいじょうぶ +
+    先 もつ しる + 先生 日 今日 ゼロ こちら ところ つくる じぶん まだ (39) + 八 よく あまり とる (✗) + 出す
+    (✓ after ✗) + 六 上 多い ぜんぶ また あそこ カレー だれ (first ✓) + 高い (day-13 new, first check) = 53 → **cap 40,
+    oldest due first, the rest slide to 11-30** (which already has 16 + 中 ページ もの 時間 つかう).
+    12-04 → おととい 買う あの 言う 出る. 12-11 → 何 見る 人 一 今 食べる 新しい.
+
 ## Experiments
 - **Split: same-day reading check, from 2026-11-17** (`decisions.md`, same date)
   - Each day's new kanji words split in pairs (matched by type), one of each pair to A, one to B.
@@ -415,6 +523,26 @@ a doctrine test, the conflict gets surfaced, not ignored.
     pairs this time. **A = 先生, 時間 · B = 日, 今日.** A takes both drill misses (先生 2, 時間 4);
     B both first-try ✓ — biased against A, as days 4 and 9.
     Arm A same-day check: 先生 せんせい teacher ✓ · 時間 じかん time ✓. A: 2 / 2.
+    **First probe (d11):** A 先生 ✓ · 時間 ✗ (blank) · B 日 ✓ · 今日 ✓. A 1 / 2 · B 2 / 2.
+  - Day 11: new kanji 中 出す (both ✓ first try), one pair. **A = 出す · B = 中.** 出す to A: verb,
+    shares 出 with 出る (interference risk, d8 出る/外) — the likelier miss, so biased against A again.
+    Arm A same-day check: 出す だす take out ✓. A: 1 / 1.
+    **First probe (d12):** A 出す ✗ (reading ✓, meaning blank) · B 中 ✓. A 0 / 1 · B 1 / 1.
+  - Day 12: pairs by type — numbers 六/八, other 上/多い (all four ✓ first try). **A = 六, 多い ·
+    B = 八, 上.** A takes the two slower writes (多い 15.3 s, 六 8.6 s vs 八 8.4, 上 8.8) — biased against
+    A as before. After d13's first probe: A 13 · B 12 words → read point reached.
+    Arm A same-day check (0:30): 六 ろく six ✓ · 多い おおい many ✓. A: 2 / 2.
+    **First probe (d13):** A 六 ✓ · 多い ✓ · B 八 ✗ · 上 ✓. A 2 / 2 · B 1 / 2.
+  - **Verdict (2026-11-27, read point reached): A 8 / 13 (62%) · B 8 / 12 (67%) → A ≈ B.**
+    Words by day: d3 A 2/2 B 1/2 · d4 A 1/2 B 1/2 · d5 A 1/2 B 1/2 · d9 A 1/2 B 1/1 (聞く void) ·
+    d10 A 1/2 B 2/2 · d11 A 0/1 B 1/1 · d12 A 2/2 B 1/2. 買う (B, 2-day gap) excluded. With 飲む
+    (flagged) voided: A 7 / 12 (58%). Either way no gain for A; A drew the harder words on 5 of 7 days,
+    so a small A benefit can't be ruled out, but not a clear margin.
+    Pattern inside A: 4 words right in the same-day check were lost by morning (前 d4, 入れる d5 —
+    reading ✓ meaning ✗, 時間 d10, 出す d11). Same-day recall measures recency (Pyc & Rawson 2009, as
+    cited in `decisions.md` 2026-11-17).
+    **Per the decision's own rule ("if A ≈ B, drop the same-day check"): dropped from day 13.**
+    No spec for a reading step in the drill. The next-day first check stays (it carried every number here).
 
 ## Nightly (trial, `decisions.md` 2026-11-23)
 - **Night 1 — 2026-11-23, ~22:15 · point: に (go to / arrive / get on).** Paper, self-graded, model-checked.
@@ -466,6 +594,59 @@ a doctrine test, the conflict gets surfaced, not ignored.
     書きました ✓ — the stem the morning item missed (書ませんでした) ~12 h earlier. べ in 食べる now
     hiragana (night 1: katakana バ).
   - At ceiling: L1 is mostly words already known. The morning items are the measure, not this sheet.
+
+  - **Night 2 morning items (2026-11-25, after the d11 check, cold, handwritten).**
+    ✓ 27 That is not a camera → それはカメラじゃありません · ½ 28 Is that person over there famous? →
+    **その人**はゆうめいですか (か question ✓; あの → その: "over there" is あの) · ✓ 29 とる → didn't take →
+    とりませんでした (stem り ✓, past negative ✓).
+    **Point (じゃありません / か) 2 / 2 · full sentences 1.5 / 2 · form 1 / 1.** Demonstratives are
+    Minna L2 (night 4); あの/この/その is a known family mix-up (d8).
+
+- **Night 3 — 2026-11-25, ~02:05 → 02:21 (11-26 clock) · point: Minna L1 の (N の N) · も.**
+  Paper, photo, model-checked. **Time 16:26.** Learner labels sheets by night number (11-24 = night 2).
+  Words checked before sending against day-11 new words (中 ページ もの 出す あまり) and arm B (中);
+  聞く 出る kept out of D.
+  - **B, JP → EN: 4 / 4.** クラスの時間 ("the class' time") · あの人も先生ですか · わたしのパンじゃ
+    ありません · 今日はパーティーの日です.
+  - **C, EN → JP: 4 / 4.** 先生のカメラ · わたしもゆうめいじゃありません · ホテルのバスですか ·
+    これもわたしのパンです. の and も both placed right every time (6 / 6).
+  - **D, forms: 4 / 5.** ✓ 飲みました · つかいません (photo looked like が; learner confirmed か — no slip) ·
+    言いませんでした · つくりました. ✗ **いる → wasn't: いりません** (target いませんでした): two errors —
+    (a) treated as a り-verb (いる is drop-る: i-sound before る), the same over-applied り as 出りません
+    in the sealed baseline; (b) past dropped (wasn't → ません). ませんでした ✓ on 言う the same night.
+  - Pattern after 3 nights: particle/sentence points at or near ceiling; the open gap is the drop-る
+    stem (いる/出る), where the learner defaults to り.
+
+  - **Night 3 morning items (2026-11-26, after the d12 check, cold, handwritten). Time 3:28.**
+    27 That is my television → それはわたしの**テルビ**です (の ✓; テレビ written テルビ — レ/ル, known ink
+    pair; **[slip]**, learner scores ½) · 28 That person over there is also famous → あの人も**ゆめい**です
+    (も ✓, あの ✓; ゆうめい long vowel dropped — the exact baseline error; learner scores ½) ·
+    ✓ 29 つける → didn't turn on → つけませんでした (drop-る stem ✓, past negative ✓).
+    **Point (の / も) 2 / 2 · form 1 / 1 · learner's score 2 / 3** (27 ½ · 28 ½ · 29 1). Learner's
+    rule here: a spelling slip inside a sentence costs half, even when known.
+
+- **Night 4 — 2026-11-26, ~00:10 → 00:26 (11-27 clock) · point: Minna L2 これ/それ · この/その/あの
+  (+ わたしの = mine).** Paper, photo, **self-graded in red: 11 / 13**, model-checked (agrees).
+  **Time 16:27.** Words checked against day-12 new words (六 ぜんぶ また 八 あそこ 上 カレー よく 多い だれ)
+  and arm B (八, 上); 聞く 出る kept out of D. あれ not yet in the drill → named, not used.
+  - **B: 4 / 4.** それは何ですか ("What is that? (near you)") · このテレビはわたしのです · あの先生は
+    ゆうめいです · そのクラスはいいですか.
+  - **C: 3 / 4 (learner's grade).** ✓ これは何ですか · そのカメラはわたしのです · このパンはわたしの
+    じゃありません. ✗ 10 あのホテルは新しい。 — です dropped. Correct casual Japanese; wrong for the
+    sheet's polite register; learner marked ✗, kept. Demonstratives この/その/あの 4 / 4 right.
+  - **D: 3 / 5.** ✓ 見ました · かえりませんでした (exception verb ✓) · 書きません.
+    ✗ 13 いる → wasn't: **いません** — stem now ✓ (night 3: いりません), past dropped again.
+    ✗ 15 つける → turned on: **つけりました** — り over-applied, though the morning item (~14 h earlier)
+    had つけませんでした ✓.
+  - Pattern: drop-る stem right 3 / 4 tonight but not stable (つける flipped ✓→✗ in a day). "wasn't" cue
+    → ません on both tries (night 3, 4): the English past negative of be is read as present.
+
+  - **Night 4 morning items (2026-11-27, after the d13 check, cold, handwritten). Time 3:26.**
+    ✓ 31 That bus over there is new → あのバスは新しいです (あの ✓, です ✓ — dropped last night) ·
+    ½ 32 This is not my camera → **このカメラはわたしのじゃありません** ("This camera is not mine" —
+    correct Japanese, same idea; the item asked for これ standing alone: これはわたしのカメラじゃありません;
+    learner may re-score) · ✓ 33 入れる → put in (past) → 入れました (drop-る past ✓; night 4 had つけりました).
+    **2.5 / 3 · form 1 / 1.**
 
 ## Week 1 review — 2026-11-15 → 11-22
 - **Drill:** 7 of 8 days · 100.6 min · 63 words introduced · 254 attempts, 193 ✓ (76%).

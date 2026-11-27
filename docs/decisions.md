@@ -71,6 +71,10 @@ retrieving the reading on the day you learn the word help? B keeps the clean num
 check. If A > B by a clear margin, that is the evidence for a spec that adds a reading step to
 the drill. ~1 extra minute per drill.
 
+**Ended 2026-11-27: A ≈ B** (A 8 / 13 · B 8 / 12; `results.md` → Experiments, verdict). Same-day check
+dropped; no reading-step spec. New kanji are split no more; every new word just gets its next-day
+first check.
+
 ## 2026-11-20 · Pre-drill check cap raised 30 → 40; time it
 
 **Decision.** Cap is 40 words. The learner times every check (start to last answer) and reports
@@ -264,3 +268,111 @@ in-app entry starts Sun 11-29.
 
 **Reverses if.** /time gets an import of times, or the paper parts move into the app.
 
+
+## 2026-11-26 · Night sheet grows by review; morning items rebalanced — from Sun 2026-11-29
+
+**Decision.** Replaces the fixed 3 · 4 · 4 · 5 shape from night 6 (Sun 11-29; Fri 11-27 night 5 keeps the old shape). Nothing added before
+Fri 11-27 (the fully timed week stays clean).
+
+**Night sheet**
+- **A 3 · B 4 · C 4 stay**, on the night's one new Minna point, blocked.
+- **E — mixed review (new).** Every earlier point (night sheets and morning items) keeps its own
+  schedule from its own results only: ✗ → next night · ✓ → 3 → 7 → 14 days. Each due point gives
+  **1 item, 2 if it was missed last time**; directions alternate meaning (JP → EN) / production
+  (EN → JP); confusable points sit side by side (に/の/で · この/その/あの · ます/ました/ません/
+  ませんでした · drop-る vs り-verbs). **No fixed size.**
+- **D — forms mixed across sets.** A new form set (て-form next) is drilled with still-missed earlier
+  forms mixed in (currently いる → wasn't, つける), not instead of them.
+- **Size is the learner's call:** never trimmed unless he says so; the agent flags a night over
+  ~25 min.
+
+**Morning items (with every pre-drill check, unasked)** — 4 items:
+1 meaning (JP → EN) + 1 production (EN → JP) on last night's point · 1 form · **1 review** (the oldest
+due point from E's schedule). **Read weekly, not daily** (3–4 items a day is too few for a daily number).
+
+**Why.** `research/08-night-sheet-growth.md`: spacing helps L2 grammar (Bird 2010); exact gap matters
+little, so reuse the check's ladder (Suzuki 2017, Kasprowicz 2019); mixing grammar exercises helps
+retention (Nakata & Suzuki 2019), most for similar categories (Brunmair & Richter 2019); blocked then
+mixed beats either alone, and each direction trains itself (Suzuki & Sunada 2019; `research/02`);
+learners left to choose block (Lu et al. 2020), so the schedule, not instinct, picks review. Morning
+size: no study sets it; extra same-point items in one sitting add little (one retrieval per session,
+Nakata 2016) and review belongs in E where spacing grows. Morning items were all EN → JP; the mock and
+JLPT test recognition → one of each.
+
+**Falsified by.**
+- Morning review items (points last seen ≥ 3 days earlier) under ~70% across week 3.
+- Sealed particle / forms checks not up on or after 2026-12-21.
+- Night time rising week on week while weekly morning totals stay flat (growth = copying).
+- Weekly morning totals swinging > ~25 points between weeks with nothing changed → too few items;
+  add morning items (measurement fix only).
+
+## 2026-11-27 · Known kana words come back as kanji; pile 40; young reviews outrank new words
+
+**Decision.** Four parts, specified in `spec/SPEC-kanji-upgrade.md`, built in week 3 (from 2026-11-30).
+1. **Upgrade.** A word asked in hiragana that has a kanji form returns as that kanji once it has
+   been written correctly on three returns in a row (rung 4). It is a new item (study trial, own
+   ladder). The kana item retires on the upgrade's first write. The two are linked in the word data
+   and in every ledger row (`upgradeOf`).
+2. **Prompt.** The upgraded word is prompted by meaning only, not reading.
+3. **Pile.** `PILE_MAX` 30 → 40, everything counted. Up to 10 new words and, separately, up to 3
+   upgrades a day.
+4. **Order under a full pile.** Young reviews (returns on days 2, 5, 12, and misses) → new words →
+   upgrades → late reviews (14-day and later). Late reviews that do not fit wait; after 3 days held
+   they count as young.
+First set: the 35 words whose kanji are in the N5–N4 range. The other 30 wait for the verdict.
+
+**Why.** `research/09-kana-to-kanji.md`: knowing a word by sound first helps learning its written
+form (Wegener 2018, 2020; Li et al. 2021); schools separate reading from writing and delay writing
+(MEXT); word knowledge offsets kanji complexity in handwriting (2026 study). No study tests this in
+adult learners of Japanese — grade C for the rule as a whole. The agent first proposed waiting for
+N4; the learner objected that this delays kanji drilling for months, and nothing in the research
+requires the wait. Prompt: probe 2026-11-16 (kanji prompts supply the reading, so it is never
+retrieved). Pile: 30 words measured at 7–11 min on days 8–13, against the spec's 20-minute limit;
+reviews cut new words to 4, 0, 1 on days 6, 8, 13. Order: `00-survey.md` rows 1–3 — the first three
+spaced returns carry most of the gain (Rawson & Dunlosky; Kornell & Bjork .62 → .88), later ones
+flatten; exact intervals matter little (Latimier 2021).
+
+**Numbers that are arithmetic, not findings:** 40, 3 a day, 3 days held, rung 4.
+
+**Reverses if.** Spec §5: upgrades need as many attempts as ordinary new kanji words (~15
+upgrades in); a full pile passes 20 minutes; first-try ✓ on due words drops below its week-2
+level; late reviews that waited miss clearly more than those on time.
+
+## 2026-11-27 · Old-word bucket — agreed in principle, not built
+
+**Decision.** Words that have passed the 30-day review leave the ladder for a separate bucket.
+- **Outside the 40 cap** (learner's call).
+- **Runs with the drill on the same one button, before it,** with its own screen and copy
+  ("review these old words first"). The learner never chooses whether to open it.
+- **One miss:** the word comes back in tomorrow's bucket. **Two misses in a row:** it is treated
+  as young again (rung 1, tomorrow, in the main pile). A ✓ after one miss puts it back to rest.
+  (Learner's rule, 2026-11-27 04:27; replaces the agent's "one miss → ladder".)
+- **Daily cap: left open** (learner, 2026-11-27 04:31, after the simulation below). 5 was floated.
+- Retired kana items never enter; their kanji upgrade does, in its own time.
+
+**Why.** After the 30-day review the scheduler brings every word back monthly for ever. At ~800
+words that is ~27 reviews a day; at 1,200 it is the whole pile and no new word arrives. Late
+reviews add little (survey rows 1–3), and the learner's due-word accuracy is near ceiling
+(day 8: 30 / 30; day 12: 29 / 30).
+
+**Open before it is specified.**
+- **The rest gap.** How long a word rests after a bucket ✓ before it may return (30, 60, 90
+  days…). Without one, a small bucket recycles the same words daily. Not chosen.
+- **What the cap of 5 means (simulation, 2026-11-27; real intake to day 13, then ~6 new a day,
+  no misses).** Words enter the bucket at about the rate they were learned (5–10 a day), which
+  is more than 5 can clear. So from the first day any old word is due (≈ 2027-02-09 with a
+  30-day rest, 03-11 with 60, 04-10 with 90) there are 5 every day, with no quiet days, and the
+  queue only grows. The real gap becomes bucket size ÷ 5: ~750 old words → ~150 days; 2,000 →
+  ~400. Quiet days would need fewer than 5 new words a day over the long run. Whether gaps that
+  long are safe is the research question below.
+- **Research first:** how sparse review of a well-learned word can be before it is lost. Not yet
+  looked for.
+- **Design handoff** for the new screen and copy. Joker rules apply if he speaks.
+- **Timing rule:** the 20-minute limit must then cover bucket + drill together.
+- Whether the bucket asks for writing or for reading.
+
+**When.** Nothing qualifies before about 2027-01-09 (day-1 words' 30-day review, if none is missed
+or delayed). Specify and build before then.
+
+**Falsifier to carry into the spec.** Bucket miss rate: above ~1 in 10 → more slots or shorter
+gaps; near zero for a month → fewer.

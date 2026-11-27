@@ -40,9 +40,11 @@ items" (no same-day new words, arm B untouched, sealed items fixed).
    **Morning items come with every pre-drill check, unasked** (learner, 2026-11-24). When the learner
    starts the day's check (sends the ledger or asks for the check), the same reply also gives the
    morning items for the previous night's sheet: **2 unseen items on the night's point + 1 form
-   item**, English → Japanese, cold, built by the "Building check and sheet items" rules, never a
+   item** (from night 6, Sun 11-29: **1 meaning JP → EN + 1 production EN → JP on the point + 1 form +
+   1 review** — `decisions.md` 2026-11-26), cold, built by the "Building check and sheet items" rules, never a
    sealed item. Kept apart from the check on the sheet and in `results.md` (scored and timed
-   separately). No night sheet the night before (rest day, skipped night) → say so in one line and
+   separately). Night sheets from 11-29 add block E (mixed review on each point's own schedule) and
+   mix form sets in D — same decision. No night sheet the night before (rest day, skipped night) → say so in one line and
    give none. The learner never has to ask for them.
 2. **Split experiment** (`results.md` → Experiments). New kanji words paired by type; A gets a
    same-day reading check after the drill, B untouched. Read after ~12–14 words per arm.
@@ -52,6 +54,7 @@ items" (no same-day new words, arm B untouched, sealed items fixed).
 4. **Time per day** (`results.md` → Time per day, learner 2026-11-24): ask for a time on every
    part (check, morning items, split A, night sheet); drill minutes from the ledger. Update the row
    each time a part ends; separate columns + total. Never estimate an untimed part.
+   **All times in m:ss, in chat and in files — never decimal minutes** (learner, 2026-11-26).
    **Time prompts — every agent, every time** (`decisions.md` 2026-11-24, "Time prompts"):
    - **When giving** the pre-check + morning items, or the night sheet: first line of the reply is
      `⏱ Start the stopwatch.`
@@ -83,6 +86,10 @@ from check history if in doubt.
 - Misses have shifted from blanks to **family mix-ups** (入る/入れる, おととい/きのう, あの/この, 出る/外).
 - Leech history: 来る (3 ✗, now ✓✓), つとめる (3 ✗, now ✓), 後 (✗✓✗✓), 言う (reading ✗ on day 8).
 - Recurring ink: dropped dakuten (五 → こ), め/ぬ, レ/ル, に/た. Counted ✓ when learner confirms.
+- **Slips** (`results.md` Definitions, learner 2026-11-25): knew it, hand wrote something else
+  (話 → はんし d11). ✓ on confirmation, no extra slot, tag **[slip]**. Learner reports the same with
+  past-negative forms: recognised in English, then the past or the negative part dropped in writing.
+  Tally slips per check; if they climb, that is a production-under-load concept, not a word list issue.
 
 ## Open questions (one at a time)
 1. **Daily study time: decide after a fully timed week** (through Fri 11-27). Basis:
@@ -111,3 +118,9 @@ from check history if in doubt.
 - Agent slips, all logged: 違う shown for ちがう (rule added), やる left off day 5, two same-day new
   words used on night 1 (rules added, `decisions.md` "Building check and sheet items"), "July
   needs a faster pace" said on 11-24 before the arithmetic (corrected in `research/06`).
+- **App specs on hold (learner 2026-11-26: amend specs, build nothing yet):**
+  `spec/SPEC-resume-session.md` (resume a drill; time only while on screen) and the scroll regression
+  in `spec/SPEC-fix-overscroll.md` → Post-build audit. Until resume ships, compute a day's drill time
+  from item timestamps if the ledger shows a reload (items without a session row).
+- **Split experiment ended 2026-11-27: A ≈ B (8/13 vs 8/12) → same-day A check dropped** (`decisions.md`
+  2026-11-17, "Ended"). No more A/B assignment; arm-B rules no longer apply to new words.

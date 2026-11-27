@@ -243,3 +243,35 @@ is also meant to carry one button (SPEC-v7 §7), and `menu` is a third footer li
   measurement instrument for one person (brief §6, §9).
 
 **Until then:** add new internal pages as rows in `PAGES` in `components/Menu.tsx`.
+
+## Page refresh mid-drill loses the session row and the requeue (found 2026-11-25, day 11)
+**→ Spec drafted 2026-11-26: `spec/SPEC-resume-session.md` (not built).**
+**What happened.** The page refreshed during the day-11 drill. The ledger kept the 22 graded items
+before the refresh but wrote **no session row** for them, and the in-memory queue was lost: 先生 was
+missed (16:29:46) and its requeue ("five later") never came back. After reload a new deal started
+(due 5 · fresh 5), so the day's pile still reached 30, but one miss went un-retried in-session.
+**Cost.** Drill minutes for the day must be rebuilt from item timestamps (done by hand in
+`results.md`); a missed word skips its same-session retry. Schedule state itself held (items graded
+before the refresh kept their rungs).
+**Candidate fix (spec first):** persist the live queue and the open session (start time, counts) to
+IndexedDB on every grade, and resume it on load; or write a session row on `pagehide`. Measure: a
+forced reload mid-drill keeps the session row and the requeued miss. Cause of this refresh
+(learner, 11-25): pull-to-refresh while tracing the reveal → fixed separately in
+`spec/SPEC-fix-overscroll.md`. Other reloads (manual, tab discard, SW update) still lose the session.
+
+## 2026-11-27 · Old-word bucket (review of words past the 30-day return)
+
+**Asked for:** a separate review for old words, outside the 40-word pile, run on the same button
+before the drill, with its own screen and copy. Agreed in principle: `decisions.md` 2026-11-27.
+
+**Already there:** nothing. `lib/schedule.ts` keeps a rung-5 word on a 30-day loop.
+
+**Before a spec:** a research pass on long-term spacing; the daily budget; a design handoff;
+writing or reading. **Needed by:** about 2027-01-09, when the first words pass the 30-day review.
+
+## 2026-11-27 · Kanji on the answer screen of a new kana word
+
+`research/09` finding 6 (one study, by analogy): showing characters while the spoken word is still
+being learned did not help and sometimes hurt. The app shows the kanji from the first write. Not
+changed in `SPEC-kanji-upgrade.md`. Test if wanted: hide it until the word is at rung 4 and compare
+miss rates.
