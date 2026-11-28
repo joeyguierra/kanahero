@@ -71,4 +71,5 @@ Also: a normal drill day with the finger-tracing habit and no reload over the ne
 - **Not verified here:** pull-to-refresh itself (a browser gesture, not emulated), and Safari.
   The phone test above (×3 swipe during a reveal) is still the real gate, plus: /time scrolls
   as before. Phone + browser: to record.
-- **Status: built, uncommitted, awaiting the phone test.**
+- **Status: shipped (`84c0df8`). Phone test done and confirmed by the learner, 2026-11-28.**
+  Phone model and browser were not recorded.

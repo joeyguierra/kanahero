@@ -3,7 +3,8 @@
 // The list is data, not code. Two of its promises are load-bearing and are
 // checked by scripts/verify-strokes.mjs: every `write` is unique (it is the
 // item id, forever), and every `meaning` is unique (a kana word is prompted by
-// its meaning alone).
+// its meaning alone). A kana word marked `upgrade` comes back as its kanji
+// once it is known (SPEC-kanji-upgrade); that word is derived by upgradesOf.
 
 export type Script = "hiragana" | "katakana" | "kanji";
 
@@ -18,6 +19,10 @@ export interface Word {
   reading: string;
   /** the usual kanji form of a word asked in hiragana, for the answer screen */
   kanji: string | null;
+  /** a word asked in hiragana that comes back as its `kanji` once it is known */
+  upgrade?: true;
+  /** on a derived word only (upgradesOf): the kana word it took over from */
+  upgradeOf?: string;
   romaji: string;
   meaning: string;
   pos?: string;
@@ -35,11 +40,40 @@ export interface Cue {
  * What the prompt may show. Never the written form: a kanji word prompts with
  * its meaning and reading, a kana word with its meaning alone, because its
  * reading is its form. The script label says which form is being asked for.
+ *
+ * A kanji upgrade is prompted by its meaning alone: the learner already knows
+ * the word by sound, and the prompt keeps asking for it. Only its study trial
+ * (`trial`) carries the reading, beside the kanji drawing itself.
  */
-export function promptFor(w: Word): Cue {
-  return w.ask === "kanji"
+export function promptFor(w: Word, trial = false): Cue {
+  return w.ask === "kanji" && (trial || !w.upgradeOf)
     ? { script: w.ask, main: w.meaning, reading: w.reading }
     : { script: w.ask, main: w.meaning };
+}
+
+/**
+ * The kanji upgrades, derived from the marked kana words and never stored in
+ * the list: each is a new item, id = the kanji form, with its own history.
+ * In list order.
+ */
+export function upgradesOf(words: Word[]): Word[] {
+  return words.flatMap((w) =>
+    w.upgrade && w.kanji
+      ? [
+          {
+            order: w.order,
+            write: w.kanji,
+            ask: "kanji" as const,
+            reading: w.reading,
+            kanji: null,
+            upgradeOf: w.write,
+            romaji: w.romaji,
+            meaning: w.meaning,
+            pos: w.pos,
+          },
+        ]
+      : [],
+  );
 }
 
 export async function loadWords(): Promise<Word[]> {

@@ -18,11 +18,11 @@ function nextLine(next: NonNullable<TodayView["next"]>): string {
 }
 
 /** One card per word, due first: 1–7 in one row, 8–20 in two, 21–30 in
-    three; upper rows take the odd cards. Rows tighten into an overlap when
+    three, 31–40 in four; upper rows take the odd cards. Rows tighten into an overlap when
     they run out of width. */
 function Spread({ due, fresh }: { due: number; fresh: number }) {
   const n = due + fresh;
-  const rowCount = n <= 7 ? 1 : n <= 20 ? 2 : 3;
+  const rowCount = n <= 7 ? 1 : n <= 20 ? 2 : n <= 30 ? 3 : 4;
   const rows = Array.from(
     { length: rowCount },
     (_, r) => Math.floor(n / rowCount) + (r < n % rowCount ? 1 : 0),

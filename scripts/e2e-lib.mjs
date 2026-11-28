@@ -70,6 +70,7 @@ export async function playItem(page, ok = true, shown = null, { wait = false, vi
   const cueOnReveal = await page.locator(".v7Cue").count();
   const word = (await page.locator(".v7AnswerWord").innerText()).trim();
   const kanji = (await page.locator(".v7AnswerKanji").allInnerTexts()).join("");
+  const reading = (await page.locator(".v7AnswerReading:not(.v7AnswerKanji)").allInnerTexts()).join("");
   const revealBoard = await page.locator(".v7Board").boundingBox();
   // how many boxes of ink the answer shows
   const inkBoxes = Number(await page.locator(".v7InkPreview").getAttribute("data-boxes"));
@@ -83,7 +84,7 @@ export async function playItem(page, ok = true, shown = null, { wait = false, vi
   }
   await page.click(`button:has-text('${ok ? "GOT IT" : "MISSED"}')`);
   return {
-    trial, prompt, cue, cueAtStart, cueAfterInk, cueOnReveal, head, word, kanji, board, revealBoard,
+    trial, prompt, cue, cueAtStart, cueAfterInk, cueOnReveal, head, word, kanji, reading, board, revealBoard,
     cellsAtStart, inkBoxes, splitSeen,
   };
 }

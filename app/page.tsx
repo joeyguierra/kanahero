@@ -16,14 +16,16 @@ import { localDay } from "@/lib/schedule";
 import {
   applyGrade,
   buildQueue,
+  deckOf,
   getServerState,
   getState,
   setState,
   subscribeState,
   todayView,
+  type Deck,
   type QueueItem,
 } from "@/lib/store";
-import { loadWords, type Word } from "@/lib/words";
+import { loadWords, upgradesOf, type Word } from "@/lib/words";
 
 type Phase = "today" | "loop" | "done" | "credits" | "menu";
 
@@ -35,6 +37,8 @@ interface Session {
   queue: QueueItem[];
   due: number;
   fresh: number;
+  /** how many of `fresh` are kanji upgrades */
+  up: number;
 }
 
 /** the session's ledger row; returns how many minutes it took */
@@ -48,6 +52,7 @@ function closeSession(session: Session, results: LoopResult[]): number {
       endTs,
       due: session.due,
       fresh: session.fresh,
+      up: session.up,
       done: results.length,
       missed: results.filter((r) => !r.ok).length,
     });
@@ -66,13 +71,14 @@ function recordGrade(session: Session, item: QueueItem, ok: boolean, ms: number)
     trial: item.trial,
     ok,
     ms,
+    ...(item.upgradeOf ? { upgradeOf: item.upgradeOf } : {}),
   });
 }
 
 /** fix the queue and the day for one deal */
-function startSession(order: string[], more: boolean): Session | null {
+function startSession(deck: Deck, more: boolean): Session | null {
   const day = localDay(new Date());
-  const queue = buildQueue(getState(), order, day, more);
+  const queue = buildQueue(getState(), deck, day, more);
   if (queue.length === 0) return null;
   return {
     day,
@@ -80,6 +86,7 @@ function startSession(order: string[], more: boolean): Session | null {
     queue,
     due: queue.filter((q) => !q.trial).length,
     fresh: queue.filter((q) => q.trial).length,
+    up: queue.filter((q) => q.trial && q.upgradeOf).length,
   };
 }
 
@@ -109,12 +116,24 @@ export default function App() {
     return () => document.removeEventListener("visibilitychange", tick);
   }, []);
 
-  const order = useMemo(() => words?.map((w) => w.write) ?? [], [words]);
+  // the list, and the kanji upgrades derived from it: the loop looks up both,
+  // the scheduler deals new words from the list alone
+  const { all, deck } = useMemo(() => {
+    const list = words ?? [];
+    const ups = upgradesOf(list);
+    return {
+      all: [...list, ...ups],
+      deck: deckOf(
+        list.map((w) => w.write),
+        ups.map((w) => [w.upgradeOf!, w.write]),
+      ),
+    };
+  }, [words]);
 
   if (!words) return <main className="frame" />;
 
   function deal(more: boolean) {
-    const next = startSession(order, more);
+    const next = startSession(deck, more);
     if (!next) return;
     setToday(next.day);
     setSession(next);
@@ -135,7 +154,7 @@ export default function App() {
     return (
       <Loop
         key={session.startTs}
-        words={words}
+        words={all}
         queue={session.queue}
         onGrade={(item, ok, ms) => recordGrade(session, item, ok, ms)}
         onFinish={(results) => {
@@ -156,7 +175,7 @@ export default function App() {
         day={session.day}
         results={summary.results}
         minutes={summary.minutes}
-        next={nextDueLine(todayView(state, order, session.day).next, session.day)}
+        next={nextDueLine(todayView(state, deck, session.day).next, session.day)}
         onClose={home}
       />
     );
@@ -165,7 +184,7 @@ export default function App() {
   return (
     <Today
       day={today}
-      view={todayView(state, order, today)}
+      view={todayView(state, deck, today)}
       onDeal={deal}
       onExport={() => void exportLedger(today)}
       onCredits={() => setPhase("credits")}

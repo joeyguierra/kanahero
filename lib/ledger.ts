@@ -14,6 +14,8 @@ export interface ItemRow {
   ok: boolean;
   /** prompt shown → grade tapped */
   ms: number;
+  /** on every row of a kanji upgrade: the kana word it took over from */
+  upgradeOf?: string;
 }
 
 export interface SessionRow {
@@ -22,7 +24,10 @@ export interface SessionRow {
   startTs: number;
   endTs: number;
   due: number;
+  /** every study trial, upgrades included */
   fresh: number;
+  /** how many of `fresh` were kanji upgrades; absent on rows from before them */
+  up?: number;
   done: number;
   missed: number;
 }

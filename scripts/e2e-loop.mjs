@@ -14,9 +14,13 @@
 //   6. next day: due first, oldest and list order, then new in the room left;
 //      a prompt left alone waits its three seconds, a tapped one does not;
 //      a got-it climbs a rung; a miss then a same-day got-it does not
-//   7. the pile stops at 30: what does not fit slides to tomorrow, and a word
+//   7. the pile stops at 40: what does not fit slides to tomorrow, and a word
 //      asked in hiragana shows its kanji form on the answer
 //   8. state saved under the old sets is dropped; the v6 blob is left alone
+//   9. a known kana word comes back as its kanji (SPEC-kanji-upgrade): Today
+//      takes a fourth row past 30 cards; the upgrade's trial draws the kanji
+//      with its reading, every later prompt and SHOW PROMPT give the meaning
+//      alone; the ledger links it to its kana word
 
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -282,12 +286,12 @@ assert.deepEqual(item(order[0]), [1, "2026-11-16"], "missed, then got: no climb"
 assert.deepEqual(item(order[1]), [2, "2026-11-18"], "got on a fresh day: rung 2, +3 days");
 console.log("6. next day: due first then new; a tap hurries the prompt; a got-it climbs, a same-day one does not");
 
-// --- 7. the pile stops at 30 ---
-// Seeded: 28 words already written today, five more due — ゆうべ among them.
+// --- 7. the pile stops at 40 ---
+// Seeded: 38 words already written today, five more due — ゆうべ among them.
 await page.clock.setFixedTime(DAY3);
 await page.evaluate((order) => {
   const items = {};
-  order.slice(30, 58).forEach((id) => {
+  order.slice(30, 68).forEach((id) => {
     items[id] = { id, rung: 2, due: "2026-11-19", lastDay: "2026-11-16", seen: true };
   });
   [order[17], order[2], order[3], order[4], order[5]].forEach((id, k) => {
@@ -298,7 +302,7 @@ await page.evaluate((order) => {
 }, order);
 await page.reload();
 await page.waitForSelector(".v7Counts");
-assert.equal(await big(page), "2 due · 0 new", "28 written today leaves room for two, and none of them new");
+assert.equal(await big(page), "2 due · 0 new", "38 written today leaves room for two, and none of them new");
 await page.click("button:has-text('DEAL')");
 const last = [await playItem(page, true), await playItem(page, true)];
 assert.deepEqual(last.map((s) => s.word), ["ゆうべ", order[2]], "oldest due first, then list order");
@@ -309,7 +313,7 @@ assert.equal(await page.locator(".v7Done .v7Next").innerText(), "next: 3 due tom
 await page.click("button:has-text('CLOSE')");
 assert.equal(await big(page), "next: Tue 17 Nov · 3 due", "the three that did not fit slide a day");
 assert.equal(await page.locator(".v7Today button.actionBar").count(), 0, "a full pile has no button");
-console.log("7. the pile stops at 30; the rest slide a day; the kanji form shows on the answer");
+console.log("7. the pile stops at 40; the rest slide a day; the kanji form shows on the answer");
 await context.close();
 
 // --- 8. old state ---
@@ -339,6 +343,107 @@ await page2.waitForSelector(".v7Counts");
 assert.equal(await big(page2), "0 due · 10 new", "the queue starts clean");
 assert.equal(await page2.evaluate(() => localStorage.getItem("kanahero:v1")), V6, "the v6 blob is left as it was");
 console.log("8. state saved under the old sets is dropped; nothing is imported");
+
+// --- 9. a known kana word comes back as its kanji ---
+const up = await browser.newContext(VIEW);
+const page3 = await up.newPage();
+page3.setDefaultTimeout(20000);
+page3.on("pageerror", (e) => errors.push(String(e)));
+const NORU = LIST.find((w) => w.write === "のる");
+assert.deepEqual([NORU.kanji, NORU.upgrade], ["乗る", true], "のる is marked for upgrade");
+assert.ok(order.indexOf("のる") > 4 && order.indexOf("のる") < 40, "the seeds below lean on where のる sits");
+const KANJI_CUE = `KANJI ${NORU.meaning}`;
+const seed = (items) =>
+  page3.evaluate((items) => localStorage.setItem("kanahero:v7", JSON.stringify({ version: 2, items })), items);
+// のる is known (rung 4) and was last written yesterday: parked, its kanji ready
+const parked = { のる: { id: "のる", rung: 4, due: "2026-11-29", lastDay: "2026-11-15", seen: true } };
+
+await page3.clock.setFixedTime(DAY3);
+await page3.goto(BASE);
+await page3.waitForSelector(".v7Counts");
+// 9a. 25 reviews, ten new words and the upgrade: 36 cards
+await seed({
+  ...parked,
+  ...Object.fromEntries(
+    order.slice(40, 65).map((id) => [id, { id, rung: 1, due: "2026-11-16", lastDay: "2026-11-15", seen: true }]),
+  ),
+});
+await page3.reload();
+await page3.waitForSelector(".v7Counts");
+assert.equal(await big(page3), "25 due · 11 new", "the upgrade counts as new; the parked kana word is not due");
+assert.equal(await page3.locator(".v7SpreadCard").count(), 36);
+assert.equal(await page3.locator(".v7SpreadRow").count(), 4, "more than thirty cards take a fourth row");
+const spreadBox = await page3.locator(".v7Spread").boundingBox();
+const countsBox = await page3.locator(".v7Counts").boundingBox();
+const dealBox = await page3.locator("button:has-text('DEAL')").boundingBox();
+assert.ok(spreadBox.y >= countsBox.y + countsBox.height, "four rows sit under the counts");
+assert.ok(spreadBox.y + spreadBox.height <= dealBox.y, "and above the button");
+assert.ok(dealBox.y + dealBox.height <= 844, "with the button on screen");
+
+// 9b. the upgrade alone with ten new words: it is dealt first, as a study trial
+await seed(parked);
+await page3.reload();
+await page3.waitForSelector(".v7Counts");
+assert.equal(await big(page3), "0 due · 11 new");
+await page3.click("button:has-text('DEAL')");
+let u = await readPrompt(page3);
+assert.deepEqual(
+  [u.trial, u.prompt, u.head],
+  [true, `KANJI のる ${NORU.meaning}`, "PROMPT 1 / 11"],
+  "the trial draws the kanji, with the reading and the meaning",
+);
+const trialRun = await playItem(page3, false, u);
+assert.deepEqual([trialRun.word, trialRun.reading, trialRun.kanji], ["乗る", "のる", ""], "the answer shows the reading");
+assert.equal(trialRun.cue, KANJI_CUE, "SHOW PROMPT: the meaning and the label, no reading");
+const between = [];
+for (let i = 0; i < 5; i++) between.push(await playItem(page3, true));
+assert.deepEqual(between.map((s) => s.word), order.slice(0, 5), "then the new words, from the top of the list");
+u = await readPrompt(page3);
+assert.deepEqual([u.trial, u.prompt], [false, KANJI_CUE], "the retry after a missed trial: meaning only");
+const retry = await playItem(page3, true, u);
+assert.deepEqual([retry.word, retry.cue], ["乗る", KANJI_CUE]);
+await page3.waitForSelector("canvas.ink");
+await page3.click(".quit");
+await page3.waitForSelector(".v7Today");
+assert.equal(await big(page3), "0 due · 5 new", "the day's upgrade is spent; five new words are left");
+let st3 = await stored(page3);
+assert.deepEqual([st3.upSpent, st3.newSpent], [{ day: "2026-11-16", n: 1 }, { day: "2026-11-16", n: 5 }]);
+assert.deepEqual([st3.items["乗る"].rung, st3.items["乗る"].due], [1, "2026-11-17"]);
+assert.deepEqual([st3.items["のる"].rung, st3.items["のる"].lastDay], [4, "2026-11-15"], "the kana item is left as it was");
+let rows3 = await ledger(page3);
+const upRows = rows3.filter((r) => r.type === "item" && r.word === "乗る");
+assert.deepEqual(upRows.map((r) => [r.trial, r.ok, r.upgradeOf]), [[true, false, "のる"], [false, true, "のる"]]);
+assert.ok(
+  rows3.filter((r) => r.type === "item" && r.word !== "乗る").every((r) => !("upgradeOf" in r)),
+  "no other row carries the link",
+);
+const upSession = rows3.filter((r) => r.type === "session").at(-1);
+assert.deepEqual([upSession.due, upSession.fresh, upSession.up, upSession.done, upSession.missed], [0, 11, 1, 7, 1]);
+
+// 9c. the next day it is a review on its own ladder, at its kana word's place
+await page3.clock.setFixedTime(new Date(2026, 10, 17, 10, 0));
+await page3.reload();
+await page3.waitForSelector(".v7Counts");
+assert.equal(await big(page3), "6 due · 10 new");
+await page3.click("button:has-text('DEAL')");
+for (let i = 0; i < 5; i++) await playItem(page3, true);
+u = await readPrompt(page3);
+assert.deepEqual([u.trial, u.prompt], [false, KANJI_CUE], "a later prompt: the label and the meaning, no reading");
+const review = await playItem(page3, true, u);
+assert.deepEqual([review.word, review.cue, review.reading], ["乗る", KANJI_CUE, "のる"]);
+await page3.waitForSelector("canvas.ink");
+await page3.click(".quit");
+await page3.waitForSelector(".v7Today");
+st3 = await stored(page3);
+assert.deepEqual([st3.items["乗る"].rung, st3.items["乗る"].due], [2, "2026-11-20"]);
+rows3 = await ledger(page3);
+assert.deepEqual(
+  rows3.filter((r) => r.type === "item" && r.word === "乗る").map((r) => r.upgradeOf),
+  ["のる", "のる", "のる"],
+  "every row of the upgraded word carries upgradeOf",
+);
+assert.equal(rows3.filter((r) => r.type === "session").at(-1).up, 0);
+console.log("9. upgrade: four rows past 30 cards; a kanji trial with its reading, then meaning only; the ledger links it");
 
 assert.deepEqual(errors, [], "no page errors");
 await browser.close();

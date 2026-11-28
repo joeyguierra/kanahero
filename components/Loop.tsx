@@ -15,7 +15,8 @@
 //           read-only; WRITE goes back to the boxes. The prompt is gone, and
 //           comes back on request: SHOW PROMPT puts the cue under the board
 //           (script, meaning, a kanji word's reading — never the written
-//           form), and it goes again when the pen next touches the board.
+//           form; a kanji upgrade shows no reading there or on any prompt
+//           after its trial), and it goes again when the pen next touches it.
 //           Looking costs nothing; it is not a miss.
 //   reveal  the model strokes and your ink, and you grade yourself: OVERLAY
 //           draws the model across the board over the ink, SPLIT puts the
@@ -140,7 +141,10 @@ export default function Loop({
   };
   const total = dealt.length;
   const position = total - queue.length + 1;
-  const cue = promptFor(word);
+  /** the prompt screen's cue; a trial's carries the reading, whatever the word */
+  const cue = promptFor(word, current.trial);
+  /** SHOW PROMPT's cue: never a trial's */
+  const peekCue = promptFor(word);
   const reveal = step === "reveal";
 
   /** hand over the board, whatever the prompt was in the middle of */
@@ -359,9 +363,9 @@ export default function Loop({
           </div>
           {peek && (
             <div className="v7CueBody">
-              <div className="v7CueScript">{cue.script}</div>
-              <div className="v7CueMain">{cue.main}</div>
-              {cue.reading && <div className="v7CueReading v7Jp">{cue.reading}</div>}
+              <div className="v7CueScript">{peekCue.script}</div>
+              <div className="v7CueMain">{peekCue.main}</div>
+              {peekCue.reading && <div className="v7CueReading v7Jp">{peekCue.reading}</div>}
             </div>
           )}
         </div>

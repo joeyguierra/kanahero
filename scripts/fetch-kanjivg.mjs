@@ -1,6 +1,8 @@
 // Vendors kanji stroke SVGs from KanjiVG (kanjivg.tagaini.net) into
 // public/strokes/<hex>.svg, plus the upstream license into public/licenses/.
-// Characters: every distinct kanji in the word list, public/words/n5.json.
+// Characters: every distinct kanji in the word list, public/words/n5.json —
+// in a word's written form, and in the kanji form of a word marked `upgrade`
+// (SPEC-kanji-upgrade: that form is dealt once the kana word is known).
 // Run once at setup: node scripts/fetch-kanjivg.mjs [weight]
 // Nothing is fetched at runtime — these files ship with the app.
 //
@@ -41,14 +43,16 @@ const INNER_WIDTH = +(STROKE_WIDTH / SCALE).toFixed(4);
 
 const isKanji = (ch) => {
   const c = ch.codePointAt(0);
-  return (c >= 0x4e00 && c <= 0x9fff) || (c >= 0x3400 && c <= 0x4dbf);
+  // 々 (U+3005, the repeat mark of 色々) sits outside the kanji blocks; KanjiVG has it
+  return (c >= 0x4e00 && c <= 0x9fff) || (c >= 0x3400 && c <= 0x4dbf) || c === 0x3005;
 };
 
 /** every distinct kanji the word list asks for, in first-seen order */
 export async function kanjiInWords() {
   const chars = [];
   for (const w of JSON.parse(await readFile(WORDS, "utf8"))) {
-    for (const ch of w.write) if (isKanji(ch) && !chars.includes(ch)) chars.push(ch);
+    const forms = w.upgrade && w.kanji ? w.write + w.kanji : w.write;
+    for (const ch of forms) if (isKanji(ch) && !chars.includes(ch)) chars.push(ch);
   }
   return chars;
 }

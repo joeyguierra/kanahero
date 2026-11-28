@@ -116,6 +116,23 @@ ear and motivation; never becomes a requirement.
 the 1-day ones over ~4 weeks. Then the rest day moves, or the day before it takes no new
 words (would need an app change: spec first).
 
+**Held, with a review date (2026-11-28, the first planned rest day).** Learner asked whether
+Saturday could be optional, or drill-only (app drill, no pre-drill check, no night sheet): "if I
+have time to doom scroll I have time to drill." **Decision: fixed 6 days through Sat 2026-12-19**
+(four rest Saturdays: 11-28, 12-05, 12-12, 12-19), then decide with the numbers, next to the
+2026-12-21 sealed retests.
+- Why fixed and not optional: an optional day is self-selected (drilled on sharp days, skipped on
+  flat ones), so neither kind of Saturday could be read. The "Reverses if" test above needs the
+  same condition four weeks running: Friday's new words, first checked after an untouched 2-day gap.
+- To read on 12-19: first-check scores of Friday's new words vs 1-day words · Sunday fresh words
+  (0 expected when the pile refills) · weekly minutes · the learner's own report on whether the
+  rest day still feels good.
+- If Saturdays are wanted after that: a **rule from a week boundary** ("Saturday = app drill only,
+  every week"), never a choice made on the day. What a drill-only Saturday would change: reviews
+  stay on schedule, up to 10 new words that day and new words again on Sunday (more pace); the
+  check keeps its own schedule; that Saturday's new kanji get no same-day check; Friday's words
+  are no longer a clean 2-day gap.
+
 ## 2026-11-23 · Nightly exercise — trial (grammar, one point per night)
 
 **Decision.** A ~10-minute exercise, last thing before sleep, on paper. One grammar point per
@@ -337,6 +354,32 @@ flatten; exact intervals matter little (Latimier 2021).
 **Reverses if.** Spec §5: upgrades need as many attempts as ordinary new kanji words (~15
 upgrades in); a full pile passes 20 minutes; first-try ✓ on due words drops below its week-2
 level; late reviews that waited miss clearly more than those on time.
+
+**Amended 2026-11-28 (workshop, spec reviewed against the code; `spec/SPEC-kanji-upgrade.md` §9).**
+- **Part 1 changes: the kana word stops when it is known.** At rung 4 (three correct returns in a
+  row) a marked kana word is *parked*: never dealt again, no 14-day or 30-day review. Its kanji is
+  dealt from the following day, never on a day the kana word was written. Learner: after three
+  correct returns the next is always the kanji; a kanji and its kana never share a drill. This
+  replaces "the kana item retires on the upgrade's first write".
+- **Part 4 gains two definitions.** A late review counts as held once it is 3 or more days past
+  due; rest days and missed days count. An upgrade that has waited 3 days moves ahead of new words,
+  not ahead of young reviews; if young reviews alone fill the 40 it keeps waiting.
+- **Today's spread:** four rows for 31–40 cards.
+- **Word data:** both `public/words/n5.json` and `research/01-n5-week1-words.json` are marked and
+  stay identical. Audit of the word data and related files: end of week 4 (`backlog.md`).
+- **Counting:** upgrades stay inside "new" on Today; session rows carry a separate upgrade count,
+  item rows `upgradeOf`. New words per day in `results.md` = new − upgrades. To revisit.
+- **Paper check:** when the kanji gets its first check, the kana word leaves the check queue.
+- **Verdict date:** about 15 upgrades arrive around mid-December, not in two weeks (12 of the 35
+  words introduced by day 13).
+- **Not ruled, left open on purpose:** whether kanji-first words (電気, 後) should start in kana.
+  Today the form rule (`research/01` §1.2, grade C) decides by kanji level, not by learning order.
+  The spec's falsifiers 1 and 2 compare the two paths; changing the kanji-first words now would
+  remove the comparison group.
+- **Why parking is safe enough to try:** the meaning-only prompt keeps asking for the word, and
+  about one marked word becomes known a day against a cap of 3, so upgrades should rarely queue.
+  New falsifier (spec §5.5): upgrades that waited longer after the kana word's last write miss
+  clearly more on the trial day.
 
 ## 2026-11-27 · Old-word bucket — agreed in principle, not built
 

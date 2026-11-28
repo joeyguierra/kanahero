@@ -237,6 +237,11 @@ a doctrine test, the conflict gets surfaced, not ignored.
   - /time: the learner entered today's check (9:37) and morning (3:26, corrected from 9:26) on the
     phone — ahead of the 11-29 start in `decisions.md` 2026-11-24.
 
+- **2026-11-28 (Sat) · rest.** First planned rest day (`decisions.md` 2026-11-22). No check, no
+  drill, no night sheet. Not a numbered drill day. Learner considered a drill-only day and chose to
+  hold fixed 6 days through 12-19 (`decisions.md`, amendment 2026-11-28). Day-13 new word 高い gets
+  its first check on 11-29 after a 2-day gap (n = 1 for the rest-day test this week).
+
 ## Time per day
 <!-- added 2026-11-24 at the learner's request. All times m:ss (learner, 2026-11-26: no decimal minutes). Drill = ledger sessions summed.
      Check = pre-drill check. Morning = the nightly point's morning items. Split A = same-day
@@ -255,7 +260,8 @@ a doctrine test, the conflict gets surfaced, not ignored.
 | 10 | 11-24 | 8:00 | 5:34 | 11:05 | — | 17:06 | **41:45** |
 | 11 | 11-25 | 13:13 (check + morning combined; not split) | ↑ | 12:52 | ~0:05 (learner est. 3–6 s; not in total) | 16:26 | **42:31** |
 | 12 | 11-26 | 8:17 | 3:28 | 7:06 | 0:30 | 16:27 | **35:48** |
-| 13 | 11-27 | 9:37 | 3:26 | 8:18 | — (split ended) | pending | **21:21** so far |
+| 13 | 11-27 | 9:37 | 3:26 | 8:18 | — (split ended) | 15:00 | **36:21** |
+| — | 11-28 | rest | | | | | |
 
 - Checks before day 8 were untimed; the grammar/listening baseline (day 9) is a one-off and not in
   the table. From night 2 on, time the night sheet and the split A check.
@@ -491,6 +497,29 @@ a doctrine test, the conflict gets surfaced, not ignored.
     oldest due first, the rest slide to 11-30** (which already has 16 + 中 ページ もの 時間 つかう).
     12-04 → おととい 買う あの 言う 出る. 12-11 → 何 見る 人 一 今 食べる 新しい.
 
+- **2026-11-27 (day 13, after drilling) — set-phrase meaning baseline, 32 phrases, in chat**
+  - Not a pre-drill check and not in its schedule. Phrase shown as written (kana), learner typed the
+    English meaning; untimed; "?" = blank. One pass, corrected after scoring.
+  - The list is **not a standard list**: 32 phrases chosen and tiered by the agent's judgment
+    (workshop on extending the word queue). The app's N5 pool (718 entries) holds almost no set
+    phrases; MLC counts 46 greetings but its list could not be read.
+  - **Daily core: 10 / 10.** おはようございます · こんにちは · こんばんは · おやすみなさい · さようなら ·
+    じゃあ また · ありがとうございます · どういたしまして · すみません · ごめんなさい.
+  - **Everyday situations: 9 / 12.** ✓ はじめまして · どうぞ よろしく おねがいします · こちらこそ ·
+    おねがいします · いただきます · ごちそうさまでした · ただいま · おかえりなさい · おげんきですか.
+    **✗ いってきます → "let's go"** (actual: I'm off, said by the one leaving home) ·
+    **いってらっしゃい "?"** (see you, said to the one leaving) · **しつれいします "?"** (excuse me,
+    entering or leaving).
+  - **Less common, service and occasions: 7 / 10.** ✓ いらっしゃいませ · おめでとうございます · もしもし ·
+    おつかれさまでした · おひさしぶりです · けっこうです · しょうしょう おまちください.
+    **✗ おだいじに "?"** (get well soon) · **ごめんください "?"** (anyone home?) ·
+    **いかがですか "?"** (how about it? / would you like some?).
+  - **Total 26 / 32.**
+  - Measures recognition of meaning only; says nothing about producing the phrases. The coming-home
+    pair (ただいま / おかえりなさい) was known, the leaving pair (いってきます / いってらっしゃい) was not.
+  - No rule, no night-sheet slot and no retest date attached (learner, 2026-11-27: "matters a
+    little"; reference table only).
+
 ## Experiments
 - **Split: same-day reading check, from 2026-11-17** (`decisions.md`, same date)
   - Each day's new kanji words split in pairs (matched by type), one of each pair to A, one to B.
@@ -647,6 +676,21 @@ a doctrine test, the conflict gets surfaced, not ignored.
     correct Japanese, same idea; the item asked for これ standing alone: これはわたしのカメラじゃありません;
     learner may re-score) · ✓ 33 入れる → put in (past) → 入れました (drop-る past ✓; night 4 had つけりました).
     **2.5 / 3 · form 1 / 1.**
+
+- **Night 5 — 2026-11-27, ~19:55 → 20:10 · point: Minna L3 ここ/そこ/あそこ · どこ.** Paper, photo,
+  **self-graded in red: 10 / 13**, model-checked (agrees). **Time 15:00.** Last night in the fixed
+  3·4·4·5 shape. Words checked against day-13 new (高い); 聞く 出る kept out of D.
+  - **B: 4 / 4.** カメラはそこです · パーティーはどこですか · あそこはわたしのホテルです ("My hotel is
+    over there") · ここはどこですか ("Where is this?").
+  - **C: 4 / 4.** バスはどこですか · 先生はあそこです · カメラはそこですか · ここはクラスじゃありません.
+    こ/そ/あ/ど place words 8 / 8 across B and C.
+  - **D: 2 / 5.** ✓ いる → wasn't → **いませんでした** (third try; night 3 いりません, night 4 いません) ·
+    ✓ できませんでした. ✗ つける → turned on → **つけりました** (night 4 the same; morning 11-26 ✓) ·
+    ✗ 入れる → didn't put in → **入れりませんでした** (morning 11-27 入れました ✓) · ✗ もつ → hold →
+    **もつます** (u-verb stem つ → ち missed).
+  - **Pattern (n small):** drop-る stem right on **i + る** (いる, できる, 見る) but り added on
+    **e + る** (つける, 入れる) in the night ladder — both right in morning items. Watch whether e + る
+    holds in E/D from 11-29. "wasn't" → ませんでした now ✓.
 
 ## Week 1 review — 2026-11-15 → 11-22
 - **Drill:** 7 of 8 days · 100.6 min · 63 words introduced · 254 attempts, 193 ✓ (76%).

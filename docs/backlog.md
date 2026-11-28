@@ -275,3 +275,52 @@ writing or reading. **Needed by:** about 2027-01-09, when the first words pass t
 being learned did not help and sometimes hurt. The app shows the kanji from the first write. Not
 changed in `SPEC-kanji-upgrade.md`. Test if wanted: hide it until the word is at rung 4 and compare
 miss rates.
+
+## 2026-11-28 · Guaranteed new-word slots when young reviews fill the pile (40 + 3)
+
+**Asked for (learner, 2026-11-28, to explore, not decided):** on a day when young reviews alone
+fill the 40, there is no room for a new word. Idea: a few extra slots for new words on top of the
+pile on those days only, e.g. 40 + 3, so no drill day has zero new words.
+
+**Already there:** nothing. `SPEC-kanji-upgrade.md` §2.4 deals young reviews first and new words
+only in the room left. With `PILE_MAX = 30`, reviews cut new words to 4, 0 and 1 on days 6, 8 and
+13 (`results.md`). Whether this still happens at 40 is not yet measured.
+
+**For it (agent's reasoning, not findings):**
+- Pace: a floor keeps new words arriving on spike days (the day after a rest or missed day, when
+  two days' reviews land together). July 2027 works "with almost no slack" (`research/06`).
+- It cannot run away: each new word brings three young returns in its first 12 days, so 3 new a
+  day adds about 9 young reviews a day at most. A pile full of young reviews is a spike, not a
+  steady state.
+- Extra slots keep every young review on time. The alternative, reserving 3 of the 40 for new
+  words, would push up to 3 young reviews back a day.
+
+**Against / to check:**
+- It adds work on what is already the heaviest day. 43 words at the measured 12 to 17 s is about
+  9 to 12 min plus trials, against the 20-minute limit.
+- New words met on heavy days may stick worse.
+
+**Open before a spec:** the number (3 is arithmetic); whether a waiting upgrade may use these
+slots; whether MORE still applies on such a day; how Today shows a pile over 40 (the spread is
+four rows of ten).
+
+**When:** not with the kanji-upgrade build. The 40 pile needs about two weeks of its own numbers
+first: count the drill days with 0 to 2 new words. If there are none, drop this.
+
+**Falsified by:** next-day first check of words introduced on extra-slot days clearly below words
+introduced on ordinary days; or a 43-word session passing 20 minutes.
+
+## 2026-11-28 · Audit the word data and its related files — end of week 4 (Fri 2026-12-11)
+
+**Asked for (learner, 2026-11-28):** revisit `public/words/n5.json` and the files around it for
+refactoring or simplification, once the kanji upgrade has shipped.
+
+**Why:** the list now lives in two byte-identical files (`public/words/n5.json`,
+`docs/research/01-n5-week1-words.json`); upgrades add `upgrade` marks and words derived at run time
+(`SPEC-kanji-upgrade.md` §2.2–2.3); the item id is still the written word, which same-sounding
+words will not fit; and the queue past 210 is coming. Session rows now carry `up` beside `fresh`
+(to revisit, same date).
+
+**To look at:** one source file or two · whether derived words should be data · what the item id
+is · the fields nothing reads (`source`, `note`, `pos`) · how `fresh` / `up` are counted.
+Nothing changes before the audit; it produces a spec or a "leave as is".
